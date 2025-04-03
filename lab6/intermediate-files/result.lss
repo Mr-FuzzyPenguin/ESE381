@@ -1,0 +1,2331 @@
+   1               		.file	"main.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__RAMPZ__ = 0x3b
+   6               	__CCP__ = 0x34
+   7               	__tmp_reg__ = 0
+   8               	__zero_reg__ = 1
+   9               		.text
+  10               	.Ltext0:
+  11               		.cfi_sections	.debug_frame
+  12               		.file 0 "/home/penguin/Code/projects/ese381/review/lab6" "main.c"
+  13               	.global	init_twi0_SerLCD
+  15               	init_twi0_SerLCD:
+  16               	.LFB5:
+  17               		.file 1 "main.c"
+   1:main.c        **** /*
+   2:main.c        ****  * write_SerLCD_image_TWI0.c
+   3:main.c        ****  *
+   4:main.c        ****  * Created: 3/24/2025 22:1:12 PM
+   5:main.c        ****  *
+   6:main.c        ****  * Author : Stanley Cokro and Katherine Trusinski
+   7:main.c        ****  * ID: 115120484
+   8:main.c        ****  * Lab Section: 1
+   9:main.c        ****  * Description: Using the SerLCD with the setup
+  10:main.c        ****  *              using I2C configuration.
+  11:main.c        ****  */
+  12:main.c        **** 
+  13:main.c        **** #include <avr/io.h>
+  14:main.c        **** #include <stdint.h>
+  15:main.c        **** #include <stdio.h>
+  16:main.c        **** 
+  17:main.c        **** #define F_CPU 4000000UL
+  18:main.c        **** #include <util/delay.h>
+  19:main.c        **** 
+  20:main.c        **** 
+  21:main.c        **** char dsp_buff1[21];
+  22:main.c        **** char dsp_buff2[21];
+  23:main.c        **** char dsp_buff3[21];
+  24:main.c        **** char dsp_buff4[21];
+  25:main.c        **** 
+  26:main.c        **** void init_twi0_SerLCD (void)
+  27:main.c        **** {
+  18               		.loc 1 27 1 view -0
+  19               		.cfi_startproc
+  20               	/* prologue: function */
+  21               	/* frame size = 0 */
+  22               	/* stack size = 0 */
+  23               	.L__stack_usage = 0
+  28:main.c        ****     // 29.3.2.1 Initialization
+  29:main.c        ****     // 29.5.1   Control Register A
+  30:main.c        ****     // This configuration gives us
+  31:main.c        ****     // I2C, SDASETUP for 8 clock cycles, SDAHOLD is 50 nano seconds (for some time) and disable fas
+  32:main.c        ****     TWI0.CTRLA = TWI_INPUTLVL_I2C_gc | TWI_SDASETUP_8CYC_gc | TWI_SDAHOLD_50NS_gc;
+  24               		.loc 1 32 4 view .LVU1
+  25               		.loc 1 32 15 is_stmt 0 view .LVU2
+  26 0000 E0E0      		ldi r30,0
+  27 0002 F9E0      		ldi r31,lo8(9)
+  28 0004 84E1      		ldi r24,lo8(20)
+  29 0006 8083      		st Z,r24
+  33:main.c        **** 
+  34:main.c        ****     // 29.3.2.1.1 Master Initialization
+  35:main.c        ****     // The Master Baud Rate
+  36:main.c        ****     // because we set the mbaud (master baud) rate to 1,
+  37:main.c        ****     // the F_{SCL} = around 304 KHz
+  38:main.c        ****     // this is "as fast" as possible that we can get it running with a 4 MHz clock.
+  39:main.c        ****     TWI0.MBAUD = 1;
+  30               		.loc 1 39 4 is_stmt 1 view .LVU3
+  31               		.loc 1 39 15 is_stmt 0 view .LVU4
+  32 0008 81E0      		ldi r24,lo8(1)
+  33 000a 8683      		std Z+6,r24
+  40:main.c        **** 
+  41:main.c        ****     // Must write a '1' to the enable twi master
+  42:main.c        ****     // "Writing a '1' to the Enable TWI Master (ENABLE) bit in the Master Control A (TWIn.MCTRLA) r
+  43:main.c        ****     TWI0.MCTRLA = TWI_ENABLE_bm;
+  34               		.loc 1 43 4 is_stmt 1 view .LVU5
+  35               		.loc 1 43 16 is_stmt 0 view .LVU6
+  36 000c 8383      		std Z+3,r24
+  44:main.c        **** 
+  45:main.c        ****     // "The Bus State (BUSSTATE) bit field from the Master Status (TWIn.MSTATUS) register must be s
+  46:main.c        ****     TWI0.MSTATUS = TWI_BUSSTATE_IDLE_gc;
+  37               		.loc 1 46 4 is_stmt 1 view .LVU7
+  38               		.loc 1 46 17 is_stmt 0 view .LVU8
+  39 000e 8583      		std Z+5,r24
+  40               	/* epilogue start */
+  47:main.c        **** }
+  41               		.loc 1 47 1 view .LVU9
+  42 0010 0895      		ret
+  43               		.cfi_endproc
+  44               	.LFE5:
+  46               	.global	write_twi0_SerLCD
+  48               	write_twi0_SerLCD:
+  49               	.LVL0:
+  50               	.LFB6:
+  48:main.c        **** 
+  49:main.c        **** int write_twi0_SerLCD(uint8_t saddr, uint8_t data)
+  50:main.c        **** {
+  51               		.loc 1 50 1 is_stmt 1 view -0
+  52               		.cfi_startproc
+  53               	/* prologue: function */
+  54               	/* frame size = 0 */
+  55               	/* stack size = 0 */
+  56               	.L__stack_usage = 0
+  51:main.c        ****     // 29.3.2.2.4 Transmitting Data Packets
+  52:main.c        **** 
+  53:main.c        **** 
+  54:main.c        ****     // 29.5.8 Master Address
+  55:main.c        ****     // this is to setup the M1 case where you must transmit the address packet first.
+  56:main.c        **** 
+  57:main.c        ****     // Case M1: Address Packet Transmit Complete - Direction Bit Set to '0'
+  58:main.c        ****     // If a slave device responds to the address packet with an ACK, the Write Interrupt Flag (WIF)
+  59:main.c        ****     // Received Acknowledge (RXACK) flag is set to '0', and the Clock Hold (CLKHOLD) flag is set to
+  60:main.c        ****     // and CLKHOLD flags are located in the Master Status (TWIn.MSTATUS) register.
+  61:main.c        ****     // The clock hold is active at this point, forcing the SCL low. This will stretch the low perio
+  62:main.c        ****     // overall clock frequency, forcing delays required to process the data and preventing further 
+  63:main.c        ****     // The software can prepare to:
+  64:main.c        ****     // Transmit data packets to the slave
+  65:main.c        **** 
+  66:main.c        ****     // the default address is 0x72
+  67:main.c        **** 	// bitshift to the right and then bit mask for the write
+  68:main.c        ****     TWI0.MADDR =  saddr << 1 | 0x0;
+  57               		.loc 1 68 4 view .LVU11
+  58               		.loc 1 68 28 is_stmt 0 view .LVU12
+  59 0012 880F      		lsl r24
+  60               	.LVL1:
+  61               		.loc 1 68 15 view .LVU13
+  62 0014 8093 0709 		sts 2311,r24
+  69:main.c        **** 
+  70:main.c        ****     // check to see if the write interrupt flag is ready
+  71:main.c        ****     // otherwise, wait.
+  72:main.c        ****     while (!(TWI0.MSTATUS & TWI_WIF_bm)){}
+  63               		.loc 1 72 5 is_stmt 1 view .LVU14
+  64               	.L3:
+  65               		.loc 1 72 41 discriminator 1 view .LVU15
+  66               		.loc 1 72 12 discriminator 1 view .LVU16
+  67               		.loc 1 72 17 is_stmt 0 discriminator 1 view .LVU17
+  68 0018 8091 0509 		lds r24,2309
+  69               		.loc 1 72 12 discriminator 1 view .LVU18
+  70 001c 86FF      		sbrs r24,6
+  71 001e 00C0      		rjmp .L3
+  73:main.c        **** 
+  74:main.c        ****     // check to see if the rxack bit is 1. If it is a 1
+  75:main.c        ****     // then that means that it is not ready
+  76:main.c        ****     /*"
+  77:main.c        ****     When this flag is read as '0', it indicates that the most recent Acknowledge bit from the slave
+  78:main.c        ****     is ready for more data.
+  79:main.c        ****     When this flag is read as '1', it indicates that the most recent Acknowledge bit from the slave
+  80:main.c        ****     slave is not able to or does not need to receive more data.
+  81:main.c        ****     ""*/
+  82:main.c        **** 
+  83:main.c        ****     // check NACK or ACK
+  84:main.c        ****     if (TWI0.MSTATUS & TWI_RXACK_bm)
+  72               		.loc 1 84 5 is_stmt 1 view .LVU19
+  73               		.loc 1 84 12 is_stmt 0 view .LVU20
+  74 0020 8091 0509 		lds r24,2309
+  75               		.loc 1 84 8 view .LVU21
+  76 0024 84FD      		sbrc r24,4
+  77 0026 00C0      		rjmp .L6
+  85:main.c        ****     {
+  86:main.c        ****         return 1;
+  87:main.c        ****     }
+  88:main.c        **** 
+  89:main.c        ****     // "transmitting data by writing to the Master Data (TWI0.MDATA) register, which will also clea
+  90:main.c        ****     TWI0.MDATA = data;
+  78               		.loc 1 90 4 is_stmt 1 view .LVU22
+  79               		.loc 1 90 15 is_stmt 0 view .LVU23
+  80 0028 6093 0809 		sts 2312,r22
+  91:main.c        **** 
+  92:main.c        ****     // again, wait until we can write again.
+  93:main.c        ****     while (!(TWI0.MSTATUS & TWI_WIF_bm)){}
+  81               		.loc 1 93 5 is_stmt 1 view .LVU24
+  82               	.L5:
+  83               		.loc 1 93 41 discriminator 1 view .LVU25
+  84               		.loc 1 93 12 discriminator 1 view .LVU26
+  85               		.loc 1 93 17 is_stmt 0 discriminator 1 view .LVU27
+  86 002c 8091 0509 		lds r24,2309
+  87               		.loc 1 93 12 discriminator 1 view .LVU28
+  88 0030 86FF      		sbrs r24,6
+  89 0032 00C0      		rjmp .L5
+  94:main.c        **** 
+  95:main.c        ****     // Check to see if you have received an acknolwedgement bit...
+  96:main.c        ****     if (TWI0.MSTATUS & TWI_RXACK_bm) {
+  90               		.loc 1 96 5 is_stmt 1 view .LVU29
+  91               		.loc 1 96 12 is_stmt 0 view .LVU30
+  92 0034 8091 0509 		lds r24,2309
+  93               		.loc 1 96 8 view .LVU31
+  94 0038 84FD      		sbrc r24,4
+  95 003a 00C0      		rjmp .L7
+  97:main.c        ****         // return a non-zero value for an error
+  98:main.c        ****         return 1;
+  99:main.c        ****     }
+ 100:main.c        **** 
+ 101:main.c        ****     // we can send another piece of data, or... we can write in
+ 102:main.c        ****     TWI0.MCTRLB |= TWI_MCMD_STOP_gc;
+  96               		.loc 1 102 4 is_stmt 1 view .LVU32
+  97               		.loc 1 102 8 is_stmt 0 view .LVU33
+  98 003c E0E0      		ldi r30,0
+  99 003e F9E0      		ldi r31,lo8(9)
+ 100 0040 8481      		ldd r24,Z+4
+ 101               		.loc 1 102 16 view .LVU34
+ 102 0042 8360      		ori r24,lo8(3)
+ 103 0044 8483      		std Z+4,r24
+ 103:main.c        ****     // to terminate the communication
+ 104:main.c        **** 	
+ 105:main.c        **** 	_delay_ms(1);
+ 104               		.loc 1 105 2 is_stmt 1 view .LVU35
+ 105               	.LVL2:
+ 106               	.LBB10:
+ 107               	.LBI10:
+ 108               		.file 2 "/usr/avr/include/util/delay.h"
+   1:/usr/avr/include/util/delay.h **** /* Copyright (c) 2002, Marek Michalkiewicz
+   2:/usr/avr/include/util/delay.h ****    Copyright (c) 2004,2005,2007 Joerg Wunsch
+   3:/usr/avr/include/util/delay.h ****    Copyright (c) 2007  Florin-Viorel Petrov
+   4:/usr/avr/include/util/delay.h ****    All rights reserved.
+   5:/usr/avr/include/util/delay.h **** 
+   6:/usr/avr/include/util/delay.h ****    Redistribution and use in source and binary forms, with or without
+   7:/usr/avr/include/util/delay.h ****    modification, are permitted provided that the following conditions are met:
+   8:/usr/avr/include/util/delay.h **** 
+   9:/usr/avr/include/util/delay.h ****    * Redistributions of source code must retain the above copyright
+  10:/usr/avr/include/util/delay.h ****      notice, this list of conditions and the following disclaimer.
+  11:/usr/avr/include/util/delay.h **** 
+  12:/usr/avr/include/util/delay.h ****    * Redistributions in binary form must reproduce the above copyright
+  13:/usr/avr/include/util/delay.h ****      notice, this list of conditions and the following disclaimer in
+  14:/usr/avr/include/util/delay.h ****      the documentation and/or other materials provided with the
+  15:/usr/avr/include/util/delay.h ****      distribution.
+  16:/usr/avr/include/util/delay.h **** 
+  17:/usr/avr/include/util/delay.h ****    * Neither the name of the copyright holders nor the names of
+  18:/usr/avr/include/util/delay.h ****      contributors may be used to endorse or promote products derived
+  19:/usr/avr/include/util/delay.h ****      from this software without specific prior written permission.
+  20:/usr/avr/include/util/delay.h **** 
+  21:/usr/avr/include/util/delay.h ****   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  22:/usr/avr/include/util/delay.h ****   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  23:/usr/avr/include/util/delay.h ****   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  24:/usr/avr/include/util/delay.h ****   ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+  25:/usr/avr/include/util/delay.h ****   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  26:/usr/avr/include/util/delay.h ****   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  27:/usr/avr/include/util/delay.h ****   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  28:/usr/avr/include/util/delay.h ****   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  29:/usr/avr/include/util/delay.h ****   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  30:/usr/avr/include/util/delay.h ****   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  31:/usr/avr/include/util/delay.h ****   POSSIBILITY OF SUCH DAMAGE. */
+  32:/usr/avr/include/util/delay.h **** 
+  33:/usr/avr/include/util/delay.h **** /* $Id$ */
+  34:/usr/avr/include/util/delay.h **** 
+  35:/usr/avr/include/util/delay.h **** #ifndef _UTIL_DELAY_H_
+  36:/usr/avr/include/util/delay.h **** #define _UTIL_DELAY_H_ 1
+  37:/usr/avr/include/util/delay.h **** 
+  38:/usr/avr/include/util/delay.h **** #ifndef __DOXYGEN__
+  39:/usr/avr/include/util/delay.h **** #  ifndef __HAS_DELAY_CYCLES
+  40:/usr/avr/include/util/delay.h **** #    define __HAS_DELAY_CYCLES 1
+  41:/usr/avr/include/util/delay.h **** #  endif
+  42:/usr/avr/include/util/delay.h **** 
+  43:/usr/avr/include/util/delay.h **** #  ifndef __ATTR_ALWAYS_INLINE__
+  44:/usr/avr/include/util/delay.h **** #    define __ATTR_ALWAYS_INLINE__ __inline__ __attribute__((__always_inline__))
+  45:/usr/avr/include/util/delay.h **** #  endif
+  46:/usr/avr/include/util/delay.h **** 
+  47:/usr/avr/include/util/delay.h **** #endif  /* __DOXYGEN__ */
+  48:/usr/avr/include/util/delay.h **** 
+  49:/usr/avr/include/util/delay.h **** #include <stdint.h>
+  50:/usr/avr/include/util/delay.h **** #include <util/delay_basic.h>
+  51:/usr/avr/include/util/delay.h **** 
+  52:/usr/avr/include/util/delay.h **** /** \file */
+  53:/usr/avr/include/util/delay.h **** /** \defgroup util_delay <util/delay.h>: Convenience functions for busy-wait delay loops
+  54:/usr/avr/include/util/delay.h ****     \code
+  55:/usr/avr/include/util/delay.h ****     #define F_CPU 1000000UL  // 1 MHz
+  56:/usr/avr/include/util/delay.h ****     //#define F_CPU 14.7456e6
+  57:/usr/avr/include/util/delay.h ****     #include <util/delay.h>
+  58:/usr/avr/include/util/delay.h ****     \endcode
+  59:/usr/avr/include/util/delay.h **** 
+  60:/usr/avr/include/util/delay.h ****     \note As an alternative method, it is possible to pass the
+  61:/usr/avr/include/util/delay.h ****     F_CPU macro down to the compiler from the Makefile.
+  62:/usr/avr/include/util/delay.h ****     Obviously, in that case, no \c \#define statement should be
+  63:/usr/avr/include/util/delay.h ****     used.
+  64:/usr/avr/include/util/delay.h **** 
+  65:/usr/avr/include/util/delay.h ****     The functions in this header file are wrappers around the basic
+  66:/usr/avr/include/util/delay.h ****     busy-wait functions from <tt>\<util/delay_basic.h\></tt>.  They are meant as
+  67:/usr/avr/include/util/delay.h ****     convenience functions where actual time values can be specified
+  68:/usr/avr/include/util/delay.h ****     rather than a number of cycles to wait for.  The idea behind is
+  69:/usr/avr/include/util/delay.h ****     that compile-time constant expressions will be eliminated by
+  70:/usr/avr/include/util/delay.h ****     compiler optimization so floating-point expressions can be used
+  71:/usr/avr/include/util/delay.h ****     to calculate the number of delay cycles needed based on the CPU
+  72:/usr/avr/include/util/delay.h ****     frequency passed by the macro F_CPU.
+  73:/usr/avr/include/util/delay.h **** 
+  74:/usr/avr/include/util/delay.h ****     \note In order for these functions to work as intended, compiler
+  75:/usr/avr/include/util/delay.h ****     optimizations <em>must</em> be enabled, and the delay time
+  76:/usr/avr/include/util/delay.h ****     <em>must</em> be an expression that is a known constant at
+  77:/usr/avr/include/util/delay.h ****     compile-time.  If these requirements are not met, the resulting
+  78:/usr/avr/include/util/delay.h ****     delay will be much longer (and basically unpredictable), and
+  79:/usr/avr/include/util/delay.h ****     applications that otherwise do not use floating-point calculations
+  80:/usr/avr/include/util/delay.h ****     will experience severe code bloat by the floating-point library
+  81:/usr/avr/include/util/delay.h ****     routines linked into the application.
+  82:/usr/avr/include/util/delay.h **** 
+  83:/usr/avr/include/util/delay.h ****     The functions available allow the specification of microsecond, and
+  84:/usr/avr/include/util/delay.h ****     millisecond delays directly, using the application-supplied macro
+  85:/usr/avr/include/util/delay.h ****     F_CPU as the CPU clock frequency (in Hertz).
+  86:/usr/avr/include/util/delay.h **** */
+  87:/usr/avr/include/util/delay.h **** 
+  88:/usr/avr/include/util/delay.h **** 
+  89:/usr/avr/include/util/delay.h **** #ifndef F_CPU
+  90:/usr/avr/include/util/delay.h **** /* prevent compiler error by supplying a default */
+  91:/usr/avr/include/util/delay.h **** # warning "F_CPU not defined for <util/delay.h>"
+  92:/usr/avr/include/util/delay.h **** /** \ingroup util_delay
+  93:/usr/avr/include/util/delay.h ****     \def F_CPU
+  94:/usr/avr/include/util/delay.h ****     \brief CPU frequency in Hz
+  95:/usr/avr/include/util/delay.h **** 
+  96:/usr/avr/include/util/delay.h ****     The macro F_CPU specifies the CPU frequency to be considered by
+  97:/usr/avr/include/util/delay.h ****     the delay macros.  This macro is normally supplied by the
+  98:/usr/avr/include/util/delay.h ****     environment (e.g. from within a project header, or the project's
+  99:/usr/avr/include/util/delay.h ****     Makefile).  The value 1 MHz here is only provided as a "vanilla"
+ 100:/usr/avr/include/util/delay.h ****     fallback if no such user-provided definition could be found.
+ 101:/usr/avr/include/util/delay.h **** 
+ 102:/usr/avr/include/util/delay.h ****     In terms of the delay functions, the CPU frequency can be given as
+ 103:/usr/avr/include/util/delay.h ****     a floating-point constant (e.g. 3.6864e6 for 3.6864 MHz).
+ 104:/usr/avr/include/util/delay.h ****     However, the macros in <util/setbaud.h> require it to be an
+ 105:/usr/avr/include/util/delay.h ****     integer value.
+ 106:/usr/avr/include/util/delay.h ****  */
+ 107:/usr/avr/include/util/delay.h **** # define F_CPU 1000000UL
+ 108:/usr/avr/include/util/delay.h **** #endif
+ 109:/usr/avr/include/util/delay.h **** 
+ 110:/usr/avr/include/util/delay.h **** #ifndef __OPTIMIZE__
+ 111:/usr/avr/include/util/delay.h **** # warning "Compiler optimizations disabled; functions from <util/delay.h> won't work as designed"
+ 112:/usr/avr/include/util/delay.h **** #endif
+ 113:/usr/avr/include/util/delay.h **** 
+ 114:/usr/avr/include/util/delay.h **** /**
+ 115:/usr/avr/include/util/delay.h ****    \ingroup util_delay
+ 116:/usr/avr/include/util/delay.h **** 
+ 117:/usr/avr/include/util/delay.h ****    Perform a delay of \c __ms milliseconds, using _delay_loop_2().
+ 118:/usr/avr/include/util/delay.h **** 
+ 119:/usr/avr/include/util/delay.h ****    The macro #F_CPU is supposed to be defined to a
+ 120:/usr/avr/include/util/delay.h ****    constant defining the CPU clock frequency (in Hertz).
+ 121:/usr/avr/include/util/delay.h **** 
+ 122:/usr/avr/include/util/delay.h ****    The maximal possible delay is 262.14 ms / F_CPU in MHz.
+ 123:/usr/avr/include/util/delay.h **** 
+ 124:/usr/avr/include/util/delay.h ****    When the user request delay which exceed the maximum possible one,
+ 125:/usr/avr/include/util/delay.h ****    _delay_ms() provides a decreased resolution functionality. In this
+ 126:/usr/avr/include/util/delay.h ****    mode _delay_ms() will work with a resolution of 1/10&nbsp;ms, providing
+ 127:/usr/avr/include/util/delay.h ****    delays up to 6.5535 seconds (independent from CPU frequency).  The
+ 128:/usr/avr/include/util/delay.h ****    user will not be informed about decreased resolution.
+ 129:/usr/avr/include/util/delay.h **** 
+ 130:/usr/avr/include/util/delay.h ****    If the avr-gcc toolchain has \c __builtin_avr_delay_cycles()
+ 131:/usr/avr/include/util/delay.h ****    support, maximal possible delay is 4294967.295 ms/ F_CPU in MHz. For
+ 132:/usr/avr/include/util/delay.h ****    values greater than the maximal possible delay, overflow may result in
+ 133:/usr/avr/include/util/delay.h ****    no delay i.e., 0&nbsp;ms.
+ 134:/usr/avr/include/util/delay.h **** 
+ 135:/usr/avr/include/util/delay.h ****    Conversion of \c __ms into clock cycles may not always result in
+ 136:/usr/avr/include/util/delay.h ****    an integral value.  By default, the clock cycles are rounded up to the next
+ 137:/usr/avr/include/util/delay.h ****    integer. This ensures that the user gets at least \c __ms
+ 138:/usr/avr/include/util/delay.h ****    microseconds of delay.
+ 139:/usr/avr/include/util/delay.h **** 
+ 140:/usr/avr/include/util/delay.h ****    Alternatively, by defining the macro \c __DELAY_ROUND_DOWN__, or
+ 141:/usr/avr/include/util/delay.h ****    \c __DELAY_ROUND_CLOSEST__, before including this header file, the
+ 142:/usr/avr/include/util/delay.h ****    algorithm can be made to round down, or round to closest integer,
+ 143:/usr/avr/include/util/delay.h ****    respectively.
+ 144:/usr/avr/include/util/delay.h **** 
+ 145:/usr/avr/include/util/delay.h ****    \note The implementation of _delay_ms() based on
+ 146:/usr/avr/include/util/delay.h ****    \c __builtin_avr_delay_cycles() is not backward compatible with older
+ 147:/usr/avr/include/util/delay.h ****    implementations.  In order to get functionality backward compatible
+ 148:/usr/avr/include/util/delay.h ****    with previous versions, the macro \c __DELAY_BACKWARD_COMPATIBLE__
+ 149:/usr/avr/include/util/delay.h ****    must be defined before including this header file.
+ 150:/usr/avr/include/util/delay.h ****  */
+ 151:/usr/avr/include/util/delay.h **** static __ATTR_ALWAYS_INLINE__ void _delay_ms(double __ms);
+ 152:/usr/avr/include/util/delay.h **** 
+ 153:/usr/avr/include/util/delay.h **** void
+ 154:/usr/avr/include/util/delay.h **** _delay_ms(double __ms)
+ 109               		.loc 2 154 1 view .LVU36
+ 110               	.LBB11:
+ 155:/usr/avr/include/util/delay.h **** {
+ 156:/usr/avr/include/util/delay.h **** 	double __tmp ;
+ 111               		.loc 2 156 2 view .LVU37
+ 157:/usr/avr/include/util/delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) \
+ 158:/usr/avr/include/util/delay.h ****   && !defined(__DELAY_BACKWARD_COMPATIBLE__)
+ 159:/usr/avr/include/util/delay.h **** 	uint32_t __ticks_dc;
+ 112               		.loc 2 159 2 view .LVU38
+ 160:/usr/avr/include/util/delay.h **** 	extern void __builtin_avr_delay_cycles(uint32_t);
+ 113               		.loc 2 160 2 view .LVU39
+ 161:/usr/avr/include/util/delay.h **** 	__tmp = ((F_CPU) / 1e3) * __ms;
+ 114               		.loc 2 161 2 view .LVU40
+ 162:/usr/avr/include/util/delay.h **** 
+ 163:/usr/avr/include/util/delay.h **** 	#if defined(__DELAY_ROUND_DOWN__)
+ 164:/usr/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)__builtin_fabs(__tmp);
+ 165:/usr/avr/include/util/delay.h **** 
+ 166:/usr/avr/include/util/delay.h **** 	#elif defined(__DELAY_ROUND_CLOSEST__)
+ 167:/usr/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)(__builtin_fabs(__tmp)+0.5);
+ 168:/usr/avr/include/util/delay.h **** 
+ 169:/usr/avr/include/util/delay.h **** 	#else
+ 170:/usr/avr/include/util/delay.h **** 		//round up by default
+ 171:/usr/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)(__builtin_ceil(__builtin_fabs(__tmp)));
+ 115               		.loc 2 171 3 view .LVU41
+ 172:/usr/avr/include/util/delay.h **** 	#endif
+ 173:/usr/avr/include/util/delay.h **** 
+ 174:/usr/avr/include/util/delay.h **** 	__builtin_avr_delay_cycles(__ticks_dc);
+ 116               		.loc 2 174 2 view .LVU42
+ 117 0046 87EE      		ldi r24,lo8(999)
+ 118 0048 93E0      		ldi r25,hi8(999)
+ 119 004a 0197      	1:	sbiw r24,1
+ 120 004c 01F4      		brne 1b
+ 121 004e 00C0      		rjmp .
+ 122 0050 0000      		nop
+ 123               	.LVL3:
+ 124               		.loc 2 174 2 is_stmt 0 view .LVU43
+ 125               	.LBE11:
+ 126               	.LBE10:
+ 106:main.c        **** 	return 0;
+ 127               		.loc 1 106 2 is_stmt 1 view .LVU44
+ 128               		.loc 1 106 9 is_stmt 0 view .LVU45
+ 129 0052 80E0      		ldi r24,0
+ 130 0054 90E0      		ldi r25,0
+ 131 0056 0895      		ret
+ 132               	.L6:
+  86:main.c        ****     }
+ 133               		.loc 1 86 16 view .LVU46
+ 134 0058 81E0      		ldi r24,lo8(1)
+ 135 005a 90E0      		ldi r25,0
+ 136 005c 0895      		ret
+ 137               	.L7:
+  98:main.c        ****     }
+ 138               		.loc 1 98 16 view .LVU47
+ 139 005e 81E0      		ldi r24,lo8(1)
+ 140 0060 90E0      		ldi r25,0
+ 141               	/* epilogue start */
+ 107:main.c        **** }
+ 142               		.loc 1 107 1 view .LVU48
+ 143 0062 0895      		ret
+ 144               		.cfi_endproc
+ 145               	.LFE6:
+ 147               	.global	init_twi0_LM75
+ 149               	init_twi0_LM75:
+ 150               	.LFB7:
+ 108:main.c        **** 
+ 109:main.c        **** void init_twi0_LM75 (void)
+ 110:main.c        **** {
+ 151               		.loc 1 110 1 is_stmt 1 view -0
+ 152               		.cfi_startproc
+ 153               	/* prologue: function */
+ 154               	/* frame size = 0 */
+ 155               	/* stack size = 0 */
+ 156               	.L__stack_usage = 0
+ 111:main.c        ****     // 29.3.2.1 Initialization
+ 112:main.c        ****     // 29.5.1   Control Register A
+ 113:main.c        ****     // This configuration gives us
+ 114:main.c        ****     // I2C, SDASETUP for 8 clock cycles, SDAHOLD is 50 nano seconds (for some time) and disable fas
+ 115:main.c        ****     TWI0.CTRLA = TWI_INPUTLVL_I2C_gc | TWI_SDASETUP_8CYC_gc | TWI_SDAHOLD_50NS_gc;
+ 157               		.loc 1 115 4 view .LVU50
+ 158               		.loc 1 115 15 is_stmt 0 view .LVU51
+ 159 0064 E0E0      		ldi r30,0
+ 160 0066 F9E0      		ldi r31,lo8(9)
+ 161 0068 84E1      		ldi r24,lo8(20)
+ 162 006a 8083      		st Z,r24
+ 116:main.c        **** 
+ 117:main.c        ****     // 29.3.2.1.1 Master Initialization
+ 118:main.c        ****     // The Master Baud Rate
+ 119:main.c        ****     // because we set the mbaud (master baud) rate to 1,
+ 120:main.c        ****     // the F_{SCL} = around 304 KHz
+ 121:main.c        ****     // this is "as fast" as possible that we can get it running with a 4 MHz clock.
+ 122:main.c        ****     TWI0.MBAUD = 1;
+ 163               		.loc 1 122 4 is_stmt 1 view .LVU52
+ 164               		.loc 1 122 15 is_stmt 0 view .LVU53
+ 165 006c 81E0      		ldi r24,lo8(1)
+ 166 006e 8683      		std Z+6,r24
+ 123:main.c        **** 
+ 124:main.c        ****     // Must write a '1' to the enable twi master
+ 125:main.c        ****     // "Writing a '1' to the Enable TWI Master (ENABLE) bit in the Master Control A (TWIn.MCTRLA) r
+ 126:main.c        ****     TWI0.MCTRLA = TWI_ENABLE_bm;
+ 167               		.loc 1 126 4 is_stmt 1 view .LVU54
+ 168               		.loc 1 126 16 is_stmt 0 view .LVU55
+ 169 0070 8383      		std Z+3,r24
+ 127:main.c        **** 
+ 128:main.c        ****     // "The Bus State (BUSSTATE) bit field from the Master Status (TWIn.MSTATUS) register must be s
+ 129:main.c        ****     TWI0.MSTATUS = TWI_BUSSTATE_IDLE_gc;
+ 170               		.loc 1 129 4 is_stmt 1 view .LVU56
+ 171               		.loc 1 129 17 is_stmt 0 view .LVU57
+ 172 0072 8583      		std Z+5,r24
+ 173               	/* epilogue start */
+ 130:main.c        **** }
+ 174               		.loc 1 130 1 view .LVU58
+ 175 0074 0895      		ret
+ 176               		.cfi_endproc
+ 177               	.LFE7:
+ 179               	.global	TWI0_LM75_read
+ 181               	TWI0_LM75_read:
+ 182               	.LVL4:
+ 183               	.LFB8:
+ 131:main.c        **** 
+ 132:main.c        **** 
+ 133:main.c        **** uint8_t temp_reg_high; // check high byte of LM75
+ 134:main.c        **** uint8_t temp_reg_low;  // check low byte of LM75
+ 135:main.c        **** // read the LM75
+ 136:main.c        **** uint16_t TWI0_LM75_read(uint8_t saddr)
+ 137:main.c        **** {
+ 184               		.loc 1 137 1 is_stmt 1 view -0
+ 185               		.cfi_startproc
+ 186               		.loc 1 137 1 is_stmt 0 view .LVU60
+ 187 0076 CF93      		push r28
+ 188               		.cfi_def_cfa_offset 3
+ 189               		.cfi_offset 28, -2
+ 190 0078 DF93      		push r29
+ 191               		.cfi_def_cfa_offset 4
+ 192               		.cfi_offset 29, -3
+ 193 007a 00D0      		rcall .
+ 194               		.cfi_def_cfa_offset 6
+ 195 007c CDB7      		in r28,__SP_L__
+ 196 007e DEB7      		in r29,__SP_H__
+ 197               		.cfi_def_cfa_register 28
+ 198               	/* prologue: function */
+ 199               	/* frame size = 2 */
+ 200               	/* stack size = 4 */
+ 201               	.L__stack_usage = 4
+ 138:main.c        ****     // send slave address read command
+ 139:main.c        ****     TWI0.MADDR = ((saddr << 1) | 0x01);
+ 202               		.loc 1 139 4 is_stmt 1 view .LVU61
+ 203               		.loc 1 139 31 is_stmt 0 view .LVU62
+ 204 0080 880F      		lsl r24
+ 205               	.LVL5:
+ 206               		.loc 1 139 31 view .LVU63
+ 207 0082 8160      		ori r24,lo8(1)
+ 208               		.loc 1 139 15 view .LVU64
+ 209 0084 8093 0709 		sts 2311,r24
+ 140:main.c        **** 
+ 141:main.c        ****     // wait until the RIF flag is received
+ 142:main.c        ****     while (!(TWI0.MSTATUS & 0x80));
+ 210               		.loc 1 142 5 is_stmt 1 view .LVU65
+ 211               	.L10:
+ 212               		.loc 1 142 12 discriminator 1 view .LVU66
+ 213               		.loc 1 142 17 is_stmt 0 discriminator 1 view .LVU67
+ 214 0088 8091 0509 		lds r24,2309
+ 215               		.loc 1 142 12 discriminator 1 view .LVU68
+ 216 008c 8115      		cp r24, __zero_reg__
+ 217 008e 04F4      		brge .L10
+ 143:main.c        **** 
+ 144:main.c        ****     // clears the RIF flag
+ 145:main.c        ****     temp_reg_high = TWI0.MDATA;
+ 218               		.loc 1 145 5 is_stmt 1 view .LVU69
+ 219               		.loc 1 145 24 is_stmt 0 view .LVU70
+ 220 0090 E0E0      		ldi r30,0
+ 221 0092 F9E0      		ldi r31,lo8(9)
+ 222 0094 9085      		ldd r25,Z+8
+ 223               		.loc 1 145 19 view .LVU71
+ 224 0096 9093 0000 		sts temp_reg_high,r25
+ 146:main.c        **** 
+ 147:main.c        ****     // MCMD issue ack followed by a byte read operation
+ 148:main.c        ****     TWI0.MCTRLB = 0x02;
+ 225               		.loc 1 148 4 is_stmt 1 view .LVU72
+ 226               		.loc 1 148 16 is_stmt 0 view .LVU73
+ 227 009a 82E0      		ldi r24,lo8(2)
+ 228 009c 8483      		std Z+4,r24
+ 149:main.c        **** 
+ 150:main.c        ****     // RIF flag, wait until data received
+ 151:main.c        ****     while (!(TWI0.MSTATUS & 0x80));
+ 229               		.loc 1 151 5 is_stmt 1 view .LVU74
+ 230               	.L11:
+ 231               		.loc 1 151 12 discriminator 1 view .LVU75
+ 232               		.loc 1 151 17 is_stmt 0 discriminator 1 view .LVU76
+ 233 009e 8091 0509 		lds r24,2309
+ 234               		.loc 1 151 12 discriminator 1 view .LVU77
+ 235 00a2 8115      		cp r24, __zero_reg__
+ 236 00a4 04F4      		brge .L11
+ 152:main.c        **** 
+ 153:main.c        ****     // clears the RIF f;ag
+ 154:main.c        ****     temp_reg_low = TWI0.MDATA;
+ 237               		.loc 1 154 5 is_stmt 1 view .LVU78
+ 238               		.loc 1 154 23 is_stmt 0 view .LVU79
+ 239 00a6 E0E0      		ldi r30,0
+ 240 00a8 F9E0      		ldi r31,lo8(9)
+ 241 00aa 2085      		ldd r18,Z+8
+ 242               		.loc 1 154 18 view .LVU80
+ 243 00ac 2093 0000 		sts temp_reg_low,r18
+ 155:main.c        **** 
+ 156:main.c        ****     // MCMD issue nack followed by a stop
+ 157:main.c        ****     TWI0.MCTRLB = 0x07;
+ 244               		.loc 1 157 4 is_stmt 1 view .LVU81
+ 245               		.loc 1 157 16 is_stmt 0 view .LVU82
+ 246 00b0 87E0      		ldi r24,lo8(7)
+ 247 00b2 8483      		std Z+4,r24
+ 158:main.c        **** 
+ 159:main.c        ****     // wait until idle
+ 160:main.c        ****     while ((TWI0.MSTATUS & 0x03) != 0x01);
+ 248               		.loc 1 160 5 is_stmt 1 view .LVU83
+ 249               	.L12:
+ 250               		.loc 1 160 33 discriminator 1 view .LVU84
+ 251               		.loc 1 160 16 is_stmt 0 discriminator 1 view .LVU85
+ 252 00b4 8091 0509 		lds r24,2309
+ 253               		.loc 1 160 33 discriminator 1 view .LVU86
+ 254 00b8 8370      		andi r24,lo8(3)
+ 255 00ba 8130      		cpi r24,lo8(1)
+ 256 00bc 01F4      		brne .L12
+ 161:main.c        **** 
+ 162:main.c        ****     // actually returns it
+ 163:main.c        ****     volatile uint16_t result = (uint16_t)((temp_reg_high << 8) | (temp_reg_low & 0x80));
+ 257               		.loc 1 163 5 is_stmt 1 view .LVU87
+ 258               		.loc 1 163 80 is_stmt 0 view .LVU88
+ 259 00be 2078      		andi r18,lo8(-128)
+ 260               		.loc 1 163 64 view .LVU89
+ 261 00c0 392F      		mov r19,r25
+ 262               		.loc 1 163 23 view .LVU90
+ 263 00c2 2983      		std Y+1,r18
+ 264 00c4 3A83      		std Y+2,r19
+ 164:main.c        **** 	
+ 165:main.c        **** 	return result;
+ 265               		.loc 1 165 2 is_stmt 1 view .LVU91
+ 266               		.loc 1 165 9 is_stmt 0 view .LVU92
+ 267 00c6 8981      		ldd r24,Y+1
+ 268 00c8 9A81      		ldd r25,Y+2
+ 269               	/* epilogue start */
+ 166:main.c        **** }
+ 270               		.loc 1 166 1 view .LVU93
+ 271 00ca 0F90      		pop __tmp_reg__
+ 272 00cc 0F90      		pop __tmp_reg__
+ 273 00ce DF91      		pop r29
+ 274 00d0 CF91      		pop r28
+ 275 00d2 0895      		ret
+ 276               		.cfi_endproc
+ 277               	.LFE8:
+ 279               	.global	init_spi0_SerLCD
+ 281               	init_spi0_SerLCD:
+ 282               	.LFB9:
+ 167:main.c        **** 
+ 168:main.c        **** // this initializes the SerLCD
+ 169:main.c        **** void init_spi0_SerLCD (void) { // Configure SPI0
+ 283               		.loc 1 169 30 is_stmt 1 view -0
+ 284               		.cfi_startproc
+ 285               	/* prologue: function */
+ 286               	/* frame size = 0 */
+ 287               	/* stack size = 0 */
+ 288               	.L__stack_usage = 0
+ 170:main.c        ****     PORTA.DIR |= PIN4_bm; // Set MOSI pin to output
+ 289               		.loc 1 170 4 view .LVU95
+ 290               		.loc 1 170 9 is_stmt 0 view .LVU96
+ 291 00d4 E0E0      		ldi r30,0
+ 292 00d6 F4E0      		ldi r31,lo8(4)
+ 293 00d8 8081      		ld r24,Z
+ 294               		.loc 1 170 14 view .LVU97
+ 295 00da 8061      		ori r24,lo8(16)
+ 296 00dc 8083      		st Z,r24
+ 171:main.c        ****     PORTA.DIR &= ~PIN5_bm; // Set MISO pin to input
+ 297               		.loc 1 171 4 is_stmt 1 view .LVU98
+ 298               		.loc 1 171 9 is_stmt 0 view .LVU99
+ 299 00de 8081      		ld r24,Z
+ 300               		.loc 1 171 14 view .LVU100
+ 301 00e0 8F7D      		andi r24,lo8(-33)
+ 302 00e2 8083      		st Z,r24
+ 172:main.c        ****     PORTA.DIR |= PIN6_bm; // Set SCK pin to output
+ 303               		.loc 1 172 4 is_stmt 1 view .LVU101
+ 304               		.loc 1 172 9 is_stmt 0 view .LVU102
+ 305 00e4 8081      		ld r24,Z
+ 306               		.loc 1 172 14 view .LVU103
+ 307 00e6 8064      		ori r24,lo8(64)
+ 308 00e8 8083      		st Z,r24
+ 173:main.c        ****     PORTA.DIR |= PIN7_bm; // Set SS pin to output
+ 309               		.loc 1 173 4 is_stmt 1 view .LVU104
+ 310               		.loc 1 173 9 is_stmt 0 view .LVU105
+ 311 00ea 8081      		ld r24,Z
+ 312               		.loc 1 173 14 view .LVU106
+ 313 00ec 8068      		ori r24,lo8(-128)
+ 314 00ee 8083      		st Z,r24
+ 174:main.c        **** 
+ 175:main.c        ****     // start it logical high
+ 176:main.c        ****     PORTA.OUT |= PIN7_bm;
+ 315               		.loc 1 176 4 is_stmt 1 view .LVU107
+ 316               		.loc 1 176 9 is_stmt 0 view .LVU108
+ 317 00f0 8481      		ldd r24,Z+4
+ 318               		.loc 1 176 14 view .LVU109
+ 319 00f2 8068      		ori r24,lo8(-128)
+ 320 00f4 8483      		std Z+4,r24
+ 177:main.c        **** 
+ 178:main.c        ****     SPI0.CTRLB = SPI_SSD_bm | SPI_MODE_0_gc;
+ 321               		.loc 1 178 4 is_stmt 1 view .LVU110
+ 322               		.loc 1 178 15 is_stmt 0 view .LVU111
+ 323 00f6 E0E4      		ldi r30,lo8(64)
+ 324 00f8 F9E0      		ldi r31,lo8(9)
+ 325 00fa 84E0      		ldi r24,lo8(4)
+ 326 00fc 8183      		std Z+1,r24
+ 179:main.c        ****     SPI0.CTRLA = SPI_ENABLE_bm | SPI_MASTER_bm | SPI_PRESC_DIV64_gc;
+ 327               		.loc 1 179 4 is_stmt 1 view .LVU112
+ 328               		.loc 1 179 15 is_stmt 0 view .LVU113
+ 329 00fe 85E2      		ldi r24,lo8(37)
+ 330 0100 8083      		st Z,r24
+ 331               	/* epilogue start */
+ 180:main.c        **** 
+ 181:main.c        **** }
+ 332               		.loc 1 181 1 view .LVU114
+ 333 0102 0895      		ret
+ 334               		.cfi_endproc
+ 335               	.LFE9:
+ 337               	.global	write_spi0_SerLCD
+ 339               	write_spi0_SerLCD:
+ 340               	.LVL6:
+ 341               	.LFB10:
+ 182:main.c        **** 
+ 183:main.c        **** // this sends a single character
+ 184:main.c        **** // writes a single character.
+ 185:main.c        **** void write_spi0_SerLCD(unsigned char data) { // Writing a character
+ 342               		.loc 1 185 44 is_stmt 1 view -0
+ 343               		.cfi_startproc
+ 344               	/* prologue: function */
+ 345               	/* frame size = 0 */
+ 346               	/* stack size = 0 */
+ 347               	.L__stack_usage = 0
+ 186:main.c        ****     PORTA.OUT &= ~PIN7_bm; // Writing data... set SS pin value to LOW
+ 348               		.loc 1 186 4 view .LVU116
+ 349               		.loc 1 186 9 is_stmt 0 view .LVU117
+ 350 0104 E0E0      		ldi r30,0
+ 351 0106 F4E0      		ldi r31,lo8(4)
+ 352 0108 9481      		ldd r25,Z+4
+ 353               		.loc 1 186 14 view .LVU118
+ 354 010a 9F77      		andi r25,lo8(127)
+ 355 010c 9483      		std Z+4,r25
+ 187:main.c        ****     SPI0.DATA = data; // loads the data register
+ 356               		.loc 1 187 4 is_stmt 1 view .LVU119
+ 357               		.loc 1 187 14 is_stmt 0 view .LVU120
+ 358 010e 8093 4409 		sts 2372,r24
+ 188:main.c        ****     while (!(SPI0.INTFLAGS & SPI_IF_bm)); // Waiting for data to be exchanged
+ 359               		.loc 1 188 5 is_stmt 1 view .LVU121
+ 360               	.LVL7:
+ 361               	.L15:
+ 362               		.loc 1 188 12 discriminator 1 view .LVU122
+ 363               		.loc 1 188 17 is_stmt 0 discriminator 1 view .LVU123
+ 364 0112 8091 4309 		lds r24,2371
+ 365               		.loc 1 188 12 discriminator 1 view .LVU124
+ 366 0116 8115      		cp r24, __zero_reg__
+ 367 0118 04F4      		brge .L15
+ 189:main.c        ****     PORTA.OUT |= PIN7_bm; // Done! Set SS pin value to HIGH
+ 368               		.loc 1 189 4 is_stmt 1 view .LVU125
+ 369               		.loc 1 189 9 is_stmt 0 view .LVU126
+ 370 011a E0E0      		ldi r30,0
+ 371 011c F4E0      		ldi r31,lo8(4)
+ 372 011e 8481      		ldd r24,Z+4
+ 373               		.loc 1 189 14 view .LVU127
+ 374 0120 8068      		ori r24,lo8(-128)
+ 375 0122 8483      		std Z+4,r24
+ 376               	.LVL8:
+ 377               	/* epilogue start */
+ 190:main.c        **** }
+ 378               		.loc 1 190 1 view .LVU128
+ 379 0124 0895      		ret
+ 380               		.cfi_endproc
+ 381               	.LFE10:
+ 383               	.global	update_twi0_SerLCD
+ 385               	update_twi0_SerLCD:
+ 386               	.LFB11:
+ 191:main.c        **** 
+ 192:main.c        **** void update_twi0_SerLCD(void){
+ 387               		.loc 1 192 30 is_stmt 1 view -0
+ 388               		.cfi_startproc
+ 389 0126 CF93      		push r28
+ 390               		.cfi_def_cfa_offset 3
+ 391               		.cfi_offset 28, -2
+ 392               	/* prologue: function */
+ 393               	/* frame size = 0 */
+ 394               	/* stack size = 1 */
+ 395               	.L__stack_usage = 1
+ 193:main.c        ****     // clear and write
+ 194:main.c        ****     write_twi0_SerLCD(0x72, '|');
+ 396               		.loc 1 194 5 view .LVU130
+ 397 0128 6CE7      		ldi r22,lo8(124)
+ 398 012a 82E7      		ldi r24,lo8(114)
+ 399 012c 0E94 0000 		call write_twi0_SerLCD
+ 400               	.LVL9:
+ 195:main.c        ****     write_twi0_SerLCD(0x72, '-');
+ 401               		.loc 1 195 5 view .LVU131
+ 402 0130 6DE2      		ldi r22,lo8(45)
+ 403 0132 82E7      		ldi r24,lo8(114)
+ 404 0134 0E94 0000 		call write_twi0_SerLCD
+ 405               	.LVL10:
+ 196:main.c        **** 
+ 197:main.c        ****     // start at the first line
+ 198:main.c        ****     write_twi0_SerLCD(0x72, 254);
+ 406               		.loc 1 198 5 view .LVU132
+ 407 0138 6EEF      		ldi r22,lo8(-2)
+ 408 013a 82E7      		ldi r24,lo8(114)
+ 409 013c 0E94 0000 		call write_twi0_SerLCD
+ 410               	.LVL11:
+ 199:main.c        ****     write_twi0_SerLCD(0x72, 128+0);
+ 411               		.loc 1 199 5 view .LVU133
+ 412 0140 60E8      		ldi r22,lo8(-128)
+ 413 0142 82E7      		ldi r24,lo8(114)
+ 414 0144 0E94 0000 		call write_twi0_SerLCD
+ 415               	.LVL12:
+ 200:main.c        ****     for (uint8_t i = 0; dsp_buff1[i];){
+ 416               		.loc 1 200 5 view .LVU134
+ 417               	.LBB12:
+ 418               		.loc 1 200 10 view .LVU135
+ 419               		.loc 1 200 18 is_stmt 0 view .LVU136
+ 420 0148 C0E0      		ldi r28,0
+ 421               		.loc 1 200 5 view .LVU137
+ 422 014a 00C0      		rjmp .L17
+ 423               	.LVL13:
+ 424               	.L18:
+ 201:main.c        ****         write_twi0_SerLCD(0x72, dsp_buff1[i++]);
+ 425               		.loc 1 201 9 is_stmt 1 view .LVU138
+ 426               		.loc 1 201 44 is_stmt 0 view .LVU139
+ 427 014c CF5F      		subi r28,lo8(-(1))
+ 428               	.LVL14:
+ 429               		.loc 1 201 9 view .LVU140
+ 430 014e 82E7      		ldi r24,lo8(114)
+ 431 0150 0E94 0000 		call write_twi0_SerLCD
+ 432               	.LVL15:
+ 433               	.L17:
+ 200:main.c        ****     for (uint8_t i = 0; dsp_buff1[i];){
+ 434               		.loc 1 200 25 is_stmt 1 discriminator 1 view .LVU141
+ 200:main.c        ****     for (uint8_t i = 0; dsp_buff1[i];){
+ 435               		.loc 1 200 34 is_stmt 0 discriminator 1 view .LVU142
+ 436 0154 EC2F      		mov r30,r28
+ 437 0156 F0E0      		ldi r31,0
+ 438 0158 E050      		subi r30,lo8(-(dsp_buff1))
+ 439 015a F040      		sbci r31,hi8(-(dsp_buff1))
+ 440 015c 6081      		ld r22,Z
+ 200:main.c        ****     for (uint8_t i = 0; dsp_buff1[i];){
+ 441               		.loc 1 200 25 discriminator 1 view .LVU143
+ 442 015e 6111      		cpse r22,__zero_reg__
+ 443 0160 00C0      		rjmp .L18
+ 444               	.LBE12:
+ 202:main.c        ****     }
+ 203:main.c        ****     // move to second line
+ 204:main.c        ****     write_twi0_SerLCD(0x72, 254);
+ 445               		.loc 1 204 5 is_stmt 1 view .LVU144
+ 446 0162 6EEF      		ldi r22,lo8(-2)
+ 447 0164 82E7      		ldi r24,lo8(114)
+ 448 0166 0E94 0000 		call write_twi0_SerLCD
+ 449               	.LVL16:
+ 205:main.c        ****     write_twi0_SerLCD(0x72, 128+64);
+ 450               		.loc 1 205 5 view .LVU145
+ 451 016a 60EC      		ldi r22,lo8(-64)
+ 452 016c 82E7      		ldi r24,lo8(114)
+ 453 016e 0E94 0000 		call write_twi0_SerLCD
+ 454               	.LVL17:
+ 206:main.c        ****     for (uint8_t i = 0; dsp_buff2[i];){
+ 455               		.loc 1 206 5 view .LVU146
+ 456               	.LBB13:
+ 457               		.loc 1 206 10 view .LVU147
+ 458               		.loc 1 206 18 is_stmt 0 view .LVU148
+ 459 0172 C0E0      		ldi r28,0
+ 460               	.LVL18:
+ 461               		.loc 1 206 5 view .LVU149
+ 462 0174 00C0      		rjmp .L19
+ 463               	.LVL19:
+ 464               	.L20:
+ 207:main.c        ****         write_twi0_SerLCD(0x72, dsp_buff2[i++]);
+ 465               		.loc 1 207 9 is_stmt 1 view .LVU150
+ 466               		.loc 1 207 44 is_stmt 0 view .LVU151
+ 467 0176 CF5F      		subi r28,lo8(-(1))
+ 468               	.LVL20:
+ 469               		.loc 1 207 9 view .LVU152
+ 470 0178 82E7      		ldi r24,lo8(114)
+ 471 017a 0E94 0000 		call write_twi0_SerLCD
+ 472               	.LVL21:
+ 473               	.L19:
+ 206:main.c        ****     for (uint8_t i = 0; dsp_buff2[i];){
+ 474               		.loc 1 206 25 is_stmt 1 discriminator 1 view .LVU153
+ 206:main.c        ****     for (uint8_t i = 0; dsp_buff2[i];){
+ 475               		.loc 1 206 34 is_stmt 0 discriminator 1 view .LVU154
+ 476 017e EC2F      		mov r30,r28
+ 477 0180 F0E0      		ldi r31,0
+ 478 0182 E050      		subi r30,lo8(-(dsp_buff2))
+ 479 0184 F040      		sbci r31,hi8(-(dsp_buff2))
+ 480 0186 6081      		ld r22,Z
+ 206:main.c        ****     for (uint8_t i = 0; dsp_buff2[i];){
+ 481               		.loc 1 206 25 discriminator 1 view .LVU155
+ 482 0188 6111      		cpse r22,__zero_reg__
+ 483 018a 00C0      		rjmp .L20
+ 484               	.LBE13:
+ 208:main.c        ****     }
+ 209:main.c        ****     // move to third line
+ 210:main.c        ****     write_twi0_SerLCD(0x72, 254);
+ 485               		.loc 1 210 5 is_stmt 1 view .LVU156
+ 486 018c 6EEF      		ldi r22,lo8(-2)
+ 487 018e 82E7      		ldi r24,lo8(114)
+ 488 0190 0E94 0000 		call write_twi0_SerLCD
+ 489               	.LVL22:
+ 211:main.c        ****     write_twi0_SerLCD(0x72, 128+20);
+ 490               		.loc 1 211 5 view .LVU157
+ 491 0194 64E9      		ldi r22,lo8(-108)
+ 492 0196 82E7      		ldi r24,lo8(114)
+ 493 0198 0E94 0000 		call write_twi0_SerLCD
+ 494               	.LVL23:
+ 212:main.c        ****     for (uint8_t i = 0; dsp_buff3[i];){
+ 495               		.loc 1 212 5 view .LVU158
+ 496               	.LBB14:
+ 497               		.loc 1 212 10 view .LVU159
+ 498               		.loc 1 212 18 is_stmt 0 view .LVU160
+ 499 019c C0E0      		ldi r28,0
+ 500               	.LVL24:
+ 501               		.loc 1 212 5 view .LVU161
+ 502 019e 00C0      		rjmp .L21
+ 503               	.LVL25:
+ 504               	.L22:
+ 213:main.c        ****         write_twi0_SerLCD(0x72, dsp_buff3[i++]);
+ 505               		.loc 1 213 9 is_stmt 1 view .LVU162
+ 506               		.loc 1 213 44 is_stmt 0 view .LVU163
+ 507 01a0 CF5F      		subi r28,lo8(-(1))
+ 508               	.LVL26:
+ 509               		.loc 1 213 9 view .LVU164
+ 510 01a2 82E7      		ldi r24,lo8(114)
+ 511 01a4 0E94 0000 		call write_twi0_SerLCD
+ 512               	.LVL27:
+ 513               	.L21:
+ 212:main.c        ****     for (uint8_t i = 0; dsp_buff3[i];){
+ 514               		.loc 1 212 25 is_stmt 1 discriminator 1 view .LVU165
+ 212:main.c        ****     for (uint8_t i = 0; dsp_buff3[i];){
+ 515               		.loc 1 212 34 is_stmt 0 discriminator 1 view .LVU166
+ 516 01a8 EC2F      		mov r30,r28
+ 517 01aa F0E0      		ldi r31,0
+ 518 01ac E050      		subi r30,lo8(-(dsp_buff3))
+ 519 01ae F040      		sbci r31,hi8(-(dsp_buff3))
+ 520 01b0 6081      		ld r22,Z
+ 212:main.c        ****     for (uint8_t i = 0; dsp_buff3[i];){
+ 521               		.loc 1 212 25 discriminator 1 view .LVU167
+ 522 01b2 6111      		cpse r22,__zero_reg__
+ 523 01b4 00C0      		rjmp .L22
+ 524               	.LBE14:
+ 214:main.c        ****     }
+ 215:main.c        ****     // move to fourth line
+ 216:main.c        ****     write_twi0_SerLCD(0x72, 254);
+ 525               		.loc 1 216 5 is_stmt 1 view .LVU168
+ 526 01b6 6EEF      		ldi r22,lo8(-2)
+ 527 01b8 82E7      		ldi r24,lo8(114)
+ 528 01ba 0E94 0000 		call write_twi0_SerLCD
+ 529               	.LVL28:
+ 217:main.c        ****     write_twi0_SerLCD(0x72, 128+84);
+ 530               		.loc 1 217 5 view .LVU169
+ 531 01be 64ED      		ldi r22,lo8(-44)
+ 532 01c0 82E7      		ldi r24,lo8(114)
+ 533 01c2 0E94 0000 		call write_twi0_SerLCD
+ 534               	.LVL29:
+ 218:main.c        ****     for (uint8_t i = 0; dsp_buff4[i];){
+ 535               		.loc 1 218 5 view .LVU170
+ 536               	.LBB15:
+ 537               		.loc 1 218 10 view .LVU171
+ 538               		.loc 1 218 18 is_stmt 0 view .LVU172
+ 539 01c6 C0E0      		ldi r28,0
+ 540               	.LVL30:
+ 541               		.loc 1 218 5 view .LVU173
+ 542 01c8 00C0      		rjmp .L23
+ 543               	.LVL31:
+ 544               	.L24:
+ 219:main.c        ****         write_twi0_SerLCD(0x72, dsp_buff4[i++]);
+ 545               		.loc 1 219 9 is_stmt 1 view .LVU174
+ 546               		.loc 1 219 44 is_stmt 0 view .LVU175
+ 547 01ca CF5F      		subi r28,lo8(-(1))
+ 548               	.LVL32:
+ 549               		.loc 1 219 9 view .LVU176
+ 550 01cc 82E7      		ldi r24,lo8(114)
+ 551 01ce 0E94 0000 		call write_twi0_SerLCD
+ 552               	.LVL33:
+ 553               	.L23:
+ 218:main.c        ****     for (uint8_t i = 0; dsp_buff4[i];){
+ 554               		.loc 1 218 25 is_stmt 1 discriminator 1 view .LVU177
+ 218:main.c        ****     for (uint8_t i = 0; dsp_buff4[i];){
+ 555               		.loc 1 218 34 is_stmt 0 discriminator 1 view .LVU178
+ 556 01d2 EC2F      		mov r30,r28
+ 557 01d4 F0E0      		ldi r31,0
+ 558 01d6 E050      		subi r30,lo8(-(dsp_buff4))
+ 559 01d8 F040      		sbci r31,hi8(-(dsp_buff4))
+ 560 01da 6081      		ld r22,Z
+ 218:main.c        ****     for (uint8_t i = 0; dsp_buff4[i];){
+ 561               		.loc 1 218 25 discriminator 1 view .LVU179
+ 562 01dc 6111      		cpse r22,__zero_reg__
+ 563 01de 00C0      		rjmp .L24
+ 564               	.LBE15:
+ 220:main.c        ****     }
+ 221:main.c        **** 
+ 222:main.c        ****     // wait so that it doesn't write too frequently
+ 223:main.c        ****     _delay_us(500);
+ 565               		.loc 1 223 5 is_stmt 1 view .LVU180
+ 566               	.LVL34:
+ 567               	.LBB16:
+ 568               	.LBI16:
+ 175:/usr/avr/include/util/delay.h **** 
+ 176:/usr/avr/include/util/delay.h **** #else
+ 177:/usr/avr/include/util/delay.h **** 	uint16_t __ticks;
+ 178:/usr/avr/include/util/delay.h **** 	__tmp = ((F_CPU) / 4e3) * __ms;
+ 179:/usr/avr/include/util/delay.h **** 	if (__tmp < 1.0)
+ 180:/usr/avr/include/util/delay.h **** 		__ticks = 1;
+ 181:/usr/avr/include/util/delay.h **** 	else if (__tmp > 65535)
+ 182:/usr/avr/include/util/delay.h **** 	{
+ 183:/usr/avr/include/util/delay.h **** 		//	__ticks = requested delay in 1/10 ms
+ 184:/usr/avr/include/util/delay.h **** 		__ticks = (uint16_t) (__ms * 10.0);
+ 185:/usr/avr/include/util/delay.h **** 		while(__ticks)
+ 186:/usr/avr/include/util/delay.h **** 		{
+ 187:/usr/avr/include/util/delay.h **** 			// wait 1/10 ms
+ 188:/usr/avr/include/util/delay.h **** 			_delay_loop_2(((F_CPU) / 4e3) / 10);
+ 189:/usr/avr/include/util/delay.h **** 			__ticks --;
+ 190:/usr/avr/include/util/delay.h **** 		}
+ 191:/usr/avr/include/util/delay.h **** 		return;
+ 192:/usr/avr/include/util/delay.h **** 	}
+ 193:/usr/avr/include/util/delay.h **** 	else
+ 194:/usr/avr/include/util/delay.h **** 		__ticks = (uint16_t)__tmp;
+ 195:/usr/avr/include/util/delay.h **** 	_delay_loop_2(__ticks);
+ 196:/usr/avr/include/util/delay.h **** #endif
+ 197:/usr/avr/include/util/delay.h **** }
+ 198:/usr/avr/include/util/delay.h **** 
+ 199:/usr/avr/include/util/delay.h **** /**
+ 200:/usr/avr/include/util/delay.h ****    \ingroup util_delay
+ 201:/usr/avr/include/util/delay.h **** 
+ 202:/usr/avr/include/util/delay.h ****    Perform a delay of \c __us microseconds, using _delay_loop_1().
+ 203:/usr/avr/include/util/delay.h **** 
+ 204:/usr/avr/include/util/delay.h ****    The macro #F_CPU is supposed to be defined to a
+ 205:/usr/avr/include/util/delay.h ****    constant defining the CPU clock frequency (in Hertz).
+ 206:/usr/avr/include/util/delay.h **** 
+ 207:/usr/avr/include/util/delay.h ****    The maximal possible delay is 768 &mu;s / F_CPU in MHz.
+ 208:/usr/avr/include/util/delay.h **** 
+ 209:/usr/avr/include/util/delay.h ****    If the user requests a delay greater than the maximal possible one,
+ 210:/usr/avr/include/util/delay.h ****    _delay_us() will automatically call _delay_ms() instead.  The user
+ 211:/usr/avr/include/util/delay.h ****    will not be informed about this case.
+ 212:/usr/avr/include/util/delay.h **** 
+ 213:/usr/avr/include/util/delay.h ****    If the avr-gcc toolchain has __builtin_avr_delay_cycles()
+ 214:/usr/avr/include/util/delay.h ****    support, maximal possible delay is 4294967.295 &mu;s/ F_CPU in MHz. For
+ 215:/usr/avr/include/util/delay.h ****    values greater than the maximal possible delay, overflow may result in
+ 216:/usr/avr/include/util/delay.h ****    no delay i.e., 0&nbsp;&mu;s.
+ 217:/usr/avr/include/util/delay.h **** 
+ 218:/usr/avr/include/util/delay.h ****    Conversion of \c __us into clock cycles may not always result in
+ 219:/usr/avr/include/util/delay.h ****    integer.  By default, the clock cycles are rounded up to next
+ 220:/usr/avr/include/util/delay.h ****    integer. This ensures that the user gets at least \c __us
+ 221:/usr/avr/include/util/delay.h ****    microseconds of delay.
+ 222:/usr/avr/include/util/delay.h **** 
+ 223:/usr/avr/include/util/delay.h ****    Alternatively, by defining the macro \c __DELAY_ROUND_DOWN__, or
+ 224:/usr/avr/include/util/delay.h ****    \c __DELAY_ROUND_CLOSEST__, before including this header file, the
+ 225:/usr/avr/include/util/delay.h ****    algorithm can be made to round down, or round to closest integer,
+ 226:/usr/avr/include/util/delay.h ****    respectively.
+ 227:/usr/avr/include/util/delay.h **** 
+ 228:/usr/avr/include/util/delay.h ****    \note The implementation of _delay_us() based on
+ 229:/usr/avr/include/util/delay.h ****    \c __builtin_avr_delay_cycles() is not backward compatible with older
+ 230:/usr/avr/include/util/delay.h ****    implementations.  In order to get functionality backward compatible
+ 231:/usr/avr/include/util/delay.h ****    with previous versions, the macro \c __DELAY_BACKWARD_COMPATIBLE__
+ 232:/usr/avr/include/util/delay.h ****    must be defined before including this header file.
+ 233:/usr/avr/include/util/delay.h ****  */
+ 234:/usr/avr/include/util/delay.h **** static __ATTR_ALWAYS_INLINE__ void _delay_us(double __us);
+ 235:/usr/avr/include/util/delay.h **** 
+ 236:/usr/avr/include/util/delay.h **** void
+ 237:/usr/avr/include/util/delay.h **** _delay_us(double __us)
+ 569               		.loc 2 237 1 view .LVU181
+ 570               	.LBB17:
+ 238:/usr/avr/include/util/delay.h **** {
+ 239:/usr/avr/include/util/delay.h **** 	double __tmp ;
+ 571               		.loc 2 239 2 view .LVU182
+ 240:/usr/avr/include/util/delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) \
+ 241:/usr/avr/include/util/delay.h ****   && !defined(__DELAY_BACKWARD_COMPATIBLE__)
+ 242:/usr/avr/include/util/delay.h **** 	uint32_t __ticks_dc;
+ 572               		.loc 2 242 2 view .LVU183
+ 243:/usr/avr/include/util/delay.h **** 	extern void __builtin_avr_delay_cycles(uint32_t);
+ 573               		.loc 2 243 2 view .LVU184
+ 244:/usr/avr/include/util/delay.h **** 	__tmp = ((F_CPU) / 1e6) * __us;
+ 574               		.loc 2 244 2 view .LVU185
+ 245:/usr/avr/include/util/delay.h **** 
+ 246:/usr/avr/include/util/delay.h **** 	#if defined(__DELAY_ROUND_DOWN__)
+ 247:/usr/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)__builtin_fabs(__tmp);
+ 248:/usr/avr/include/util/delay.h **** 
+ 249:/usr/avr/include/util/delay.h **** 	#elif defined(__DELAY_ROUND_CLOSEST__)
+ 250:/usr/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)(__builtin_fabs(__tmp)+0.5);
+ 251:/usr/avr/include/util/delay.h **** 
+ 252:/usr/avr/include/util/delay.h **** 	#else
+ 253:/usr/avr/include/util/delay.h **** 		//round up by default
+ 254:/usr/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)(__builtin_ceil(__builtin_fabs(__tmp)));
+ 575               		.loc 2 254 3 view .LVU186
+ 255:/usr/avr/include/util/delay.h **** 	#endif
+ 256:/usr/avr/include/util/delay.h **** 
+ 257:/usr/avr/include/util/delay.h **** 	__builtin_avr_delay_cycles(__ticks_dc);
+ 576               		.loc 2 257 2 view .LVU187
+ 577 01e0 83EF      		ldi r24,lo8(499)
+ 578 01e2 91E0      		ldi r25,hi8(499)
+ 579 01e4 0197      	1:	sbiw r24,1
+ 580 01e6 01F4      		brne 1b
+ 581 01e8 00C0      		rjmp .
+ 582 01ea 0000      		nop
+ 583               	.LVL35:
+ 584               	/* epilogue start */
+ 585               		.loc 2 257 2 is_stmt 0 view .LVU188
+ 586               	.LBE17:
+ 587               	.LBE16:
+ 224:main.c        **** }
+ 588               		.loc 1 224 1 view .LVU189
+ 589 01ec CF91      		pop r28
+ 590               	.LVL36:
+ 591               		.loc 1 224 1 view .LVU190
+ 592 01ee 0895      		ret
+ 593               		.cfi_endproc
+ 594               	.LFE11:
+ 596               	.global	update_SerLCD
+ 598               	update_SerLCD:
+ 599               	.LFB12:
+ 225:main.c        **** 
+ 226:main.c        **** // all this does is take the dsp_buff* and write it directly into SPI0.DATA
+ 227:main.c        **** void update_SerLCD(void){
+ 600               		.loc 1 227 25 is_stmt 1 view -0
+ 601               		.cfi_startproc
+ 602 01f0 CF93      		push r28
+ 603               		.cfi_def_cfa_offset 3
+ 604               		.cfi_offset 28, -2
+ 605               	/* prologue: function */
+ 606               	/* frame size = 0 */
+ 607               	/* stack size = 1 */
+ 608               	.L__stack_usage = 1
+ 228:main.c        **** 	// clear and write
+ 229:main.c        **** 	write_spi0_SerLCD('|');
+ 609               		.loc 1 229 2 view .LVU192
+ 610 01f2 8CE7      		ldi r24,lo8(124)
+ 611 01f4 0E94 0000 		call write_spi0_SerLCD
+ 612               	.LVL37:
+ 230:main.c        **** 	write_spi0_SerLCD('-');
+ 613               		.loc 1 230 2 view .LVU193
+ 614 01f8 8DE2      		ldi r24,lo8(45)
+ 615 01fa 0E94 0000 		call write_spi0_SerLCD
+ 616               	.LVL38:
+ 231:main.c        **** 
+ 232:main.c        **** 	// start at the first line
+ 233:main.c        **** 	write_spi0_SerLCD(254);
+ 617               		.loc 1 233 2 view .LVU194
+ 618 01fe 8EEF      		ldi r24,lo8(-2)
+ 619 0200 0E94 0000 		call write_spi0_SerLCD
+ 620               	.LVL39:
+ 234:main.c        **** 	write_spi0_SerLCD(128+0);
+ 621               		.loc 1 234 2 view .LVU195
+ 622 0204 80E8      		ldi r24,lo8(-128)
+ 623 0206 0E94 0000 		call write_spi0_SerLCD
+ 624               	.LVL40:
+ 235:main.c        **** 	for (uint8_t i = 0; dsp_buff1[i];){
+ 625               		.loc 1 235 2 view .LVU196
+ 626               	.LBB18:
+ 627               		.loc 1 235 7 view .LVU197
+ 628               		.loc 1 235 15 is_stmt 0 view .LVU198
+ 629 020a C0E0      		ldi r28,0
+ 630               		.loc 1 235 2 view .LVU199
+ 631 020c 00C0      		rjmp .L26
+ 632               	.LVL41:
+ 633               	.L27:
+ 236:main.c        **** 		write_spi0_SerLCD(dsp_buff1[i++]);
+ 634               		.loc 1 236 3 is_stmt 1 view .LVU200
+ 635               		.loc 1 236 32 is_stmt 0 view .LVU201
+ 636 020e CF5F      		subi r28,lo8(-(1))
+ 637               	.LVL42:
+ 638               		.loc 1 236 3 view .LVU202
+ 639 0210 0E94 0000 		call write_spi0_SerLCD
+ 640               	.LVL43:
+ 641               	.L26:
+ 235:main.c        **** 	for (uint8_t i = 0; dsp_buff1[i];){
+ 642               		.loc 1 235 22 is_stmt 1 discriminator 1 view .LVU203
+ 235:main.c        **** 	for (uint8_t i = 0; dsp_buff1[i];){
+ 643               		.loc 1 235 31 is_stmt 0 discriminator 1 view .LVU204
+ 644 0214 EC2F      		mov r30,r28
+ 645 0216 F0E0      		ldi r31,0
+ 646 0218 E050      		subi r30,lo8(-(dsp_buff1))
+ 647 021a F040      		sbci r31,hi8(-(dsp_buff1))
+ 648 021c 8081      		ld r24,Z
+ 235:main.c        **** 	for (uint8_t i = 0; dsp_buff1[i];){
+ 649               		.loc 1 235 22 discriminator 1 view .LVU205
+ 650 021e 8111      		cpse r24,__zero_reg__
+ 651 0220 00C0      		rjmp .L27
+ 652               	.LBE18:
+ 237:main.c        **** 	}
+ 238:main.c        **** 	// move to second line
+ 239:main.c        **** 	write_spi0_SerLCD(254);
+ 653               		.loc 1 239 2 is_stmt 1 view .LVU206
+ 654 0222 8EEF      		ldi r24,lo8(-2)
+ 655 0224 0E94 0000 		call write_spi0_SerLCD
+ 656               	.LVL44:
+ 240:main.c        **** 	write_spi0_SerLCD(128+64);
+ 657               		.loc 1 240 2 view .LVU207
+ 658 0228 80EC      		ldi r24,lo8(-64)
+ 659 022a 0E94 0000 		call write_spi0_SerLCD
+ 660               	.LVL45:
+ 241:main.c        **** 	for (uint8_t i = 0; dsp_buff2[i];){
+ 661               		.loc 1 241 2 view .LVU208
+ 662               	.LBB19:
+ 663               		.loc 1 241 7 view .LVU209
+ 664               		.loc 1 241 15 is_stmt 0 view .LVU210
+ 665 022e C0E0      		ldi r28,0
+ 666               	.LVL46:
+ 667               		.loc 1 241 2 view .LVU211
+ 668 0230 00C0      		rjmp .L28
+ 669               	.LVL47:
+ 670               	.L29:
+ 242:main.c        **** 		write_spi0_SerLCD(dsp_buff2[i++]);
+ 671               		.loc 1 242 3 is_stmt 1 view .LVU212
+ 672               		.loc 1 242 32 is_stmt 0 view .LVU213
+ 673 0232 CF5F      		subi r28,lo8(-(1))
+ 674               	.LVL48:
+ 675               		.loc 1 242 3 view .LVU214
+ 676 0234 0E94 0000 		call write_spi0_SerLCD
+ 677               	.LVL49:
+ 678               	.L28:
+ 241:main.c        **** 	for (uint8_t i = 0; dsp_buff2[i];){
+ 679               		.loc 1 241 22 is_stmt 1 discriminator 1 view .LVU215
+ 241:main.c        **** 	for (uint8_t i = 0; dsp_buff2[i];){
+ 680               		.loc 1 241 31 is_stmt 0 discriminator 1 view .LVU216
+ 681 0238 EC2F      		mov r30,r28
+ 682 023a F0E0      		ldi r31,0
+ 683 023c E050      		subi r30,lo8(-(dsp_buff2))
+ 684 023e F040      		sbci r31,hi8(-(dsp_buff2))
+ 685 0240 8081      		ld r24,Z
+ 241:main.c        **** 	for (uint8_t i = 0; dsp_buff2[i];){
+ 686               		.loc 1 241 22 discriminator 1 view .LVU217
+ 687 0242 8111      		cpse r24,__zero_reg__
+ 688 0244 00C0      		rjmp .L29
+ 689               	.LBE19:
+ 243:main.c        **** 	}
+ 244:main.c        **** 	// move to third line
+ 245:main.c        **** 	write_spi0_SerLCD(254);
+ 690               		.loc 1 245 2 is_stmt 1 view .LVU218
+ 691 0246 8EEF      		ldi r24,lo8(-2)
+ 692 0248 0E94 0000 		call write_spi0_SerLCD
+ 693               	.LVL50:
+ 246:main.c        **** 	write_spi0_SerLCD(128+20);
+ 694               		.loc 1 246 2 view .LVU219
+ 695 024c 84E9      		ldi r24,lo8(-108)
+ 696 024e 0E94 0000 		call write_spi0_SerLCD
+ 697               	.LVL51:
+ 247:main.c        **** 	for (uint8_t i = 0; dsp_buff3[i];){
+ 698               		.loc 1 247 2 view .LVU220
+ 699               	.LBB20:
+ 700               		.loc 1 247 7 view .LVU221
+ 701               		.loc 1 247 15 is_stmt 0 view .LVU222
+ 702 0252 C0E0      		ldi r28,0
+ 703               	.LVL52:
+ 704               		.loc 1 247 2 view .LVU223
+ 705 0254 00C0      		rjmp .L30
+ 706               	.LVL53:
+ 707               	.L31:
+ 248:main.c        **** 		write_spi0_SerLCD(dsp_buff3[i++]);
+ 708               		.loc 1 248 3 is_stmt 1 view .LVU224
+ 709               		.loc 1 248 32 is_stmt 0 view .LVU225
+ 710 0256 CF5F      		subi r28,lo8(-(1))
+ 711               	.LVL54:
+ 712               		.loc 1 248 3 view .LVU226
+ 713 0258 0E94 0000 		call write_spi0_SerLCD
+ 714               	.LVL55:
+ 715               	.L30:
+ 247:main.c        **** 	for (uint8_t i = 0; dsp_buff3[i];){
+ 716               		.loc 1 247 22 is_stmt 1 discriminator 1 view .LVU227
+ 247:main.c        **** 	for (uint8_t i = 0; dsp_buff3[i];){
+ 717               		.loc 1 247 31 is_stmt 0 discriminator 1 view .LVU228
+ 718 025c EC2F      		mov r30,r28
+ 719 025e F0E0      		ldi r31,0
+ 720 0260 E050      		subi r30,lo8(-(dsp_buff3))
+ 721 0262 F040      		sbci r31,hi8(-(dsp_buff3))
+ 722 0264 8081      		ld r24,Z
+ 247:main.c        **** 	for (uint8_t i = 0; dsp_buff3[i];){
+ 723               		.loc 1 247 22 discriminator 1 view .LVU229
+ 724 0266 8111      		cpse r24,__zero_reg__
+ 725 0268 00C0      		rjmp .L31
+ 726               	.LBE20:
+ 249:main.c        **** 	}
+ 250:main.c        **** 	// move to fourth line
+ 251:main.c        **** 	write_spi0_SerLCD(254);
+ 727               		.loc 1 251 2 is_stmt 1 view .LVU230
+ 728 026a 8EEF      		ldi r24,lo8(-2)
+ 729 026c 0E94 0000 		call write_spi0_SerLCD
+ 730               	.LVL56:
+ 252:main.c        **** 	write_spi0_SerLCD(128+84);
+ 731               		.loc 1 252 2 view .LVU231
+ 732 0270 84ED      		ldi r24,lo8(-44)
+ 733 0272 0E94 0000 		call write_spi0_SerLCD
+ 734               	.LVL57:
+ 253:main.c        **** 	for (uint8_t i = 0; dsp_buff4[i];){
+ 735               		.loc 1 253 2 view .LVU232
+ 736               	.LBB21:
+ 737               		.loc 1 253 7 view .LVU233
+ 738               		.loc 1 253 15 is_stmt 0 view .LVU234
+ 739 0276 C0E0      		ldi r28,0
+ 740               	.LVL58:
+ 741               		.loc 1 253 2 view .LVU235
+ 742 0278 00C0      		rjmp .L32
+ 743               	.LVL59:
+ 744               	.L33:
+ 254:main.c        **** 		write_spi0_SerLCD(dsp_buff4[i++]);
+ 745               		.loc 1 254 3 is_stmt 1 view .LVU236
+ 746               		.loc 1 254 32 is_stmt 0 view .LVU237
+ 747 027a CF5F      		subi r28,lo8(-(1))
+ 748               	.LVL60:
+ 749               		.loc 1 254 3 view .LVU238
+ 750 027c 0E94 0000 		call write_spi0_SerLCD
+ 751               	.LVL61:
+ 752               	.L32:
+ 253:main.c        **** 	for (uint8_t i = 0; dsp_buff4[i];){
+ 753               		.loc 1 253 22 is_stmt 1 discriminator 1 view .LVU239
+ 253:main.c        **** 	for (uint8_t i = 0; dsp_buff4[i];){
+ 754               		.loc 1 253 31 is_stmt 0 discriminator 1 view .LVU240
+ 755 0280 EC2F      		mov r30,r28
+ 756 0282 F0E0      		ldi r31,0
+ 757 0284 E050      		subi r30,lo8(-(dsp_buff4))
+ 758 0286 F040      		sbci r31,hi8(-(dsp_buff4))
+ 759 0288 8081      		ld r24,Z
+ 253:main.c        **** 	for (uint8_t i = 0; dsp_buff4[i];){
+ 760               		.loc 1 253 22 discriminator 1 view .LVU241
+ 761 028a 8111      		cpse r24,__zero_reg__
+ 762 028c 00C0      		rjmp .L33
+ 763               	/* epilogue start */
+ 764               	.LBE21:
+ 255:main.c        **** 	}
+ 256:main.c        **** 
+ 257:main.c        **** 	// wait so that it doesn't write too frequently
+ 258:main.c        **** }
+ 765               		.loc 1 258 1 view .LVU242
+ 766 028e CF91      		pop r28
+ 767               	.LVL62:
+ 768               		.loc 1 258 1 view .LVU243
+ 769 0290 0895      		ret
+ 770               		.cfi_endproc
+ 771               	.LFE12:
+ 773               		.section	.rodata.str1.1,"aMS",@progbits,1
+ 774               	.LC0:
+ 775 0000 2020 2020 		.string	"                    "
+ 775      2020 2020 
+ 775      2020 2020 
+ 775      2020 2020 
+ 775      2020 2020 
+ 776               		.text
+ 777               	.global	clear_display_buffs
+ 779               	clear_display_buffs:
+ 780               	.LFB13:
+ 259:main.c        **** 
+ 260:main.c        **** // this clears the display buffers
+ 261:main.c        **** void clear_display_buffs(void){
+ 781               		.loc 1 261 31 is_stmt 1 view -0
+ 782               		.cfi_startproc
+ 783               	/* prologue: function */
+ 784               	/* frame size = 0 */
+ 785               	/* stack size = 0 */
+ 786               	.L__stack_usage = 0
+ 262:main.c        ****     sprintf(dsp_buff1, "                    ");
+ 787               		.loc 1 262 5 view .LVU245
+ 788 0292 85E1      		ldi r24,lo8(21)
+ 789 0294 E0E0      		ldi r30,lo8(.LC0)
+ 790 0296 F0E0      		ldi r31,hi8(.LC0)
+ 791 0298 A0E0      		ldi r26,lo8(dsp_buff1)
+ 792 029a B0E0      		ldi r27,hi8(dsp_buff1)
+ 793               		0:
+ 794 029c 0190      		ld r0,Z+
+ 795 029e 0D92      		st X+,r0
+ 796 02a0 8A95      		dec r24
+ 797 02a2 01F4      		brne 0b
+ 263:main.c        ****     sprintf(dsp_buff2, "                    ");
+ 798               		.loc 1 263 5 view .LVU246
+ 799 02a4 85E1      		ldi r24,lo8(21)
+ 800 02a6 E0E0      		ldi r30,lo8(.LC0)
+ 801 02a8 F0E0      		ldi r31,hi8(.LC0)
+ 802 02aa A0E0      		ldi r26,lo8(dsp_buff2)
+ 803 02ac B0E0      		ldi r27,hi8(dsp_buff2)
+ 804               		0:
+ 805 02ae 0190      		ld r0,Z+
+ 806 02b0 0D92      		st X+,r0
+ 807 02b2 8A95      		dec r24
+ 808 02b4 01F4      		brne 0b
+ 264:main.c        ****     sprintf(dsp_buff3, "                    ");
+ 809               		.loc 1 264 5 view .LVU247
+ 810 02b6 85E1      		ldi r24,lo8(21)
+ 811 02b8 E0E0      		ldi r30,lo8(.LC0)
+ 812 02ba F0E0      		ldi r31,hi8(.LC0)
+ 813 02bc A0E0      		ldi r26,lo8(dsp_buff3)
+ 814 02be B0E0      		ldi r27,hi8(dsp_buff3)
+ 815               		0:
+ 816 02c0 0190      		ld r0,Z+
+ 817 02c2 0D92      		st X+,r0
+ 818 02c4 8A95      		dec r24
+ 819 02c6 01F4      		brne 0b
+ 265:main.c        ****     sprintf(dsp_buff4, "                    ");
+ 820               		.loc 1 265 5 view .LVU248
+ 821 02c8 85E1      		ldi r24,lo8(21)
+ 822 02ca E0E0      		ldi r30,lo8(.LC0)
+ 823 02cc F0E0      		ldi r31,hi8(.LC0)
+ 824 02ce A0E0      		ldi r26,lo8(dsp_buff4)
+ 825 02d0 B0E0      		ldi r27,hi8(dsp_buff4)
+ 826               		0:
+ 827 02d2 0190      		ld r0,Z+
+ 828 02d4 0D92      		st X+,r0
+ 829 02d6 8A95      		dec r24
+ 830 02d8 01F4      		brne 0b
+ 831               	/* epilogue start */
+ 266:main.c        **** }
+ 832               		.loc 1 266 1 is_stmt 0 view .LVU249
+ 833 02da 0895      		ret
+ 834               		.cfi_endproc
+ 835               	.LFE13:
+ 837               		.section	.rodata.str1.1
+ 838               	.LC1:
+ 839 0015 4875 6D61 		.string	"Human Readable LM75"
+ 839      6E20 5265 
+ 839      6164 6162 
+ 839      6C65 204C 
+ 839      4D37 3500 
+ 840               	.LC2:
+ 841 0029 2564 2E25 		.string	"%d.%d C"
+ 841      6420 4300 
+ 842               	.LC3:
+ 843 0031 2566 2046 		.string	"%f F"
+ 843      00
+ 844               		.text
+ 845               	.global	main
+ 847               	main:
+ 848               	.LFB14:
+ 267:main.c        **** 
+ 268:main.c        **** 
+ 269:main.c        **** 
+ 270:main.c        **** int main(void)
+ 271:main.c        **** {
+ 849               		.loc 1 271 1 is_stmt 1 view -0
+ 850               		.cfi_startproc
+ 851 02dc CDB7      		in r28,__SP_L__
+ 852 02de DEB7      		in r29,__SP_H__
+ 853               		.cfi_def_cfa_register 28
+ 854 02e0 2D97      		sbiw r28,13
+ 855               		.cfi_def_cfa_offset 15
+ 856 02e2 CDBF      		out __SP_L__,r28
+ 857 02e4 DEBF      		out __SP_H__,r29
+ 858               	/* prologue: function */
+ 859               	/* frame size = 13 */
+ 860               	/* stack size = 13 */
+ 861               	.L__stack_usage = 13
+ 272:main.c        ****     // initialize the LCD
+ 273:main.c        ****     init_twi0_SerLCD();
+ 862               		.loc 1 273 5 view .LVU251
+ 863 02e6 0E94 0000 		call init_twi0_SerLCD
+ 864               	.LVL63:
+ 274:main.c        **** 
+ 275:main.c        **** 	// init LM75
+ 276:main.c        **** 	init_twi0_LM75();
+ 865               		.loc 1 276 2 view .LVU252
+ 866 02ea 0E94 0000 		call init_twi0_LM75
+ 867               	.LVL64:
+ 277:main.c        **** 
+ 278:main.c        ****     // display clear
+ 279:main.c        ****     clear_display_buffs();
+ 868               		.loc 1 279 5 view .LVU253
+ 869 02ee 0E94 0000 		call clear_display_buffs
+ 870               	.LVL65:
+ 280:main.c        **** 
+ 281:main.c        ****     // Clear board
+ 282:main.c        ****     write_twi0_SerLCD(0x72, '|');
+ 871               		.loc 1 282 5 view .LVU254
+ 872 02f2 6CE7      		ldi r22,lo8(124)
+ 873 02f4 82E7      		ldi r24,lo8(114)
+ 874 02f6 0E94 0000 		call write_twi0_SerLCD
+ 875               	.LVL66:
+ 283:main.c        ****     write_twi0_SerLCD(0x72, '-');
+ 876               		.loc 1 283 5 view .LVU255
+ 877 02fa 6DE2      		ldi r22,lo8(45)
+ 878 02fc 82E7      		ldi r24,lo8(114)
+ 879 02fe 0E94 0000 		call write_twi0_SerLCD
+ 880               	.LVL67:
+ 284:main.c        **** 
+ 285:main.c        ****     // alters and writes the clear command
+ 286:main.c        ****     update_twi0_SerLCD();
+ 881               		.loc 1 286 5 view .LVU256
+ 882 0302 0E94 0000 		call update_twi0_SerLCD
+ 883               	.LVL68:
+ 884 0306 00C0      		rjmp .L38
+ 885               	.LVL69:
+ 886               	.L37:
+ 887               	.LBB22:
+ 888               	.LBB23:
+ 287:main.c        **** 
+ 288:main.c        ****     while(1)
+ 289:main.c        ****     {
+ 290:main.c        **** 
+ 291:main.c        **** 		// start with a celcius_accumulator
+ 292:main.c        ****         int8_t celcius_accumulator = 0;
+ 293:main.c        ****         // the address for the LM75
+ 294:main.c        ****         volatile uint16_t totalread = TWI0_LM75_read(0b1001000);
+ 295:main.c        ****         uint8_t half=0;
+ 296:main.c        **** 
+ 297:main.c        ****         // shift out 7 digits because we only care about the d8 bit
+ 298:main.c        ****         totalread = totalread >> 7;
+ 299:main.c        **** 
+ 300:main.c        ****         // this is the 0.5 * lsb
+ 301:main.c        ****         half = 5*totalread % 2;
+ 302:main.c        **** 
+ 303:main.c        ****         uint8_t scale = 1;
+ 304:main.c        ****         for (int i = 0; i < 7; i++)
+ 305:main.c        ****         {
+ 306:main.c        **** 			// shift out once more
+ 307:main.c        **** 			totalread = totalread >> 1;
+ 889               		.loc 1 307 4 view .LVU257
+ 890               		.loc 1 307 26 is_stmt 0 view .LVU258
+ 891 0308 8981      		ldd r24,Y+1
+ 892 030a 9A81      		ldd r25,Y+2
+ 893 030c 9695      		lsr r25
+ 894 030e 8795      		ror r24
+ 895               		.loc 1 307 14 view .LVU259
+ 896 0310 8983      		std Y+1,r24
+ 897 0312 9A83      		std Y+2,r25
+ 308:main.c        ****             celcius_accumulator += scale*(totalread % 2);
+ 898               		.loc 1 308 13 is_stmt 1 view .LVU260
+ 899               		.loc 1 308 53 is_stmt 0 view .LVU261
+ 900 0314 8981      		ldd r24,Y+1
+ 901 0316 9A81      		ldd r25,Y+2
+ 902 0318 8170      		andi r24,1
+ 903 031a 9927      		clr r25
+ 904               		.loc 1 308 41 view .LVU262
+ 905 031c 9195      		neg r25
+ 906 031e 8195      		neg r24
+ 907 0320 9109      		sbc r25,__zero_reg__
+ 908 0322 8623      		and r24,r22
+ 909               		.loc 1 308 33 view .LVU263
+ 910 0324 780F      		add r23,r24
+ 911               	.LVL70:
+ 309:main.c        **** 			scale *= 2;
+ 912               		.loc 1 309 4 is_stmt 1 view .LVU264
+ 913               		.loc 1 309 10 is_stmt 0 view .LVU265
+ 914 0326 660F      		lsl r22
+ 915               	.LVL71:
+ 304:main.c        ****         {
+ 916               		.loc 1 304 33 is_stmt 1 discriminator 3 view .LVU266
+ 917 0328 2F5F      		subi r18,-1
+ 918 032a 3F4F      		sbci r19,-1
+ 919               	.LVL72:
+ 920               	.L36:
+ 304:main.c        ****         {
+ 921               		.loc 1 304 27 discriminator 1 view .LVU267
+ 922 032c 2730      		cpi r18,7
+ 923 032e 3105      		cpc r19,__zero_reg__
+ 924 0330 04F0      		brlt .L37
+ 925               	.LBE23:
+ 310:main.c        ****         }
+ 311:main.c        **** 		
+ 312:main.c        **** 		// shift out once more
+ 313:main.c        **** 		totalread = totalread >> 1;
+ 926               		.loc 1 313 3 view .LVU268
+ 927               		.loc 1 313 25 is_stmt 0 view .LVU269
+ 928 0332 8981      		ldd r24,Y+1
+ 929 0334 9A81      		ldd r25,Y+2
+ 930 0336 9695      		lsr r25
+ 931 0338 8795      		ror r24
+ 932               		.loc 1 313 13 view .LVU270
+ 933 033a 8983      		std Y+1,r24
+ 934 033c 9A83      		std Y+2,r25
+ 314:main.c        ****         celcius_accumulator -= 128*(totalread %2) ;
+ 935               		.loc 1 314 9 is_stmt 1 view .LVU271
+ 936               		.loc 1 314 47 is_stmt 0 view .LVU272
+ 937 033e 8981      		ldd r24,Y+1
+ 938 0340 9A81      		ldd r25,Y+2
+ 939               		.loc 1 314 29 view .LVU273
+ 940 0342 8795      		ror r24
+ 941 0344 8827      		clr r24
+ 942 0346 8795      		ror r24
+ 943 0348 272E      		mov r2,r23
+ 944 034a 281A      		sub r2,r24
+ 945               	.LVL73:
+ 315:main.c        **** 
+ 316:main.c        ****         sprintf(dsp_buff1, "Human Readable LM75");
+ 946               		.loc 1 316 9 is_stmt 1 view .LVU274
+ 947 034c 84E1      		ldi r24,lo8(20)
+ 948 034e E0E0      		ldi r30,lo8(.LC1)
+ 949 0350 F0E0      		ldi r31,hi8(.LC1)
+ 950 0352 A0E0      		ldi r26,lo8(dsp_buff1)
+ 951 0354 B0E0      		ldi r27,hi8(dsp_buff1)
+ 952               		0:
+ 953 0356 0190      		ld r0,Z+
+ 954 0358 0D92      		st X+,r0
+ 955 035a 8A95      		dec r24
+ 956 035c 01F4      		brne 0b
+ 317:main.c        ****         sprintf(dsp_buff2, "%d.%d C",celcius_accumulator, 5*half);
+ 957               		.loc 1 317 9 view .LVU275
+ 958 035e 232D      		mov r18,r3
+ 959               	.LVL74:
+ 960               		.loc 1 317 9 is_stmt 0 view .LVU276
+ 961 0360 30E0      		ldi r19,0
+ 962 0362 C901      		movw r24,r18
+ 963 0364 880F      		lsl r24
+ 964 0366 991F      		rol r25
+ 965 0368 880F      		lsl r24
+ 966 036a 991F      		rol r25
+ 967 036c 820F      		add r24,r18
+ 968 036e 931F      		adc r25,r19
+ 969 0370 9F93      		push r25
+ 970 0372 8F93      		push r24
+ 971 0374 822D      		mov r24,r2
+ 972 0376 022C      		mov __tmp_reg__,r2
+ 973 0378 000C      		lsl r0
+ 974 037a 990B      		sbc r25,r25
+ 975 037c 9F93      		push r25
+ 976 037e 2F92      		push r2
+ 977 0380 80E0      		ldi r24,lo8(.LC2)
+ 978 0382 90E0      		ldi r25,hi8(.LC2)
+ 979 0384 9F93      		push r25
+ 980 0386 8F93      		push r24
+ 981 0388 80E0      		ldi r24,lo8(dsp_buff2)
+ 982 038a 90E0      		ldi r25,hi8(dsp_buff2)
+ 983 038c 9F93      		push r25
+ 984 038e 8F93      		push r24
+ 985 0390 0E94 0000 		call sprintf
+ 986               	.LVL75:
+ 318:main.c        ****         sprintf(dsp_buff3, "%f F",32+((9.0/5.0)*(celcius_accumulator + (0.5 * half))));
+ 987               		.loc 1 318 9 is_stmt 1 view .LVU277
+ 988               		.loc 1 318 77 is_stmt 0 view .LVU278
+ 989 0394 632D      		mov r22,r3
+ 990 0396 70E0      		ldi r23,0
+ 991 0398 80E0      		ldi r24,0
+ 992 039a 90E0      		ldi r25,0
+ 993 039c 0E94 0000 		call __floatsisf
+ 994               	.LVL76:
+ 995 03a0 20E0      		ldi r18,0
+ 996 03a2 30E0      		ldi r19,0
+ 997 03a4 40E0      		ldi r20,0
+ 998 03a6 5FE3      		ldi r21,lo8(63)
+ 999 03a8 6B83      		std Y+3,r22
+ 1000 03aa 7C83      		std Y+4,r23
+ 1001 03ac 8D83      		std Y+5,r24
+ 1002 03ae 9E83      		std Y+6,r25
+ 1003 03b0 6B81      		ldd r22,Y+3
+ 1004 03b2 7C81      		ldd r23,Y+4
+ 1005 03b4 8D81      		ldd r24,Y+5
+ 1006 03b6 9E81      		ldd r25,Y+6
+ 1007 03b8 0E94 0000 		call __mulsf3
+ 1008               	.LVL77:
+ 1009 03bc 6B87      		std Y+11,r22
+ 1010 03be 7C87      		std Y+12,r23
+ 1011 03c0 382E      		mov r3,r24
+ 1012               	.LVL78:
+ 1013               		.loc 1 318 77 view .LVU279
+ 1014 03c2 9D87      		std Y+13,r25
+ 1015               		.loc 1 318 70 view .LVU280
+ 1016 03c4 622D      		mov r22,r2
+ 1017 03c6 220C      		lsl r2
+ 1018 03c8 770B      		sbc r23,r23
+ 1019 03ca 880B      		sbc r24,r24
+ 1020 03cc 990B      		sbc r25,r25
+ 1021 03ce 0E94 0000 		call __floatsisf
+ 1022               	.LVL79:
+ 1023 03d2 CB84      		ldd r12,Y+11
+ 1024 03d4 DC84      		ldd r13,Y+12
+ 1025 03d6 E32C      		mov r14,r3
+ 1026 03d8 FD84      		ldd r15,Y+13
+ 1027 03da A701      		movw r20,r14
+ 1028 03dc 9601      		movw r18,r12
+ 1029 03de 462E      		mov r4,r22
+ 1030 03e0 572E      		mov r5,r23
+ 1031 03e2 682E      		mov r6,r24
+ 1032 03e4 792E      		mov r7,r25
+ 1033 03e6 C301      		movw r24,r6
+ 1034 03e8 B201      		movw r22,r4
+ 1035 03ea 0E94 0000 		call __addsf3
+ 1036               	.LVL80:
+ 1037               		.loc 1 318 48 view .LVU281
+ 1038 03ee 26E6      		ldi r18,lo8(102)
+ 1039 03f0 36E6      		ldi r19,lo8(102)
+ 1040 03f2 46EE      		ldi r20,lo8(-26)
+ 1041 03f4 5FE3      		ldi r21,lo8(63)
+ 1042 03f6 862E      		mov r8,r22
+ 1043 03f8 972E      		mov r9,r23
+ 1044 03fa A82E      		mov r10,r24
+ 1045 03fc B92E      		mov r11,r25
+ 1046 03fe C501      		movw r24,r10
+ 1047 0400 B401      		movw r22,r8
+ 1048 0402 0E94 0000 		call __mulsf3
+ 1049               	.LVL81:
+ 1050               		.loc 1 318 9 view .LVU282
+ 1051 0406 20E0      		ldi r18,0
+ 1052 0408 30E0      		ldi r19,0
+ 1053 040a 40E0      		ldi r20,0
+ 1054 040c 52E4      		ldi r21,lo8(66)
+ 1055 040e 6F83      		std Y+7,r22
+ 1056 0410 7887      		std Y+8,r23
+ 1057 0412 8987      		std Y+9,r24
+ 1058 0414 9A87      		std Y+10,r25
+ 1059 0416 6F81      		ldd r22,Y+7
+ 1060 0418 7885      		ldd r23,Y+8
+ 1061 041a 8985      		ldd r24,Y+9
+ 1062 041c 9A85      		ldd r25,Y+10
+ 1063 041e 0E94 0000 		call __addsf3
+ 1064               	.LVL82:
+ 1065 0422 9F93      		push r25
+ 1066 0424 8F93      		push r24
+ 1067 0426 7F93      		push r23
+ 1068 0428 6F93      		push r22
+ 1069 042a 80E0      		ldi r24,lo8(.LC3)
+ 1070 042c 90E0      		ldi r25,hi8(.LC3)
+ 1071 042e 9F93      		push r25
+ 1072 0430 8F93      		push r24
+ 1073 0432 80E0      		ldi r24,lo8(dsp_buff3)
+ 1074 0434 90E0      		ldi r25,hi8(dsp_buff3)
+ 1075 0436 9F93      		push r25
+ 1076 0438 8F93      		push r24
+ 1077 043a 0E94 0000 		call sprintf
+ 1078               	.LVL83:
+ 319:main.c        **** 
+ 320:main.c        **** 		update_twi0_SerLCD();
+ 1079               		.loc 1 320 3 is_stmt 1 view .LVU283
+ 1080 043e 0E94 0000 		call update_twi0_SerLCD
+ 1081               	.LVL84:
+ 1082               	.LBE22:
+ 288:main.c        ****     {
+ 1083               		.loc 1 288 10 view .LVU284
+ 289:main.c        **** 
+ 1084               		.loc 1 289 5 is_stmt 0 view .LVU285
+ 1085 0442 CDBF      		out __SP_L__,r28
+ 1086 0444 DEBF      		out __SP_H__,r29
+ 1087               	.LVL85:
+ 1088               	.L38:
+ 288:main.c        ****     {
+ 1089               		.loc 1 288 5 is_stmt 1 view .LVU286
+ 1090               	.LBB26:
+ 292:main.c        ****         // the address for the LM75
+ 1091               		.loc 1 292 9 view .LVU287
+ 294:main.c        ****         uint8_t half=0;
+ 1092               		.loc 1 294 9 view .LVU288
+ 294:main.c        ****         uint8_t half=0;
+ 1093               		.loc 1 294 39 is_stmt 0 view .LVU289
+ 1094 0446 88E4      		ldi r24,lo8(72)
+ 1095 0448 0E94 0000 		call TWI0_LM75_read
+ 1096               	.LVL86:
+ 1097 044c 082F      		mov r16,r24
+ 1098 044e 192F      		mov r17,r25
+ 294:main.c        ****         uint8_t half=0;
+ 1099               		.loc 1 294 27 discriminator 1 view .LVU290
+ 1100 0450 0983      		std Y+1,r16
+ 1101 0452 1A83      		std Y+2,r17
+ 295:main.c        **** 
+ 1102               		.loc 1 295 9 is_stmt 1 view .LVU291
+ 1103               	.LVL87:
+ 298:main.c        **** 
+ 1104               		.loc 1 298 9 view .LVU292
+ 298:main.c        **** 
+ 1105               		.loc 1 298 31 is_stmt 0 view .LVU293
+ 1106 0454 8981      		ldd r24,Y+1
+ 1107 0456 9A81      		ldd r25,Y+2
+ 1108 0458 880F      		lsl r24
+ 1109 045a 892F      		mov r24,r25
+ 1110 045c 881F      		rol r24
+ 1111 045e 990B      		sbc r25,r25
+ 1112 0460 9195      		neg r25
+ 298:main.c        **** 
+ 1113               		.loc 1 298 19 view .LVU294
+ 1114 0462 8983      		std Y+1,r24
+ 1115 0464 9A83      		std Y+2,r25
+ 301:main.c        **** 
+ 1116               		.loc 1 301 9 is_stmt 1 view .LVU295
+ 301:main.c        **** 
+ 1117               		.loc 1 301 28 is_stmt 0 view .LVU296
+ 1118 0466 6981      		ldd r22,Y+1
+ 1119 0468 7A81      		ldd r23,Y+2
+ 301:main.c        **** 
+ 1120               		.loc 1 301 14 view .LVU297
+ 1121 046a 862F      		mov r24,r22
+ 1122 046c 8170      		andi r24,lo8(1)
+ 1123 046e 382E      		mov r3,r24
+ 1124               	.LVL88:
+ 303:main.c        ****         for (int i = 0; i < 7; i++)
+ 1125               		.loc 1 303 9 is_stmt 1 view .LVU298
+ 304:main.c        ****         {
+ 1126               		.loc 1 304 9 view .LVU299
+ 1127               	.LBB24:
+ 304:main.c        ****         {
+ 1128               		.loc 1 304 14 view .LVU300
+ 304:main.c        ****         {
+ 1129               		.loc 1 304 18 is_stmt 0 view .LVU301
+ 1130 0470 20E0      		ldi r18,0
+ 1131 0472 30E0      		ldi r19,0
+ 1132               	.LBE24:
+ 303:main.c        ****         for (int i = 0; i < 7; i++)
+ 1133               		.loc 1 303 17 view .LVU302
+ 1134 0474 61E0      		ldi r22,lo8(1)
+ 292:main.c        ****         // the address for the LM75
+ 1135               		.loc 1 292 16 view .LVU303
+ 1136 0476 70E0      		ldi r23,0
+ 1137               	.LBB25:
+ 304:main.c        ****         {
+ 1138               		.loc 1 304 9 view .LVU304
+ 1139 0478 00C0      		rjmp .L36
+ 1140               	.LBE25:
+ 1141               	.LBE26:
+ 1142               		.cfi_endproc
+ 1143               	.LFE14:
+ 1145               	.global	temp_reg_low
+ 1146               		.section .bss
+ 1149               	temp_reg_low:
+ 1150 0000 00        		.zero	1
+ 1151               	.global	temp_reg_high
+ 1154               	temp_reg_high:
+ 1155 0001 00        		.zero	1
+ 1156               	.global	dsp_buff4
+ 1159               	dsp_buff4:
+ 1160 0002 0000 0000 		.zero	21
+ 1160      0000 0000 
+ 1160      0000 0000 
+ 1160      0000 0000 
+ 1160      0000 0000 
+ 1161               	.global	dsp_buff3
+ 1164               	dsp_buff3:
+ 1165 0017 0000 0000 		.zero	21
+ 1165      0000 0000 
+ 1165      0000 0000 
+ 1165      0000 0000 
+ 1165      0000 0000 
+ 1166               	.global	dsp_buff2
+ 1169               	dsp_buff2:
+ 1170 002c 0000 0000 		.zero	21
+ 1170      0000 0000 
+ 1170      0000 0000 
+ 1170      0000 0000 
+ 1170      0000 0000 
+ 1171               	.global	dsp_buff1
+ 1174               	dsp_buff1:
+ 1175 0041 0000 0000 		.zero	21
+ 1175      0000 0000 
+ 1175      0000 0000 
+ 1175      0000 0000 
+ 1175      0000 0000 
+ 1176               		.text
+ 1177               	.Letext0:
+ 1178               		.file 3 "/usr/avr/include/stdint.h"
+ 1179               		.file 4 "/usr/avr/include/avr/ioavr128db48.h"
+ 1180               		.file 5 "/usr/avr/include/stdio.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+   output.elf-main.s:2      *ABS*:0000003e __SP_H__
+   output.elf-main.s:3      *ABS*:0000003d __SP_L__
+   output.elf-main.s:4      *ABS*:0000003f __SREG__
+   output.elf-main.s:5      *ABS*:0000003b __RAMPZ__
+   output.elf-main.s:6      *ABS*:00000034 __CCP__
+   output.elf-main.s:7      *ABS*:00000000 __tmp_reg__
+   output.elf-main.s:8      *ABS*:00000001 __zero_reg__
+   output.elf-main.s:15     .text:00000000 init_twi0_SerLCD
+   output.elf-main.s:18     .text:00000000 .Loc.0
+   output.elf-main.s:19     .text:00000000 L0
+   output.elf-main.s:24     .text:00000000 .Loc.1
+   output.elf-main.s:25     .text:00000000 .Loc.2
+   output.elf-main.s:30     .text:00000008 .Loc.3
+   output.elf-main.s:31     .text:00000008 .Loc.4
+   output.elf-main.s:34     .text:0000000c .Loc.5
+   output.elf-main.s:35     .text:0000000c .Loc.6
+   output.elf-main.s:37     .text:0000000e .Loc.7
+   output.elf-main.s:38     .text:0000000e .Loc.8
+   output.elf-main.s:41     .text:00000010 .Loc.9
+   output.elf-main.s:43     .text:00000012 L0
+   output.elf-main.s:48     .text:00000012 write_twi0_SerLCD
+   output.elf-main.s:51     .text:00000012 .Loc.10
+   output.elf-main.s:52     .text:00000012 L0
+   output.elf-main.s:57     .text:00000012 .Loc.11
+   output.elf-main.s:58     .text:00000012 .Loc.12
+   output.elf-main.s:61     .text:00000014 .Loc.13
+   output.elf-main.s:63     .text:00000018 .Loc.14
+   output.elf-main.s:65     .text:00000018 .Loc.15
+   output.elf-main.s:66     .text:00000018 .Loc.16
+   output.elf-main.s:67     .text:00000018 .Loc.17
+   output.elf-main.s:69     .text:0000001c .Loc.18
+   output.elf-main.s:72     .text:00000020 .Loc.19
+   output.elf-main.s:73     .text:00000020 .Loc.20
+   output.elf-main.s:75     .text:00000024 .Loc.21
+   output.elf-main.s:78     .text:00000028 .Loc.22
+   output.elf-main.s:79     .text:00000028 .Loc.23
+   output.elf-main.s:81     .text:0000002c .Loc.24
+   output.elf-main.s:83     .text:0000002c .Loc.25
+   output.elf-main.s:84     .text:0000002c .Loc.26
+   output.elf-main.s:85     .text:0000002c .Loc.27
+   output.elf-main.s:87     .text:00000030 .Loc.28
+   output.elf-main.s:90     .text:00000034 .Loc.29
+   output.elf-main.s:91     .text:00000034 .Loc.30
+   output.elf-main.s:93     .text:00000038 .Loc.31
+   output.elf-main.s:96     .text:0000003c .Loc.32
+   output.elf-main.s:97     .text:0000003c .Loc.33
+   output.elf-main.s:101    .text:00000042 .Loc.34
+   output.elf-main.s:104    .text:00000046 .Loc.35
+   output.elf-main.s:109    .text:00000046 .Loc.36
+   output.elf-main.s:111    .text:00000046 .Loc.37
+   output.elf-main.s:112    .text:00000046 .Loc.38
+   output.elf-main.s:113    .text:00000046 .Loc.39
+   output.elf-main.s:114    .text:00000046 .Loc.40
+   output.elf-main.s:115    .text:00000046 .Loc.41
+   output.elf-main.s:116    .text:00000046 .Loc.42
+   output.elf-main.s:121    .text:00000050 L0
+   output.elf-main.s:124    .text:00000052 .Loc.43
+   output.elf-main.s:127    .text:00000052 .Loc.44
+   output.elf-main.s:128    .text:00000052 .Loc.45
+   output.elf-main.s:133    .text:00000058 .Loc.46
+   output.elf-main.s:138    .text:0000005e .Loc.47
+   output.elf-main.s:142    .text:00000062 .Loc.48
+   output.elf-main.s:144    .text:00000064 L0
+   output.elf-main.s:149    .text:00000064 init_twi0_LM75
+   output.elf-main.s:151    .text:00000064 .Loc.49
+   output.elf-main.s:152    .text:00000064 L0
+   output.elf-main.s:157    .text:00000064 .Loc.50
+   output.elf-main.s:158    .text:00000064 .Loc.51
+   output.elf-main.s:163    .text:0000006c .Loc.52
+   output.elf-main.s:164    .text:0000006c .Loc.53
+   output.elf-main.s:167    .text:00000070 .Loc.54
+   output.elf-main.s:168    .text:00000070 .Loc.55
+   output.elf-main.s:170    .text:00000072 .Loc.56
+   output.elf-main.s:171    .text:00000072 .Loc.57
+   output.elf-main.s:174    .text:00000074 .Loc.58
+   output.elf-main.s:176    .text:00000076 L0
+   output.elf-main.s:181    .text:00000076 TWI0_LM75_read
+   output.elf-main.s:184    .text:00000076 .Loc.59
+   output.elf-main.s:185    .text:00000076 L0
+   output.elf-main.s:186    .text:00000076 .Loc.60
+   output.elf-main.s:193    .text:0000007c L0
+   output.elf-main.s:202    .text:00000080 .Loc.61
+   output.elf-main.s:203    .text:00000080 .Loc.62
+   output.elf-main.s:206    .text:00000082 .Loc.63
+   output.elf-main.s:208    .text:00000084 .Loc.64
+   output.elf-main.s:210    .text:00000088 .Loc.65
+   output.elf-main.s:212    .text:00000088 .Loc.66
+   output.elf-main.s:213    .text:00000088 .Loc.67
+   output.elf-main.s:215    .text:0000008c .Loc.68
+   output.elf-main.s:218    .text:00000090 .Loc.69
+   output.elf-main.s:219    .text:00000090 .Loc.70
+   output.elf-main.s:223    .text:00000096 .Loc.71
+   output.elf-main.s:1154   .bss:00000001 temp_reg_high
+   output.elf-main.s:225    .text:0000009a .Loc.72
+   output.elf-main.s:226    .text:0000009a .Loc.73
+   output.elf-main.s:229    .text:0000009e .Loc.74
+   output.elf-main.s:231    .text:0000009e .Loc.75
+   output.elf-main.s:232    .text:0000009e .Loc.76
+   output.elf-main.s:234    .text:000000a2 .Loc.77
+   output.elf-main.s:237    .text:000000a6 .Loc.78
+   output.elf-main.s:238    .text:000000a6 .Loc.79
+   output.elf-main.s:242    .text:000000ac .Loc.80
+   output.elf-main.s:1149   .bss:00000000 temp_reg_low
+   output.elf-main.s:244    .text:000000b0 .Loc.81
+   output.elf-main.s:245    .text:000000b0 .Loc.82
+   output.elf-main.s:248    .text:000000b4 .Loc.83
+   output.elf-main.s:250    .text:000000b4 .Loc.84
+   output.elf-main.s:251    .text:000000b4 .Loc.85
+   output.elf-main.s:253    .text:000000b8 .Loc.86
+   output.elf-main.s:257    .text:000000be .Loc.87
+   output.elf-main.s:258    .text:000000be .Loc.88
+   output.elf-main.s:260    .text:000000c0 .Loc.89
+   output.elf-main.s:262    .text:000000c2 .Loc.90
+   output.elf-main.s:265    .text:000000c6 .Loc.91
+   output.elf-main.s:266    .text:000000c6 .Loc.92
+   output.elf-main.s:270    .text:000000ca .Loc.93
+   output.elf-main.s:276    .text:000000d4 L0
+   output.elf-main.s:281    .text:000000d4 init_spi0_SerLCD
+   output.elf-main.s:283    .text:000000d4 .Loc.94
+   output.elf-main.s:284    .text:000000d4 L0
+   output.elf-main.s:289    .text:000000d4 .Loc.95
+   output.elf-main.s:290    .text:000000d4 .Loc.96
+   output.elf-main.s:294    .text:000000da .Loc.97
+   output.elf-main.s:297    .text:000000de .Loc.98
+   output.elf-main.s:298    .text:000000de .Loc.99
+   output.elf-main.s:300    .text:000000e0 .Loc.100
+   output.elf-main.s:303    .text:000000e4 .Loc.101
+   output.elf-main.s:304    .text:000000e4 .Loc.102
+   output.elf-main.s:306    .text:000000e6 .Loc.103
+   output.elf-main.s:309    .text:000000ea .Loc.104
+   output.elf-main.s:310    .text:000000ea .Loc.105
+   output.elf-main.s:312    .text:000000ec .Loc.106
+   output.elf-main.s:315    .text:000000f0 .Loc.107
+   output.elf-main.s:316    .text:000000f0 .Loc.108
+   output.elf-main.s:318    .text:000000f2 .Loc.109
+   output.elf-main.s:321    .text:000000f6 .Loc.110
+   output.elf-main.s:322    .text:000000f6 .Loc.111
+   output.elf-main.s:327    .text:000000fe .Loc.112
+   output.elf-main.s:328    .text:000000fe .Loc.113
+   output.elf-main.s:332    .text:00000102 .Loc.114
+   output.elf-main.s:334    .text:00000104 L0
+   output.elf-main.s:339    .text:00000104 write_spi0_SerLCD
+   output.elf-main.s:342    .text:00000104 .Loc.115
+   output.elf-main.s:343    .text:00000104 L0
+   output.elf-main.s:348    .text:00000104 .Loc.116
+   output.elf-main.s:349    .text:00000104 .Loc.117
+   output.elf-main.s:353    .text:0000010a .Loc.118
+   output.elf-main.s:356    .text:0000010e .Loc.119
+   output.elf-main.s:357    .text:0000010e .Loc.120
+   output.elf-main.s:359    .text:00000112 .Loc.121
+   output.elf-main.s:362    .text:00000112 .Loc.122
+   output.elf-main.s:363    .text:00000112 .Loc.123
+   output.elf-main.s:365    .text:00000116 .Loc.124
+   output.elf-main.s:368    .text:0000011a .Loc.125
+   output.elf-main.s:369    .text:0000011a .Loc.126
+   output.elf-main.s:373    .text:00000120 .Loc.127
+   output.elf-main.s:378    .text:00000124 .Loc.128
+   output.elf-main.s:380    .text:00000126 L0
+   output.elf-main.s:385    .text:00000126 update_twi0_SerLCD
+   output.elf-main.s:387    .text:00000126 .Loc.129
+   output.elf-main.s:388    .text:00000126 L0
+   output.elf-main.s:396    .text:00000128 .Loc.130
+   output.elf-main.s:401    .text:00000130 .Loc.131
+   output.elf-main.s:406    .text:00000138 .Loc.132
+   output.elf-main.s:411    .text:00000140 .Loc.133
+   output.elf-main.s:416    .text:00000148 .Loc.134
+   output.elf-main.s:418    .text:00000148 .Loc.135
+   output.elf-main.s:419    .text:00000148 .Loc.136
+   output.elf-main.s:421    .text:0000014a .Loc.137
+   output.elf-main.s:425    .text:0000014c .Loc.138
+   output.elf-main.s:426    .text:0000014c .Loc.139
+   output.elf-main.s:429    .text:0000014e .Loc.140
+   output.elf-main.s:434    .text:00000154 .Loc.141
+   output.elf-main.s:435    .text:00000154 .Loc.142
+   output.elf-main.s:1174   .bss:00000041 dsp_buff1
+   output.elf-main.s:441    .text:0000015e .Loc.143
+   output.elf-main.s:445    .text:00000162 .Loc.144
+   output.elf-main.s:450    .text:0000016a .Loc.145
+   output.elf-main.s:455    .text:00000172 .Loc.146
+   output.elf-main.s:457    .text:00000172 .Loc.147
+   output.elf-main.s:458    .text:00000172 .Loc.148
+   output.elf-main.s:461    .text:00000174 .Loc.149
+   output.elf-main.s:465    .text:00000176 .Loc.150
+   output.elf-main.s:466    .text:00000176 .Loc.151
+   output.elf-main.s:469    .text:00000178 .Loc.152
+   output.elf-main.s:474    .text:0000017e .Loc.153
+   output.elf-main.s:475    .text:0000017e .Loc.154
+   output.elf-main.s:1169   .bss:0000002c dsp_buff2
+   output.elf-main.s:481    .text:00000188 .Loc.155
+   output.elf-main.s:485    .text:0000018c .Loc.156
+   output.elf-main.s:490    .text:00000194 .Loc.157
+   output.elf-main.s:495    .text:0000019c .Loc.158
+   output.elf-main.s:497    .text:0000019c .Loc.159
+   output.elf-main.s:498    .text:0000019c .Loc.160
+   output.elf-main.s:501    .text:0000019e .Loc.161
+   output.elf-main.s:505    .text:000001a0 .Loc.162
+   output.elf-main.s:506    .text:000001a0 .Loc.163
+   output.elf-main.s:509    .text:000001a2 .Loc.164
+   output.elf-main.s:514    .text:000001a8 .Loc.165
+   output.elf-main.s:515    .text:000001a8 .Loc.166
+   output.elf-main.s:1164   .bss:00000017 dsp_buff3
+   output.elf-main.s:521    .text:000001b2 .Loc.167
+   output.elf-main.s:525    .text:000001b6 .Loc.168
+   output.elf-main.s:530    .text:000001be .Loc.169
+   output.elf-main.s:535    .text:000001c6 .Loc.170
+   output.elf-main.s:537    .text:000001c6 .Loc.171
+   output.elf-main.s:538    .text:000001c6 .Loc.172
+   output.elf-main.s:541    .text:000001c8 .Loc.173
+   output.elf-main.s:545    .text:000001ca .Loc.174
+   output.elf-main.s:546    .text:000001ca .Loc.175
+   output.elf-main.s:549    .text:000001cc .Loc.176
+   output.elf-main.s:554    .text:000001d2 .Loc.177
+   output.elf-main.s:555    .text:000001d2 .Loc.178
+   output.elf-main.s:1159   .bss:00000002 dsp_buff4
+   output.elf-main.s:561    .text:000001dc .Loc.179
+   output.elf-main.s:565    .text:000001e0 .Loc.180
+   output.elf-main.s:569    .text:000001e0 .Loc.181
+   output.elf-main.s:571    .text:000001e0 .Loc.182
+   output.elf-main.s:572    .text:000001e0 .Loc.183
+   output.elf-main.s:573    .text:000001e0 .Loc.184
+   output.elf-main.s:574    .text:000001e0 .Loc.185
+   output.elf-main.s:575    .text:000001e0 .Loc.186
+   output.elf-main.s:576    .text:000001e0 .Loc.187
+   output.elf-main.s:581    .text:000001ea L0
+   output.elf-main.s:585    .text:000001ec .Loc.188
+   output.elf-main.s:588    .text:000001ec .Loc.189
+   output.elf-main.s:591    .text:000001ee .Loc.190
+   output.elf-main.s:593    .text:000001f0 L0
+   output.elf-main.s:598    .text:000001f0 update_SerLCD
+   output.elf-main.s:600    .text:000001f0 .Loc.191
+   output.elf-main.s:601    .text:000001f0 L0
+   output.elf-main.s:609    .text:000001f2 .Loc.192
+   output.elf-main.s:613    .text:000001f8 .Loc.193
+   output.elf-main.s:617    .text:000001fe .Loc.194
+   output.elf-main.s:621    .text:00000204 .Loc.195
+   output.elf-main.s:625    .text:0000020a .Loc.196
+   output.elf-main.s:627    .text:0000020a .Loc.197
+   output.elf-main.s:628    .text:0000020a .Loc.198
+   output.elf-main.s:630    .text:0000020c .Loc.199
+   output.elf-main.s:634    .text:0000020e .Loc.200
+   output.elf-main.s:635    .text:0000020e .Loc.201
+   output.elf-main.s:638    .text:00000210 .Loc.202
+   output.elf-main.s:642    .text:00000214 .Loc.203
+   output.elf-main.s:643    .text:00000214 .Loc.204
+   output.elf-main.s:649    .text:0000021e .Loc.205
+   output.elf-main.s:653    .text:00000222 .Loc.206
+   output.elf-main.s:657    .text:00000228 .Loc.207
+   output.elf-main.s:661    .text:0000022e .Loc.208
+   output.elf-main.s:663    .text:0000022e .Loc.209
+   output.elf-main.s:664    .text:0000022e .Loc.210
+   output.elf-main.s:667    .text:00000230 .Loc.211
+   output.elf-main.s:671    .text:00000232 .Loc.212
+   output.elf-main.s:672    .text:00000232 .Loc.213
+   output.elf-main.s:675    .text:00000234 .Loc.214
+   output.elf-main.s:679    .text:00000238 .Loc.215
+   output.elf-main.s:680    .text:00000238 .Loc.216
+   output.elf-main.s:686    .text:00000242 .Loc.217
+   output.elf-main.s:690    .text:00000246 .Loc.218
+   output.elf-main.s:694    .text:0000024c .Loc.219
+   output.elf-main.s:698    .text:00000252 .Loc.220
+   output.elf-main.s:700    .text:00000252 .Loc.221
+   output.elf-main.s:701    .text:00000252 .Loc.222
+   output.elf-main.s:704    .text:00000254 .Loc.223
+   output.elf-main.s:708    .text:00000256 .Loc.224
+   output.elf-main.s:709    .text:00000256 .Loc.225
+   output.elf-main.s:712    .text:00000258 .Loc.226
+   output.elf-main.s:716    .text:0000025c .Loc.227
+   output.elf-main.s:717    .text:0000025c .Loc.228
+   output.elf-main.s:723    .text:00000266 .Loc.229
+   output.elf-main.s:727    .text:0000026a .Loc.230
+   output.elf-main.s:731    .text:00000270 .Loc.231
+   output.elf-main.s:735    .text:00000276 .Loc.232
+   output.elf-main.s:737    .text:00000276 .Loc.233
+   output.elf-main.s:738    .text:00000276 .Loc.234
+   output.elf-main.s:741    .text:00000278 .Loc.235
+   output.elf-main.s:745    .text:0000027a .Loc.236
+   output.elf-main.s:746    .text:0000027a .Loc.237
+   output.elf-main.s:749    .text:0000027c .Loc.238
+   output.elf-main.s:753    .text:00000280 .Loc.239
+   output.elf-main.s:754    .text:00000280 .Loc.240
+   output.elf-main.s:760    .text:0000028a .Loc.241
+   output.elf-main.s:765    .text:0000028e .Loc.242
+   output.elf-main.s:768    .text:00000290 .Loc.243
+   output.elf-main.s:770    .text:00000292 L0
+   output.elf-main.s:779    .text:00000292 clear_display_buffs
+   output.elf-main.s:781    .text:00000292 .Loc.244
+   output.elf-main.s:782    .text:00000292 L0
+   output.elf-main.s:787    .text:00000292 .Loc.245
+   output.elf-main.s:798    .text:000002a4 .Loc.246
+   output.elf-main.s:809    .text:000002b6 .Loc.247
+   output.elf-main.s:820    .text:000002c8 .Loc.248
+   output.elf-main.s:832    .text:000002da .Loc.249
+   output.elf-main.s:834    .text:000002dc L0
+   output.elf-main.s:847    .text:000002dc main
+   output.elf-main.s:849    .text:000002dc .Loc.250
+   output.elf-main.s:850    .text:000002dc L0
+   output.elf-main.s:862    .text:000002e6 .Loc.251
+   output.elf-main.s:865    .text:000002ea .Loc.252
+   output.elf-main.s:868    .text:000002ee .Loc.253
+   output.elf-main.s:871    .text:000002f2 .Loc.254
+   output.elf-main.s:876    .text:000002fa .Loc.255
+   output.elf-main.s:881    .text:00000302 .Loc.256
+   output.elf-main.s:889    .text:00000308 .Loc.257
+   output.elf-main.s:890    .text:00000308 .Loc.258
+   output.elf-main.s:895    .text:00000310 .Loc.259
+   output.elf-main.s:898    .text:00000314 .Loc.260
+   output.elf-main.s:899    .text:00000314 .Loc.261
+   output.elf-main.s:904    .text:0000031c .Loc.262
+   output.elf-main.s:909    .text:00000324 .Loc.263
+   output.elf-main.s:912    .text:00000326 .Loc.264
+   output.elf-main.s:913    .text:00000326 .Loc.265
+   output.elf-main.s:916    .text:00000328 .Loc.266
+   output.elf-main.s:921    .text:0000032c .Loc.267
+   output.elf-main.s:926    .text:00000332 .Loc.268
+   output.elf-main.s:927    .text:00000332 .Loc.269
+   output.elf-main.s:932    .text:0000033a .Loc.270
+   output.elf-main.s:935    .text:0000033e .Loc.271
+   output.elf-main.s:936    .text:0000033e .Loc.272
+   output.elf-main.s:939    .text:00000342 .Loc.273
+   output.elf-main.s:946    .text:0000034c .Loc.274
+   output.elf-main.s:957    .text:0000035e .Loc.275
+   output.elf-main.s:960    .text:00000360 .Loc.276
+   output.elf-main.s:987    .text:00000394 .Loc.277
+   output.elf-main.s:988    .text:00000394 .Loc.278
+   output.elf-main.s:1013   .text:000003c2 .Loc.279
+   output.elf-main.s:1015   .text:000003c4 .Loc.280
+   output.elf-main.s:1037   .text:000003ee .Loc.281
+   output.elf-main.s:1050   .text:00000406 .Loc.282
+   output.elf-main.s:1079   .text:0000043e .Loc.283
+   output.elf-main.s:1083   .text:00000442 .Loc.284
+   output.elf-main.s:1084   .text:00000442 .Loc.285
+   output.elf-main.s:1089   .text:00000446 .Loc.286
+   output.elf-main.s:1091   .text:00000446 .Loc.287
+   output.elf-main.s:1092   .text:00000446 .Loc.288
+   output.elf-main.s:1093   .text:00000446 .Loc.289
+   output.elf-main.s:1099   .text:00000450 .Loc.290
+   output.elf-main.s:1102   .text:00000454 .Loc.291
+   output.elf-main.s:1104   .text:00000454 .Loc.292
+   output.elf-main.s:1105   .text:00000454 .Loc.293
+   output.elf-main.s:1113   .text:00000462 .Loc.294
+   output.elf-main.s:1116   .text:00000466 .Loc.295
+   output.elf-main.s:1117   .text:00000466 .Loc.296
+   output.elf-main.s:1120   .text:0000046a .Loc.297
+   output.elf-main.s:1125   .text:00000470 .Loc.298
+   output.elf-main.s:1126   .text:00000470 .Loc.299
+   output.elf-main.s:1128   .text:00000470 .Loc.300
+   output.elf-main.s:1129   .text:00000470 .Loc.301
+   output.elf-main.s:1133   .text:00000474 .Loc.302
+   output.elf-main.s:1135   .text:00000476 .Loc.303
+   output.elf-main.s:1138   .text:00000478 .Loc.304
+   output.elf-main.s:1142   .text:0000047a L0
+   output.elf-main.s:1181   .text:0000047a L0
+                     .debug_frame:00000000 L0
+   output.elf-main.s:64     .text:00000018 .L3
+   output.elf-main.s:132    .text:00000058 .L6
+   output.elf-main.s:82     .text:0000002c .L5
+   output.elf-main.s:137    .text:0000005e .L7
+   output.elf-main.s:119    .text:0000004a .L11
+   output.elf-main.s:211    .text:00000088 .L10
+   output.elf-main.s:230    .text:0000009e .L11
+   output.elf-main.s:249    .text:000000b4 .L12
+   output.elf-main.s:361    .text:00000112 .L15
+   output.elf-main.s:433    .text:00000154 .L17
+   output.elf-main.s:424    .text:0000014c .L18
+   output.elf-main.s:473    .text:0000017e .L19
+   output.elf-main.s:464    .text:00000176 .L20
+   output.elf-main.s:513    .text:000001a8 .L21
+   output.elf-main.s:504    .text:000001a0 .L22
+   output.elf-main.s:553    .text:000001d2 .L23
+   output.elf-main.s:544    .text:000001ca .L24
+   output.elf-main.s:579    .text:000001e4 .L12
+   output.elf-main.s:641    .text:00000214 .L26
+   output.elf-main.s:633    .text:0000020e .L27
+   output.elf-main.s:678    .text:00000238 .L28
+   output.elf-main.s:670    .text:00000232 .L29
+   output.elf-main.s:715    .text:0000025c .L30
+   output.elf-main.s:707    .text:00000256 .L31
+   output.elf-main.s:752    .text:00000280 .L32
+   output.elf-main.s:744    .text:0000027a .L33
+   output.elf-main.s:793    .text:0000029c .L01
+   output.elf-main.s:804    .text:000002ae .L02
+   output.elf-main.s:815    .text:000002c0 .L03
+   output.elf-main.s:826    .text:000002d2 .L04
+   output.elf-main.s:1088   .text:00000446 .L38
+   output.elf-main.s:886    .text:00000308 .L37
+   output.elf-main.s:952    .text:00000356 .L05
+   output.elf-main.s:920    .text:0000032c .L36
+   output.elf-main.s:2549   .debug_abbrev:00000000 .Ldebug_abbrev0
+   output.elf-main.s:10     .text:00000000 .Ltext0
+   output.elf-main.s:1177   .text:0000047a .Letext0
+   output.elf-main.s:3783   .debug_line:00000000 .Ldebug_line0
+   output.elf-main.s:848    .text:000002dc .LFB14
+   output.elf-main.s:1143   .text:0000047a .LFE14
+   output.elf-main.s:3762   .debug_rnglists:0000000c .LLRL17
+   output.elf-main.s:3331   .debug_loclists:00000012 .LLST18
+   output.elf-main.s:3324   .debug_loclists:0000000c .LVUS18
+   output.elf-main.s:3356   .debug_loclists:0000002f .LLST19
+   output.elf-main.s:3349   .debug_loclists:00000029 .LVUS19
+   output.elf-main.s:3379   .debug_loclists:0000004a .LLST20
+   output.elf-main.s:3374   .debug_loclists:00000046 .LVUS20
+   output.elf-main.s:3770   .debug_rnglists:00000017 .LLRL21
+   output.elf-main.s:3397   .debug_loclists:0000005e .LLST22
+   output.elf-main.s:3392   .debug_loclists:0000005a .LVUS22
+   output.elf-main.s:986    .text:00000394 .LVL75
+   output.elf-main.s:994    .text:000003a0 .LVL76
+   output.elf-main.s:1008   .text:000003bc .LVL77
+   output.elf-main.s:1022   .text:000003d2 .LVL79
+   output.elf-main.s:1036   .text:000003ee .LVL80
+   output.elf-main.s:1049   .text:00000406 .LVL81
+   output.elf-main.s:1064   .text:00000422 .LVL82
+   output.elf-main.s:1078   .text:0000043e .LVL83
+   output.elf-main.s:1081   .text:00000442 .LVL84
+   output.elf-main.s:1096   .text:0000044c .LVL86
+   output.elf-main.s:864    .text:000002ea .LVL63
+   output.elf-main.s:867    .text:000002ee .LVL64
+   output.elf-main.s:870    .text:000002f2 .LVL65
+   output.elf-main.s:875    .text:000002fa .LVL66
+   output.elf-main.s:880    .text:00000302 .LVL67
+   output.elf-main.s:883    .text:00000306 .LVL68
+   output.elf-main.s:780    .text:00000292 .LFB13
+   output.elf-main.s:835    .text:000002dc .LFE13
+   output.elf-main.s:599    .text:000001f0 .LFB12
+   output.elf-main.s:771    .text:00000292 .LFE12
+   output.elf-main.s:626    .text:0000020a .LBB18
+   output.elf-main.s:652    .text:00000222 .LBE18
+   output.elf-main.s:3420   .debug_loclists:00000077 .LLST13
+   output.elf-main.s:3415   .debug_loclists:00000073 .LVUS13
+   output.elf-main.s:640    .text:00000214 .LVL43
+   output.elf-main.s:662    .text:0000022e .LBB19
+   output.elf-main.s:689    .text:00000246 .LBE19
+   output.elf-main.s:3438   .debug_loclists:0000008b .LLST14
+   output.elf-main.s:3433   .debug_loclists:00000087 .LVUS14
+   output.elf-main.s:677    .text:00000238 .LVL49
+   output.elf-main.s:699    .text:00000252 .LBB20
+   output.elf-main.s:726    .text:0000026a .LBE20
+   output.elf-main.s:3456   .debug_loclists:0000009f .LLST15
+   output.elf-main.s:3451   .debug_loclists:0000009b .LVUS15
+   output.elf-main.s:714    .text:0000025c .LVL55
+   output.elf-main.s:736    .text:00000276 .LBB21
+   output.elf-main.s:764    .text:0000028e .LBE21
+   output.elf-main.s:3476   .debug_loclists:000000b5 .LLST16
+   output.elf-main.s:3469   .debug_loclists:000000af .LVUS16
+   output.elf-main.s:751    .text:00000280 .LVL61
+   output.elf-main.s:612    .text:000001f8 .LVL37
+   output.elf-main.s:616    .text:000001fe .LVL38
+   output.elf-main.s:620    .text:00000204 .LVL39
+   output.elf-main.s:624    .text:0000020a .LVL40
+   output.elf-main.s:656    .text:00000228 .LVL44
+   output.elf-main.s:660    .text:0000022e .LVL45
+   output.elf-main.s:693    .text:0000024c .LVL50
+   output.elf-main.s:697    .text:00000252 .LVL51
+   output.elf-main.s:730    .text:00000270 .LVL56
+   output.elf-main.s:734    .text:00000276 .LVL57
+   output.elf-main.s:386    .text:00000126 .LFB11
+   output.elf-main.s:594    .text:000001f0 .LFE11
+   output.elf-main.s:417    .text:00000148 .LBB12
+   output.elf-main.s:444    .text:00000162 .LBE12
+   output.elf-main.s:3504   .debug_loclists:000000d8 .LLST6
+   output.elf-main.s:3499   .debug_loclists:000000d4 .LVUS6
+   output.elf-main.s:432    .text:00000154 .LVL15
+   output.elf-main.s:456    .text:00000172 .LBB13
+   output.elf-main.s:484    .text:0000018c .LBE13
+   output.elf-main.s:3522   .debug_loclists:000000ec .LLST7
+   output.elf-main.s:3517   .debug_loclists:000000e8 .LVUS7
+   output.elf-main.s:472    .text:0000017e .LVL21
+   output.elf-main.s:496    .text:0000019c .LBB14
+   output.elf-main.s:524    .text:000001b6 .LBE14
+   output.elf-main.s:3540   .debug_loclists:00000100 .LLST8
+   output.elf-main.s:3535   .debug_loclists:000000fc .LVUS8
+   output.elf-main.s:512    .text:000001a8 .LVL27
+   output.elf-main.s:536    .text:000001c6 .LBB15
+   output.elf-main.s:564    .text:000001e0 .LBE15
+   output.elf-main.s:3560   .debug_loclists:00000116 .LLST9
+   output.elf-main.s:3553   .debug_loclists:00000110 .LVUS9
+   output.elf-main.s:552    .text:000001d2 .LVL33
+   output.elf-main.s:568    .text:000001e0 .LBI16
+   output.elf-main.s:567    .text:000001e0 .LBB16
+   output.elf-main.s:587    .text:000001ec .LBE16
+   output.elf-main.s:3586   .debug_loclists:00000137 .LLST10
+   output.elf-main.s:3583   .debug_loclists:00000135 .LVUS10
+   output.elf-main.s:3598   .debug_loclists:00000146 .LLST11
+   output.elf-main.s:3595   .debug_loclists:00000144 .LVUS11
+   output.elf-main.s:3610   .debug_loclists:00000155 .LLST12
+   output.elf-main.s:3607   .debug_loclists:00000153 .LVUS12
+   output.elf-main.s:400    .text:00000130 .LVL9
+   output.elf-main.s:405    .text:00000138 .LVL10
+   output.elf-main.s:410    .text:00000140 .LVL11
+   output.elf-main.s:415    .text:00000148 .LVL12
+   output.elf-main.s:449    .text:0000016a .LVL16
+   output.elf-main.s:454    .text:00000172 .LVL17
+   output.elf-main.s:489    .text:00000194 .LVL22
+   output.elf-main.s:494    .text:0000019c .LVL23
+   output.elf-main.s:529    .text:000001be .LVL28
+   output.elf-main.s:534    .text:000001c6 .LVL29
+   output.elf-main.s:341    .text:00000104 .LFB10
+   output.elf-main.s:381    .text:00000126 .LFE10
+   output.elf-main.s:3626   .debug_loclists:00000166 .LLST5
+   output.elf-main.s:3619   .debug_loclists:00000160 .LVUS5
+   output.elf-main.s:282    .text:000000d4 .LFB9
+   output.elf-main.s:335    .text:00000104 .LFE9
+   output.elf-main.s:183    .text:00000076 .LFB8
+   output.elf-main.s:277    .text:000000d4 .LFE8
+   output.elf-main.s:3658   .debug_loclists:0000018b .LLST4
+   output.elf-main.s:3653   .debug_loclists:00000187 .LVUS4
+   output.elf-main.s:150    .text:00000064 .LFB7
+   output.elf-main.s:177    .text:00000076 .LFE7
+   output.elf-main.s:50     .text:00000012 .LFB6
+   output.elf-main.s:145    .text:00000064 .LFE6
+   output.elf-main.s:3684   .debug_loclists:000001a6 .LLST0
+   output.elf-main.s:3679   .debug_loclists:000001a2 .LVUS0
+   output.elf-main.s:107    .text:00000046 .LBI10
+   output.elf-main.s:106    .text:00000046 .LBB10
+   output.elf-main.s:126    .text:00000052 .LBE10
+   output.elf-main.s:3708   .debug_loclists:000001bc .LLST1
+   output.elf-main.s:3705   .debug_loclists:000001ba .LVUS1
+   output.elf-main.s:3720   .debug_loclists:000001c9 .LLST2
+   output.elf-main.s:3717   .debug_loclists:000001c7 .LVUS2
+   output.elf-main.s:3732   .debug_loclists:000001d6 .LLST3
+   output.elf-main.s:3729   .debug_loclists:000001d4 .LVUS3
+   output.elf-main.s:16     .text:00000000 .LFB5
+   output.elf-main.s:44     .text:00000012 .LFE5
+   output.elf-main.s:1182   .debug_info:00000000 .Ldebug_info0
+
+UNDEFINED SYMBOLS
+sprintf
+__floatsisf
+__mulsf3
+__addsf3
+__do_clear_bss
