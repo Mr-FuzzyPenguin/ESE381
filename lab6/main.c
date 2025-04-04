@@ -318,7 +318,7 @@ int main(void)
 
         // for Fahrenheit some interesting shenanigans must be done.
         // absolute value:
-        int16_t c1 = 18 * (10 * celcius_accumulator + 5 * half);
+        int16_t c1 = 180 * celcius_accumulator + 90 * half;
         int16_t c3 = 3200 + c1;
         if (celcius_accumulator >= 0)
         {
