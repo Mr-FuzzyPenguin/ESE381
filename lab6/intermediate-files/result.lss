@@ -117,7 +117,7 @@
   64:main.c        ****     // Transmit data packets to the slave
   65:main.c        **** 
   66:main.c        ****     // the default address is 0x72
-  67:main.c        **** 	// bitshift to the right and then bit mask for the write
+  67:main.c        ****     // bitshift to the right and then bit mask for the write
   68:main.c        ****     TWI0.MADDR =  saddr << 1 | 0x0;
   57               		.loc 1 68 4 view .LVU11
   58               		.loc 1 68 28 is_stmt 0 view .LVU12
@@ -201,9 +201,9 @@
  102 0042 8360      		ori r24,lo8(3)
  103 0044 8483      		std Z+4,r24
  103:main.c        ****     // to terminate the communication
- 104:main.c        **** 	
- 105:main.c        **** 	_delay_ms(1);
- 104               		.loc 1 105 2 is_stmt 1 view .LVU35
+ 104:main.c        **** 
+ 105:main.c        ****     _delay_ms(1);
+ 104               		.loc 1 105 5 is_stmt 1 view .LVU35
  105               	.LVL2:
  106               	.LBB10:
  107               	.LBI10:
@@ -400,9 +400,9 @@
  124               		.loc 2 174 2 is_stmt 0 view .LVU43
  125               	.LBE11:
  126               	.LBE10:
- 106:main.c        **** 	return 0;
- 127               		.loc 1 106 2 is_stmt 1 view .LVU44
- 128               		.loc 1 106 9 is_stmt 0 view .LVU45
+ 106:main.c        ****     return 0;
+ 127               		.loc 1 106 5 is_stmt 1 view .LVU44
+ 128               		.loc 1 106 12 is_stmt 0 view .LVU45
  129 0052 80E0      		ldi r24,0
  130 0054 90E0      		ldi r25,0
  131 0056 0895      		ret
@@ -594,10 +594,10 @@
  262               		.loc 1 163 23 view .LVU90
  263 00c2 2983      		std Y+1,r18
  264 00c4 3A83      		std Y+2,r19
- 164:main.c        **** 	
- 165:main.c        **** 	return result;
- 265               		.loc 1 165 2 is_stmt 1 view .LVU91
- 266               		.loc 1 165 9 is_stmt 0 view .LVU92
+ 164:main.c        **** 
+ 165:main.c        ****     return result;
+ 265               		.loc 1 165 5 is_stmt 1 view .LVU91
+ 266               		.loc 1 165 12 is_stmt 0 view .LVU92
  267 00c6 8981      		ldd r24,Y+1
  268 00c8 9A81      		ldd r25,Y+2
  269               	/* epilogue start */
@@ -1089,204 +1089,204 @@
  606               	/* frame size = 0 */
  607               	/* stack size = 1 */
  608               	.L__stack_usage = 1
- 228:main.c        **** 	// clear and write
- 229:main.c        **** 	write_spi0_SerLCD('|');
- 609               		.loc 1 229 2 view .LVU192
+ 228:main.c        ****     // clear and write
+ 229:main.c        ****     write_spi0_SerLCD('|');
+ 609               		.loc 1 229 5 view .LVU192
  610 01f2 8CE7      		ldi r24,lo8(124)
  611 01f4 0E94 0000 		call write_spi0_SerLCD
  612               	.LVL37:
- 230:main.c        **** 	write_spi0_SerLCD('-');
- 613               		.loc 1 230 2 view .LVU193
+ 230:main.c        ****     write_spi0_SerLCD('-');
+ 613               		.loc 1 230 5 view .LVU193
  614 01f8 8DE2      		ldi r24,lo8(45)
  615 01fa 0E94 0000 		call write_spi0_SerLCD
  616               	.LVL38:
  231:main.c        **** 
- 232:main.c        **** 	// start at the first line
- 233:main.c        **** 	write_spi0_SerLCD(254);
- 617               		.loc 1 233 2 view .LVU194
+ 232:main.c        ****     // start at the first line
+ 233:main.c        ****     write_spi0_SerLCD(254);
+ 617               		.loc 1 233 5 view .LVU194
  618 01fe 8EEF      		ldi r24,lo8(-2)
  619 0200 0E94 0000 		call write_spi0_SerLCD
  620               	.LVL39:
- 234:main.c        **** 	write_spi0_SerLCD(128+0);
- 621               		.loc 1 234 2 view .LVU195
+ 234:main.c        ****     write_spi0_SerLCD(128+0);
+ 621               		.loc 1 234 5 view .LVU195
  622 0204 80E8      		ldi r24,lo8(-128)
  623 0206 0E94 0000 		call write_spi0_SerLCD
  624               	.LVL40:
- 235:main.c        **** 	for (uint8_t i = 0; dsp_buff1[i];){
- 625               		.loc 1 235 2 view .LVU196
+ 235:main.c        ****     for (uint8_t i = 0; dsp_buff1[i];){
+ 625               		.loc 1 235 5 view .LVU196
  626               	.LBB18:
- 627               		.loc 1 235 7 view .LVU197
- 628               		.loc 1 235 15 is_stmt 0 view .LVU198
+ 627               		.loc 1 235 10 view .LVU197
+ 628               		.loc 1 235 18 is_stmt 0 view .LVU198
  629 020a C0E0      		ldi r28,0
- 630               		.loc 1 235 2 view .LVU199
+ 630               		.loc 1 235 5 view .LVU199
  631 020c 00C0      		rjmp .L26
  632               	.LVL41:
  633               	.L27:
- 236:main.c        **** 		write_spi0_SerLCD(dsp_buff1[i++]);
- 634               		.loc 1 236 3 is_stmt 1 view .LVU200
- 635               		.loc 1 236 32 is_stmt 0 view .LVU201
+ 236:main.c        ****         write_spi0_SerLCD(dsp_buff1[i++]);
+ 634               		.loc 1 236 9 is_stmt 1 view .LVU200
+ 635               		.loc 1 236 38 is_stmt 0 view .LVU201
  636 020e CF5F      		subi r28,lo8(-(1))
  637               	.LVL42:
- 638               		.loc 1 236 3 view .LVU202
+ 638               		.loc 1 236 9 view .LVU202
  639 0210 0E94 0000 		call write_spi0_SerLCD
  640               	.LVL43:
  641               	.L26:
- 235:main.c        **** 	for (uint8_t i = 0; dsp_buff1[i];){
- 642               		.loc 1 235 22 is_stmt 1 discriminator 1 view .LVU203
- 235:main.c        **** 	for (uint8_t i = 0; dsp_buff1[i];){
- 643               		.loc 1 235 31 is_stmt 0 discriminator 1 view .LVU204
+ 235:main.c        ****     for (uint8_t i = 0; dsp_buff1[i];){
+ 642               		.loc 1 235 25 is_stmt 1 discriminator 1 view .LVU203
+ 235:main.c        ****     for (uint8_t i = 0; dsp_buff1[i];){
+ 643               		.loc 1 235 34 is_stmt 0 discriminator 1 view .LVU204
  644 0214 EC2F      		mov r30,r28
  645 0216 F0E0      		ldi r31,0
  646 0218 E050      		subi r30,lo8(-(dsp_buff1))
  647 021a F040      		sbci r31,hi8(-(dsp_buff1))
  648 021c 8081      		ld r24,Z
- 235:main.c        **** 	for (uint8_t i = 0; dsp_buff1[i];){
- 649               		.loc 1 235 22 discriminator 1 view .LVU205
+ 235:main.c        ****     for (uint8_t i = 0; dsp_buff1[i];){
+ 649               		.loc 1 235 25 discriminator 1 view .LVU205
  650 021e 8111      		cpse r24,__zero_reg__
  651 0220 00C0      		rjmp .L27
  652               	.LBE18:
- 237:main.c        **** 	}
- 238:main.c        **** 	// move to second line
- 239:main.c        **** 	write_spi0_SerLCD(254);
- 653               		.loc 1 239 2 is_stmt 1 view .LVU206
+ 237:main.c        ****     }
+ 238:main.c        ****     // move to second line
+ 239:main.c        ****     write_spi0_SerLCD(254);
+ 653               		.loc 1 239 5 is_stmt 1 view .LVU206
  654 0222 8EEF      		ldi r24,lo8(-2)
  655 0224 0E94 0000 		call write_spi0_SerLCD
  656               	.LVL44:
- 240:main.c        **** 	write_spi0_SerLCD(128+64);
- 657               		.loc 1 240 2 view .LVU207
+ 240:main.c        ****     write_spi0_SerLCD(128+64);
+ 657               		.loc 1 240 5 view .LVU207
  658 0228 80EC      		ldi r24,lo8(-64)
  659 022a 0E94 0000 		call write_spi0_SerLCD
  660               	.LVL45:
- 241:main.c        **** 	for (uint8_t i = 0; dsp_buff2[i];){
- 661               		.loc 1 241 2 view .LVU208
+ 241:main.c        ****     for (uint8_t i = 0; dsp_buff2[i];){
+ 661               		.loc 1 241 5 view .LVU208
  662               	.LBB19:
- 663               		.loc 1 241 7 view .LVU209
- 664               		.loc 1 241 15 is_stmt 0 view .LVU210
+ 663               		.loc 1 241 10 view .LVU209
+ 664               		.loc 1 241 18 is_stmt 0 view .LVU210
  665 022e C0E0      		ldi r28,0
  666               	.LVL46:
- 667               		.loc 1 241 2 view .LVU211
+ 667               		.loc 1 241 5 view .LVU211
  668 0230 00C0      		rjmp .L28
  669               	.LVL47:
  670               	.L29:
- 242:main.c        **** 		write_spi0_SerLCD(dsp_buff2[i++]);
- 671               		.loc 1 242 3 is_stmt 1 view .LVU212
- 672               		.loc 1 242 32 is_stmt 0 view .LVU213
+ 242:main.c        ****         write_spi0_SerLCD(dsp_buff2[i++]);
+ 671               		.loc 1 242 9 is_stmt 1 view .LVU212
+ 672               		.loc 1 242 38 is_stmt 0 view .LVU213
  673 0232 CF5F      		subi r28,lo8(-(1))
  674               	.LVL48:
- 675               		.loc 1 242 3 view .LVU214
+ 675               		.loc 1 242 9 view .LVU214
  676 0234 0E94 0000 		call write_spi0_SerLCD
  677               	.LVL49:
  678               	.L28:
- 241:main.c        **** 	for (uint8_t i = 0; dsp_buff2[i];){
- 679               		.loc 1 241 22 is_stmt 1 discriminator 1 view .LVU215
- 241:main.c        **** 	for (uint8_t i = 0; dsp_buff2[i];){
- 680               		.loc 1 241 31 is_stmt 0 discriminator 1 view .LVU216
+ 241:main.c        ****     for (uint8_t i = 0; dsp_buff2[i];){
+ 679               		.loc 1 241 25 is_stmt 1 discriminator 1 view .LVU215
+ 241:main.c        ****     for (uint8_t i = 0; dsp_buff2[i];){
+ 680               		.loc 1 241 34 is_stmt 0 discriminator 1 view .LVU216
  681 0238 EC2F      		mov r30,r28
  682 023a F0E0      		ldi r31,0
  683 023c E050      		subi r30,lo8(-(dsp_buff2))
  684 023e F040      		sbci r31,hi8(-(dsp_buff2))
  685 0240 8081      		ld r24,Z
- 241:main.c        **** 	for (uint8_t i = 0; dsp_buff2[i];){
- 686               		.loc 1 241 22 discriminator 1 view .LVU217
+ 241:main.c        ****     for (uint8_t i = 0; dsp_buff2[i];){
+ 686               		.loc 1 241 25 discriminator 1 view .LVU217
  687 0242 8111      		cpse r24,__zero_reg__
  688 0244 00C0      		rjmp .L29
  689               	.LBE19:
- 243:main.c        **** 	}
- 244:main.c        **** 	// move to third line
- 245:main.c        **** 	write_spi0_SerLCD(254);
- 690               		.loc 1 245 2 is_stmt 1 view .LVU218
+ 243:main.c        ****     }
+ 244:main.c        ****     // move to third line
+ 245:main.c        ****     write_spi0_SerLCD(254);
+ 690               		.loc 1 245 5 is_stmt 1 view .LVU218
  691 0246 8EEF      		ldi r24,lo8(-2)
  692 0248 0E94 0000 		call write_spi0_SerLCD
  693               	.LVL50:
- 246:main.c        **** 	write_spi0_SerLCD(128+20);
- 694               		.loc 1 246 2 view .LVU219
+ 246:main.c        ****     write_spi0_SerLCD(128+20);
+ 694               		.loc 1 246 5 view .LVU219
  695 024c 84E9      		ldi r24,lo8(-108)
  696 024e 0E94 0000 		call write_spi0_SerLCD
  697               	.LVL51:
- 247:main.c        **** 	for (uint8_t i = 0; dsp_buff3[i];){
- 698               		.loc 1 247 2 view .LVU220
+ 247:main.c        ****     for (uint8_t i = 0; dsp_buff3[i];){
+ 698               		.loc 1 247 5 view .LVU220
  699               	.LBB20:
- 700               		.loc 1 247 7 view .LVU221
- 701               		.loc 1 247 15 is_stmt 0 view .LVU222
+ 700               		.loc 1 247 10 view .LVU221
+ 701               		.loc 1 247 18 is_stmt 0 view .LVU222
  702 0252 C0E0      		ldi r28,0
  703               	.LVL52:
- 704               		.loc 1 247 2 view .LVU223
+ 704               		.loc 1 247 5 view .LVU223
  705 0254 00C0      		rjmp .L30
  706               	.LVL53:
  707               	.L31:
- 248:main.c        **** 		write_spi0_SerLCD(dsp_buff3[i++]);
- 708               		.loc 1 248 3 is_stmt 1 view .LVU224
- 709               		.loc 1 248 32 is_stmt 0 view .LVU225
+ 248:main.c        ****         write_spi0_SerLCD(dsp_buff3[i++]);
+ 708               		.loc 1 248 9 is_stmt 1 view .LVU224
+ 709               		.loc 1 248 38 is_stmt 0 view .LVU225
  710 0256 CF5F      		subi r28,lo8(-(1))
  711               	.LVL54:
- 712               		.loc 1 248 3 view .LVU226
+ 712               		.loc 1 248 9 view .LVU226
  713 0258 0E94 0000 		call write_spi0_SerLCD
  714               	.LVL55:
  715               	.L30:
- 247:main.c        **** 	for (uint8_t i = 0; dsp_buff3[i];){
- 716               		.loc 1 247 22 is_stmt 1 discriminator 1 view .LVU227
- 247:main.c        **** 	for (uint8_t i = 0; dsp_buff3[i];){
- 717               		.loc 1 247 31 is_stmt 0 discriminator 1 view .LVU228
+ 247:main.c        ****     for (uint8_t i = 0; dsp_buff3[i];){
+ 716               		.loc 1 247 25 is_stmt 1 discriminator 1 view .LVU227
+ 247:main.c        ****     for (uint8_t i = 0; dsp_buff3[i];){
+ 717               		.loc 1 247 34 is_stmt 0 discriminator 1 view .LVU228
  718 025c EC2F      		mov r30,r28
  719 025e F0E0      		ldi r31,0
  720 0260 E050      		subi r30,lo8(-(dsp_buff3))
  721 0262 F040      		sbci r31,hi8(-(dsp_buff3))
  722 0264 8081      		ld r24,Z
- 247:main.c        **** 	for (uint8_t i = 0; dsp_buff3[i];){
- 723               		.loc 1 247 22 discriminator 1 view .LVU229
+ 247:main.c        ****     for (uint8_t i = 0; dsp_buff3[i];){
+ 723               		.loc 1 247 25 discriminator 1 view .LVU229
  724 0266 8111      		cpse r24,__zero_reg__
  725 0268 00C0      		rjmp .L31
  726               	.LBE20:
- 249:main.c        **** 	}
- 250:main.c        **** 	// move to fourth line
- 251:main.c        **** 	write_spi0_SerLCD(254);
- 727               		.loc 1 251 2 is_stmt 1 view .LVU230
+ 249:main.c        ****     }
+ 250:main.c        ****     // move to fourth line
+ 251:main.c        ****     write_spi0_SerLCD(254);
+ 727               		.loc 1 251 5 is_stmt 1 view .LVU230
  728 026a 8EEF      		ldi r24,lo8(-2)
  729 026c 0E94 0000 		call write_spi0_SerLCD
  730               	.LVL56:
- 252:main.c        **** 	write_spi0_SerLCD(128+84);
- 731               		.loc 1 252 2 view .LVU231
+ 252:main.c        ****     write_spi0_SerLCD(128+84);
+ 731               		.loc 1 252 5 view .LVU231
  732 0270 84ED      		ldi r24,lo8(-44)
  733 0272 0E94 0000 		call write_spi0_SerLCD
  734               	.LVL57:
- 253:main.c        **** 	for (uint8_t i = 0; dsp_buff4[i];){
- 735               		.loc 1 253 2 view .LVU232
+ 253:main.c        ****     for (uint8_t i = 0; dsp_buff4[i];){
+ 735               		.loc 1 253 5 view .LVU232
  736               	.LBB21:
- 737               		.loc 1 253 7 view .LVU233
- 738               		.loc 1 253 15 is_stmt 0 view .LVU234
+ 737               		.loc 1 253 10 view .LVU233
+ 738               		.loc 1 253 18 is_stmt 0 view .LVU234
  739 0276 C0E0      		ldi r28,0
  740               	.LVL58:
- 741               		.loc 1 253 2 view .LVU235
+ 741               		.loc 1 253 5 view .LVU235
  742 0278 00C0      		rjmp .L32
  743               	.LVL59:
  744               	.L33:
- 254:main.c        **** 		write_spi0_SerLCD(dsp_buff4[i++]);
- 745               		.loc 1 254 3 is_stmt 1 view .LVU236
- 746               		.loc 1 254 32 is_stmt 0 view .LVU237
+ 254:main.c        ****         write_spi0_SerLCD(dsp_buff4[i++]);
+ 745               		.loc 1 254 9 is_stmt 1 view .LVU236
+ 746               		.loc 1 254 38 is_stmt 0 view .LVU237
  747 027a CF5F      		subi r28,lo8(-(1))
  748               	.LVL60:
- 749               		.loc 1 254 3 view .LVU238
+ 749               		.loc 1 254 9 view .LVU238
  750 027c 0E94 0000 		call write_spi0_SerLCD
  751               	.LVL61:
  752               	.L32:
- 253:main.c        **** 	for (uint8_t i = 0; dsp_buff4[i];){
- 753               		.loc 1 253 22 is_stmt 1 discriminator 1 view .LVU239
- 253:main.c        **** 	for (uint8_t i = 0; dsp_buff4[i];){
- 754               		.loc 1 253 31 is_stmt 0 discriminator 1 view .LVU240
+ 253:main.c        ****     for (uint8_t i = 0; dsp_buff4[i];){
+ 753               		.loc 1 253 25 is_stmt 1 discriminator 1 view .LVU239
+ 253:main.c        ****     for (uint8_t i = 0; dsp_buff4[i];){
+ 754               		.loc 1 253 34 is_stmt 0 discriminator 1 view .LVU240
  755 0280 EC2F      		mov r30,r28
  756 0282 F0E0      		ldi r31,0
  757 0284 E050      		subi r30,lo8(-(dsp_buff4))
  758 0286 F040      		sbci r31,hi8(-(dsp_buff4))
  759 0288 8081      		ld r24,Z
- 253:main.c        **** 	for (uint8_t i = 0; dsp_buff4[i];){
- 760               		.loc 1 253 22 discriminator 1 view .LVU241
+ 253:main.c        ****     for (uint8_t i = 0; dsp_buff4[i];){
+ 760               		.loc 1 253 25 discriminator 1 view .LVU241
  761 028a 8111      		cpse r24,__zero_reg__
  762 028c 00C0      		rjmp .L33
  763               	/* epilogue start */
  764               	.LBE21:
- 255:main.c        **** 	}
+ 255:main.c        ****     }
  256:main.c        **** 
- 257:main.c        **** 	// wait so that it doesn't write too frequently
+ 257:main.c        ****     // wait so that it doesn't write too frequently
  258:main.c        **** }
  765               		.loc 1 258 1 view .LVU242
  766 028e CF91      		pop r28
@@ -1380,8 +1380,8 @@
  841 0029 2564 2E25 		.string	"%d.%d C"
  841      6420 4300 
  842               	.LC3:
- 843 0031 2566 2046 		.string	"%f F"
- 843      00
+ 843 0031 2564 2E25 		.string	"%d.%d F"
+ 843      6420 4600 
  844               		.text
  845               	.global	main
  847               	main:
@@ -1393,64 +1393,62 @@
  271:main.c        **** {
  849               		.loc 1 271 1 is_stmt 1 view -0
  850               		.cfi_startproc
- 851 02dc CDB7      		in r28,__SP_L__
- 852 02de DEB7      		in r29,__SP_H__
- 853               		.cfi_def_cfa_register 28
- 854 02e0 2D97      		sbiw r28,13
- 855               		.cfi_def_cfa_offset 15
- 856 02e2 CDBF      		out __SP_L__,r28
- 857 02e4 DEBF      		out __SP_H__,r29
- 858               	/* prologue: function */
- 859               	/* frame size = 13 */
- 860               	/* stack size = 13 */
- 861               	.L__stack_usage = 13
+ 851 02dc 00D0      		rcall .
+ 852               		.cfi_def_cfa_offset 4
+ 853 02de CDB7      		in r28,__SP_L__
+ 854 02e0 DEB7      		in r29,__SP_H__
+ 855               		.cfi_def_cfa_register 28
+ 856               	/* prologue: function */
+ 857               	/* frame size = 2 */
+ 858               	/* stack size = 2 */
+ 859               	.L__stack_usage = 2
  272:main.c        ****     // initialize the LCD
  273:main.c        ****     init_twi0_SerLCD();
- 862               		.loc 1 273 5 view .LVU251
- 863 02e6 0E94 0000 		call init_twi0_SerLCD
- 864               	.LVL63:
+ 860               		.loc 1 273 5 view .LVU251
+ 861 02e2 0E94 0000 		call init_twi0_SerLCD
+ 862               	.LVL63:
  274:main.c        **** 
- 275:main.c        **** 	// init LM75
- 276:main.c        **** 	init_twi0_LM75();
- 865               		.loc 1 276 2 view .LVU252
- 866 02ea 0E94 0000 		call init_twi0_LM75
- 867               	.LVL64:
+ 275:main.c        ****     // init LM75
+ 276:main.c        ****     init_twi0_LM75();
+ 863               		.loc 1 276 5 view .LVU252
+ 864 02e6 0E94 0000 		call init_twi0_LM75
+ 865               	.LVL64:
  277:main.c        **** 
  278:main.c        ****     // display clear
  279:main.c        ****     clear_display_buffs();
- 868               		.loc 1 279 5 view .LVU253
- 869 02ee 0E94 0000 		call clear_display_buffs
- 870               	.LVL65:
+ 866               		.loc 1 279 5 view .LVU253
+ 867 02ea 0E94 0000 		call clear_display_buffs
+ 868               	.LVL65:
  280:main.c        **** 
  281:main.c        ****     // Clear board
  282:main.c        ****     write_twi0_SerLCD(0x72, '|');
- 871               		.loc 1 282 5 view .LVU254
- 872 02f2 6CE7      		ldi r22,lo8(124)
- 873 02f4 82E7      		ldi r24,lo8(114)
- 874 02f6 0E94 0000 		call write_twi0_SerLCD
- 875               	.LVL66:
+ 869               		.loc 1 282 5 view .LVU254
+ 870 02ee 6CE7      		ldi r22,lo8(124)
+ 871 02f0 82E7      		ldi r24,lo8(114)
+ 872 02f2 0E94 0000 		call write_twi0_SerLCD
+ 873               	.LVL66:
  283:main.c        ****     write_twi0_SerLCD(0x72, '-');
- 876               		.loc 1 283 5 view .LVU255
- 877 02fa 6DE2      		ldi r22,lo8(45)
- 878 02fc 82E7      		ldi r24,lo8(114)
- 879 02fe 0E94 0000 		call write_twi0_SerLCD
- 880               	.LVL67:
+ 874               		.loc 1 283 5 view .LVU255
+ 875 02f6 6DE2      		ldi r22,lo8(45)
+ 876 02f8 82E7      		ldi r24,lo8(114)
+ 877 02fa 0E94 0000 		call write_twi0_SerLCD
+ 878               	.LVL67:
  284:main.c        **** 
  285:main.c        ****     // alters and writes the clear command
  286:main.c        ****     update_twi0_SerLCD();
- 881               		.loc 1 286 5 view .LVU256
- 882 0302 0E94 0000 		call update_twi0_SerLCD
- 883               	.LVL68:
- 884 0306 00C0      		rjmp .L38
- 885               	.LVL69:
- 886               	.L37:
- 887               	.LBB22:
- 888               	.LBB23:
+ 879               		.loc 1 286 5 view .LVU256
+ 880 02fe 0E94 0000 		call update_twi0_SerLCD
+ 881               	.LVL68:
+ 882 0302 00C0      		rjmp .L40
+ 883               	.LVL69:
+ 884               	.L37:
+ 885               	.LBB22:
+ 886               	.LBB23:
  287:main.c        **** 
  288:main.c        ****     while(1)
  289:main.c        ****     {
  290:main.c        **** 
- 291:main.c        **** 		// start with a celcius_accumulator
+ 291:main.c        ****         // start with a celcius_accumulator
  292:main.c        ****         int8_t celcius_accumulator = 0;
  293:main.c        ****         // the address for the LM75
  294:main.c        ****         volatile uint16_t totalread = TWI0_LM75_read(0b1001000);
@@ -1465,339 +1463,389 @@
  303:main.c        ****         uint8_t scale = 1;
  304:main.c        ****         for (int i = 0; i < 7; i++)
  305:main.c        ****         {
- 306:main.c        **** 			// shift out once more
- 307:main.c        **** 			totalread = totalread >> 1;
- 889               		.loc 1 307 4 view .LVU257
- 890               		.loc 1 307 26 is_stmt 0 view .LVU258
- 891 0308 8981      		ldd r24,Y+1
- 892 030a 9A81      		ldd r25,Y+2
- 893 030c 9695      		lsr r25
- 894 030e 8795      		ror r24
- 895               		.loc 1 307 14 view .LVU259
- 896 0310 8983      		std Y+1,r24
- 897 0312 9A83      		std Y+2,r25
+ 306:main.c        ****             // shift out once more
+ 307:main.c        ****             totalread = totalread >> 1;
+ 887               		.loc 1 307 13 view .LVU257
+ 888               		.loc 1 307 35 is_stmt 0 view .LVU258
+ 889 0304 8981      		ldd r24,Y+1
+ 890 0306 9A81      		ldd r25,Y+2
+ 891 0308 9695      		lsr r25
+ 892 030a 8795      		ror r24
+ 893               		.loc 1 307 23 view .LVU259
+ 894 030c 8983      		std Y+1,r24
+ 895 030e 9A83      		std Y+2,r25
  308:main.c        ****             celcius_accumulator += scale*(totalread % 2);
- 898               		.loc 1 308 13 is_stmt 1 view .LVU260
- 899               		.loc 1 308 53 is_stmt 0 view .LVU261
- 900 0314 8981      		ldd r24,Y+1
- 901 0316 9A81      		ldd r25,Y+2
- 902 0318 8170      		andi r24,1
- 903 031a 9927      		clr r25
- 904               		.loc 1 308 41 view .LVU262
- 905 031c 9195      		neg r25
- 906 031e 8195      		neg r24
- 907 0320 9109      		sbc r25,__zero_reg__
- 908 0322 8623      		and r24,r22
- 909               		.loc 1 308 33 view .LVU263
- 910 0324 780F      		add r23,r24
- 911               	.LVL70:
- 309:main.c        **** 			scale *= 2;
- 912               		.loc 1 309 4 is_stmt 1 view .LVU264
- 913               		.loc 1 309 10 is_stmt 0 view .LVU265
- 914 0326 660F      		lsl r22
- 915               	.LVL71:
+ 896               		.loc 1 308 13 is_stmt 1 view .LVU260
+ 897               		.loc 1 308 53 is_stmt 0 view .LVU261
+ 898 0310 8981      		ldd r24,Y+1
+ 899 0312 9A81      		ldd r25,Y+2
+ 900 0314 8170      		andi r24,1
+ 901 0316 9927      		clr r25
+ 902               		.loc 1 308 41 view .LVU262
+ 903 0318 9195      		neg r25
+ 904 031a 8195      		neg r24
+ 905 031c 9109      		sbc r25,__zero_reg__
+ 906 031e 8623      		and r24,r22
+ 907               		.loc 1 308 33 view .LVU263
+ 908 0320 780F      		add r23,r24
+ 909               	.LVL70:
+ 309:main.c        ****             scale *= 2;
+ 910               		.loc 1 309 13 is_stmt 1 view .LVU264
+ 911               		.loc 1 309 19 is_stmt 0 view .LVU265
+ 912 0322 660F      		lsl r22
+ 913               	.LVL71:
  304:main.c        ****         {
- 916               		.loc 1 304 33 is_stmt 1 discriminator 3 view .LVU266
- 917 0328 2F5F      		subi r18,-1
- 918 032a 3F4F      		sbci r19,-1
- 919               	.LVL72:
- 920               	.L36:
+ 914               		.loc 1 304 33 is_stmt 1 discriminator 3 view .LVU266
+ 915 0324 4F5F      		subi r20,-1
+ 916 0326 5F4F      		sbci r21,-1
+ 917               	.LVL72:
+ 918               	.L36:
  304:main.c        ****         {
- 921               		.loc 1 304 27 discriminator 1 view .LVU267
- 922 032c 2730      		cpi r18,7
- 923 032e 3105      		cpc r19,__zero_reg__
- 924 0330 04F0      		brlt .L37
- 925               	.LBE23:
+ 919               		.loc 1 304 27 discriminator 1 view .LVU267
+ 920 0328 4730      		cpi r20,7
+ 921 032a 5105      		cpc r21,__zero_reg__
+ 922 032c 04F0      		brlt .L37
+ 923               	.LBE23:
  310:main.c        ****         }
- 311:main.c        **** 		
- 312:main.c        **** 		// shift out once more
- 313:main.c        **** 		totalread = totalread >> 1;
- 926               		.loc 1 313 3 view .LVU268
- 927               		.loc 1 313 25 is_stmt 0 view .LVU269
- 928 0332 8981      		ldd r24,Y+1
- 929 0334 9A81      		ldd r25,Y+2
- 930 0336 9695      		lsr r25
- 931 0338 8795      		ror r24
- 932               		.loc 1 313 13 view .LVU270
- 933 033a 8983      		std Y+1,r24
- 934 033c 9A83      		std Y+2,r25
+ 311:main.c        **** 
+ 312:main.c        ****         // shift out once more
+ 313:main.c        ****         totalread = totalread >> 1;
+ 924               		.loc 1 313 9 view .LVU268
+ 925               		.loc 1 313 31 is_stmt 0 view .LVU269
+ 926 032e 8981      		ldd r24,Y+1
+ 927 0330 9A81      		ldd r25,Y+2
+ 928 0332 9695      		lsr r25
+ 929 0334 8795      		ror r24
+ 930               		.loc 1 313 19 view .LVU270
+ 931 0336 8983      		std Y+1,r24
+ 932 0338 9A83      		std Y+2,r25
  314:main.c        ****         celcius_accumulator -= 128*(totalread %2) ;
- 935               		.loc 1 314 9 is_stmt 1 view .LVU271
- 936               		.loc 1 314 47 is_stmt 0 view .LVU272
- 937 033e 8981      		ldd r24,Y+1
- 938 0340 9A81      		ldd r25,Y+2
- 939               		.loc 1 314 29 view .LVU273
+ 933               		.loc 1 314 9 is_stmt 1 view .LVU271
+ 934               		.loc 1 314 47 is_stmt 0 view .LVU272
+ 935 033a 8981      		ldd r24,Y+1
+ 936 033c 9A81      		ldd r25,Y+2
+ 937               		.loc 1 314 29 view .LVU273
+ 938 033e 8795      		ror r24
+ 939 0340 8827      		clr r24
  940 0342 8795      		ror r24
- 941 0344 8827      		clr r24
- 942 0346 8795      		ror r24
- 943 0348 272E      		mov r2,r23
- 944 034a 281A      		sub r2,r24
- 945               	.LVL73:
+ 941 0344 F72E      		mov r15,r23
+ 942 0346 F81A      		sub r15,r24
+ 943               	.LVL73:
  315:main.c        **** 
  316:main.c        ****         sprintf(dsp_buff1, "Human Readable LM75");
- 946               		.loc 1 316 9 is_stmt 1 view .LVU274
- 947 034c 84E1      		ldi r24,lo8(20)
- 948 034e E0E0      		ldi r30,lo8(.LC1)
- 949 0350 F0E0      		ldi r31,hi8(.LC1)
- 950 0352 A0E0      		ldi r26,lo8(dsp_buff1)
- 951 0354 B0E0      		ldi r27,hi8(dsp_buff1)
- 952               		0:
- 953 0356 0190      		ld r0,Z+
- 954 0358 0D92      		st X+,r0
- 955 035a 8A95      		dec r24
- 956 035c 01F4      		brne 0b
+ 944               		.loc 1 316 9 is_stmt 1 view .LVU274
+ 945 0348 84E1      		ldi r24,lo8(20)
+ 946 034a E0E0      		ldi r30,lo8(.LC1)
+ 947 034c F0E0      		ldi r31,hi8(.LC1)
+ 948 034e A0E0      		ldi r26,lo8(dsp_buff1)
+ 949 0350 B0E0      		ldi r27,hi8(dsp_buff1)
+ 950               		0:
+ 951 0352 0190      		ld r0,Z+
+ 952 0354 0D92      		st X+,r0
+ 953 0356 8A95      		dec r24
+ 954 0358 01F4      		brne 0b
  317:main.c        ****         sprintf(dsp_buff2, "%d.%d C",celcius_accumulator, 5*half);
- 957               		.loc 1 317 9 view .LVU275
- 958 035e 232D      		mov r18,r3
- 959               	.LVL74:
- 960               		.loc 1 317 9 is_stmt 0 view .LVU276
- 961 0360 30E0      		ldi r19,0
- 962 0362 C901      		movw r24,r18
- 963 0364 880F      		lsl r24
- 964 0366 991F      		rol r25
- 965 0368 880F      		lsl r24
- 966 036a 991F      		rol r25
- 967 036c 820F      		add r24,r18
- 968 036e 931F      		adc r25,r19
- 969 0370 9F93      		push r25
- 970 0372 8F93      		push r24
- 971 0374 822D      		mov r24,r2
- 972 0376 022C      		mov __tmp_reg__,r2
- 973 0378 000C      		lsl r0
- 974 037a 990B      		sbc r25,r25
- 975 037c 9F93      		push r25
- 976 037e 2F92      		push r2
- 977 0380 80E0      		ldi r24,lo8(.LC2)
- 978 0382 90E0      		ldi r25,hi8(.LC2)
- 979 0384 9F93      		push r25
- 980 0386 8F93      		push r24
- 981 0388 80E0      		ldi r24,lo8(dsp_buff2)
- 982 038a 90E0      		ldi r25,hi8(dsp_buff2)
- 983 038c 9F93      		push r25
- 984 038e 8F93      		push r24
- 985 0390 0E94 0000 		call sprintf
- 986               	.LVL75:
- 318:main.c        ****         sprintf(dsp_buff3, "%f F",32+((9.0/5.0)*(celcius_accumulator + (0.5 * half))));
- 987               		.loc 1 318 9 is_stmt 1 view .LVU277
- 988               		.loc 1 318 77 is_stmt 0 view .LVU278
- 989 0394 632D      		mov r22,r3
- 990 0396 70E0      		ldi r23,0
- 991 0398 80E0      		ldi r24,0
- 992 039a 90E0      		ldi r25,0
- 993 039c 0E94 0000 		call __floatsisf
- 994               	.LVL76:
- 995 03a0 20E0      		ldi r18,0
- 996 03a2 30E0      		ldi r19,0
- 997 03a4 40E0      		ldi r20,0
- 998 03a6 5FE3      		ldi r21,lo8(63)
- 999 03a8 6B83      		std Y+3,r22
- 1000 03aa 7C83      		std Y+4,r23
- 1001 03ac 8D83      		std Y+5,r24
- 1002 03ae 9E83      		std Y+6,r25
- 1003 03b0 6B81      		ldd r22,Y+3
- 1004 03b2 7C81      		ldd r23,Y+4
- 1005 03b4 8D81      		ldd r24,Y+5
- 1006 03b6 9E81      		ldd r25,Y+6
- 1007 03b8 0E94 0000 		call __mulsf3
- 1008               	.LVL77:
- 1009 03bc 6B87      		std Y+11,r22
- 1010 03be 7C87      		std Y+12,r23
- 1011 03c0 382E      		mov r3,r24
- 1012               	.LVL78:
- 1013               		.loc 1 318 77 view .LVU279
- 1014 03c2 9D87      		std Y+13,r25
- 1015               		.loc 1 318 70 view .LVU280
- 1016 03c4 622D      		mov r22,r2
- 1017 03c6 220C      		lsl r2
- 1018 03c8 770B      		sbc r23,r23
- 1019 03ca 880B      		sbc r24,r24
- 1020 03cc 990B      		sbc r25,r25
- 1021 03ce 0E94 0000 		call __floatsisf
- 1022               	.LVL79:
- 1023 03d2 CB84      		ldd r12,Y+11
- 1024 03d4 DC84      		ldd r13,Y+12
- 1025 03d6 E32C      		mov r14,r3
- 1026 03d8 FD84      		ldd r15,Y+13
- 1027 03da A701      		movw r20,r14
- 1028 03dc 9601      		movw r18,r12
- 1029 03de 462E      		mov r4,r22
- 1030 03e0 572E      		mov r5,r23
- 1031 03e2 682E      		mov r6,r24
- 1032 03e4 792E      		mov r7,r25
- 1033 03e6 C301      		movw r24,r6
- 1034 03e8 B201      		movw r22,r4
- 1035 03ea 0E94 0000 		call __addsf3
- 1036               	.LVL80:
- 1037               		.loc 1 318 48 view .LVU281
- 1038 03ee 26E6      		ldi r18,lo8(102)
- 1039 03f0 36E6      		ldi r19,lo8(102)
- 1040 03f2 46EE      		ldi r20,lo8(-26)
- 1041 03f4 5FE3      		ldi r21,lo8(63)
- 1042 03f6 862E      		mov r8,r22
- 1043 03f8 972E      		mov r9,r23
- 1044 03fa A82E      		mov r10,r24
- 1045 03fc B92E      		mov r11,r25
- 1046 03fe C501      		movw r24,r10
- 1047 0400 B401      		movw r22,r8
- 1048 0402 0E94 0000 		call __mulsf3
- 1049               	.LVL81:
- 1050               		.loc 1 318 9 view .LVU282
- 1051 0406 20E0      		ldi r18,0
- 1052 0408 30E0      		ldi r19,0
- 1053 040a 40E0      		ldi r20,0
- 1054 040c 52E4      		ldi r21,lo8(66)
- 1055 040e 6F83      		std Y+7,r22
- 1056 0410 7887      		std Y+8,r23
- 1057 0412 8987      		std Y+9,r24
- 1058 0414 9A87      		std Y+10,r25
- 1059 0416 6F81      		ldd r22,Y+7
- 1060 0418 7885      		ldd r23,Y+8
- 1061 041a 8985      		ldd r24,Y+9
- 1062 041c 9A85      		ldd r25,Y+10
- 1063 041e 0E94 0000 		call __addsf3
- 1064               	.LVL82:
- 1065 0422 9F93      		push r25
- 1066 0424 8F93      		push r24
- 1067 0426 7F93      		push r23
- 1068 0428 6F93      		push r22
- 1069 042a 80E0      		ldi r24,lo8(.LC3)
- 1070 042c 90E0      		ldi r25,hi8(.LC3)
- 1071 042e 9F93      		push r25
- 1072 0430 8F93      		push r24
- 1073 0432 80E0      		ldi r24,lo8(dsp_buff3)
- 1074 0434 90E0      		ldi r25,hi8(dsp_buff3)
- 1075 0436 9F93      		push r25
- 1076 0438 8F93      		push r24
- 1077 043a 0E94 0000 		call sprintf
- 1078               	.LVL83:
- 319:main.c        **** 
- 320:main.c        **** 		update_twi0_SerLCD();
- 1079               		.loc 1 320 3 is_stmt 1 view .LVU283
- 1080 043e 0E94 0000 		call update_twi0_SerLCD
- 1081               	.LVL84:
- 1082               	.LBE22:
+ 955               		.loc 1 317 9 view .LVU275
+ 956 035a 8D2D      		mov r24,r13
+ 957 035c 90E0      		ldi r25,0
+ 958 035e 6C01      		movw r12,r24
+ 959 0360 CC0C      		lsl r12
+ 960 0362 DD1C      		rol r13
+ 961 0364 CC0C      		lsl r12
+ 962 0366 DD1C      		rol r13
+ 963 0368 C80E      		add r12,r24
+ 964 036a D91E      		adc r13,r25
+ 965 036c AF2C      		mov r10,r15
+ 966 036e 0F2C      		mov __tmp_reg__,r15
+ 967 0370 000C      		lsl r0
+ 968 0372 BB08      		sbc r11,r11
+ 969 0374 DF92      		push r13
+ 970 0376 CF92      		push r12
+ 971 0378 BF92      		push r11
+ 972 037a FF92      		push r15
+ 973 037c 80E0      		ldi r24,lo8(.LC2)
+ 974 037e 90E0      		ldi r25,hi8(.LC2)
+ 975 0380 9F93      		push r25
+ 976 0382 8F93      		push r24
+ 977 0384 80E0      		ldi r24,lo8(dsp_buff2)
+ 978 0386 90E0      		ldi r25,hi8(dsp_buff2)
+ 979 0388 9F93      		push r25
+ 980 038a 8F93      		push r24
+ 981 038c 0E94 0000 		call sprintf
+ 982               	.LVL74:
+ 318:main.c        **** 
+ 319:main.c        ****         // for Fahrenheit some interesting shenanigans must be done.
+ 320:main.c        ****         // absolute value:
+ 321:main.c        ****         int16_t c1 = 18 * (10 * celcius_accumulator + 5 * half);
+ 983               		.loc 1 321 9 view .LVU276
+ 984               		.loc 1 321 31 is_stmt 0 view .LVU277
+ 985 0390 C501      		movw r24,r10
+ 986 0392 880F      		lsl r24
+ 987 0394 991F      		rol r25
+ 988 0396 880F      		lsl r24
+ 989 0398 991F      		rol r25
+ 990 039a 8A0D      		add r24,r10
+ 991 039c 9B1D      		adc r25,r11
+ 992 039e 880F      		lsl r24
+ 993 03a0 991F      		rol r25
+ 994               		.loc 1 321 53 view .LVU278
+ 995 03a2 C80E      		add r12,r24
+ 996 03a4 D91E      		adc r13,r25
+ 997               		.loc 1 321 17 view .LVU279
+ 998 03a6 9601      		movw r18,r12
+ 999 03a8 220F      		lsl r18
+ 1000 03aa 331F      		rol r19
+ 1001 03ac 220F      		lsl r18
+ 1002 03ae 331F      		rol r19
+ 1003 03b0 220F      		lsl r18
+ 1004 03b2 331F      		rol r19
+ 1005 03b4 2C0D      		add r18,r12
+ 1006 03b6 3D1D      		adc r19,r13
+ 1007 03b8 220F      		lsl r18
+ 1008 03ba 331F      		rol r19
+ 1009 03bc 822F      		mov r24,r18
+ 1010 03be 932F      		mov r25,r19
+ 1011               	.LVL75:
+ 322:main.c        ****         int16_t c3 = 3200 + c1;
+ 1012               		.loc 1 322 9 is_stmt 1 view .LVU280
+ 1013               		.loc 1 322 17 is_stmt 0 view .LVU281
+ 1014 03c0 2058      		subi r18,-128
+ 1015 03c2 334F      		sbci r19,-13
+ 1016               	.LVL76:
+ 323:main.c        ****         if (celcius_accumulator >= 0)
+ 1017               		.loc 1 323 9 is_stmt 1 view .LVU282
+ 1018               		.loc 1 323 12 is_stmt 0 view .LVU283
+ 1019 03c4 CDBF      		out __SP_L__,r28
+ 1020 03c6 DEBF      		out __SP_H__,r29
+ 1021 03c8 F114      		cp r15, __zero_reg__
+ 1022 03ca 04F0      		brlt .L38
+ 1023               	.LBB24:
+ 324:main.c        ****         {
+ 325:main.c        ****             int16_t c2 = c1 % 100;
+ 1024               		.loc 1 325 13 is_stmt 1 view .LVU284
+ 1025               		.loc 1 325 21 is_stmt 0 view .LVU285
+ 1026 03cc E4E6      		ldi r30,lo8(100)
+ 1027 03ce F0E0      		ldi r31,0
+ 1028 03d0 BF01      		movw r22,r30
+ 1029 03d2 0E94 0000 		call __divmodhi4
+ 1030               	.LVL77:
+ 326:main.c        ****             sprintf(dsp_buff3, "%d.%d F",(c3 - c2) / 100, c2 / 10);
+ 1031               		.loc 1 326 13 is_stmt 1 view .LVU286
+ 1032               		.loc 1 326 46 is_stmt 0 view .LVU287
+ 1033 03d6 281B      		sub r18,r24
+ 1034 03d8 390B      		sbc r19,r25
+ 1035               	.LVL78:
+ 1036               		.loc 1 326 13 view .LVU288
+ 1037 03da 6AE0      		ldi r22,lo8(10)
+ 1038 03dc 70E0      		ldi r23,0
+ 1039 03de 0E94 0000 		call __divmodhi4
+ 1040               	.LVL79:
+ 1041               		.loc 1 326 13 view .LVU289
+ 1042 03e2 7F93      		push r23
+ 1043 03e4 6F93      		push r22
+ 1044 03e6 C901      		movw r24,r18
+ 1045 03e8 BF01      		movw r22,r30
+ 1046 03ea 0E94 0000 		call __divmodhi4
+ 1047 03ee 7F93      		push r23
+ 1048 03f0 6F93      		push r22
+ 1049 03f2 80E0      		ldi r24,lo8(.LC3)
+ 1050 03f4 90E0      		ldi r25,hi8(.LC3)
+ 1051 03f6 9F93      		push r25
+ 1052 03f8 8F93      		push r24
+ 1053 03fa 80E0      		ldi r24,lo8(dsp_buff3)
+ 1054 03fc 90E0      		ldi r25,hi8(dsp_buff3)
+ 1055 03fe 9F93      		push r25
+ 1056 0400 8F93      		push r24
+ 1057 0402 0E94 0000 		call sprintf
+ 1058               	.LVL80:
+ 1059               	.LBE24:
+ 1060 0406 CDBF      		out __SP_L__,r28
+ 1061 0408 DEBF      		out __SP_H__,r29
+ 1062               	.LVL81:
+ 1063               	.L39:
+ 327:main.c        ****         }
+ 328:main.c        ****         else
+ 329:main.c        ****         {
+ 330:main.c        ****             int16_t c2 = c3 % 100;
+ 331:main.c        ****             sprintf(dsp_buff3, "%d.%d F", (c2 - c3) / 100, c2 / 10);
+ 332:main.c        ****         }
+ 333:main.c        ****         update_twi0_SerLCD();
+ 1064               		.loc 1 333 9 is_stmt 1 view .LVU290
+ 1065 040a 0E94 0000 		call update_twi0_SerLCD
+ 1066               	.LVL82:
+ 1067               	.LBE22:
  288:main.c        ****     {
- 1083               		.loc 1 288 10 view .LVU284
- 289:main.c        **** 
- 1084               		.loc 1 289 5 is_stmt 0 view .LVU285
- 1085 0442 CDBF      		out __SP_L__,r28
- 1086 0444 DEBF      		out __SP_H__,r29
- 1087               	.LVL85:
- 1088               	.L38:
+ 1068               		.loc 1 288 10 view .LVU291
+ 1069               	.L40:
  288:main.c        ****     {
- 1089               		.loc 1 288 5 is_stmt 1 view .LVU286
- 1090               	.LBB26:
+ 1070               		.loc 1 288 5 view .LVU292
+ 1071               	.LBB28:
  292:main.c        ****         // the address for the LM75
- 1091               		.loc 1 292 9 view .LVU287
+ 1072               		.loc 1 292 9 view .LVU293
  294:main.c        ****         uint8_t half=0;
- 1092               		.loc 1 294 9 view .LVU288
+ 1073               		.loc 1 294 9 view .LVU294
  294:main.c        ****         uint8_t half=0;
- 1093               		.loc 1 294 39 is_stmt 0 view .LVU289
- 1094 0446 88E4      		ldi r24,lo8(72)
- 1095 0448 0E94 0000 		call TWI0_LM75_read
- 1096               	.LVL86:
- 1097 044c 082F      		mov r16,r24
- 1098 044e 192F      		mov r17,r25
+ 1074               		.loc 1 294 39 is_stmt 0 view .LVU295
+ 1075 040e 88E4      		ldi r24,lo8(72)
+ 1076 0410 0E94 0000 		call TWI0_LM75_read
+ 1077               	.LVL83:
+ 1078 0414 082F      		mov r16,r24
+ 1079 0416 192F      		mov r17,r25
  294:main.c        ****         uint8_t half=0;
- 1099               		.loc 1 294 27 discriminator 1 view .LVU290
- 1100 0450 0983      		std Y+1,r16
- 1101 0452 1A83      		std Y+2,r17
+ 1080               		.loc 1 294 27 discriminator 1 view .LVU296
+ 1081 0418 0983      		std Y+1,r16
+ 1082 041a 1A83      		std Y+2,r17
  295:main.c        **** 
- 1102               		.loc 1 295 9 is_stmt 1 view .LVU291
- 1103               	.LVL87:
+ 1083               		.loc 1 295 9 is_stmt 1 view .LVU297
+ 1084               	.LVL84:
  298:main.c        **** 
- 1104               		.loc 1 298 9 view .LVU292
+ 1085               		.loc 1 298 9 view .LVU298
  298:main.c        **** 
- 1105               		.loc 1 298 31 is_stmt 0 view .LVU293
- 1106 0454 8981      		ldd r24,Y+1
- 1107 0456 9A81      		ldd r25,Y+2
- 1108 0458 880F      		lsl r24
- 1109 045a 892F      		mov r24,r25
- 1110 045c 881F      		rol r24
- 1111 045e 990B      		sbc r25,r25
- 1112 0460 9195      		neg r25
+ 1086               		.loc 1 298 31 is_stmt 0 view .LVU299
+ 1087 041c 8981      		ldd r24,Y+1
+ 1088 041e 9A81      		ldd r25,Y+2
+ 1089 0420 880F      		lsl r24
+ 1090 0422 892F      		mov r24,r25
+ 1091 0424 881F      		rol r24
+ 1092 0426 990B      		sbc r25,r25
+ 1093 0428 9195      		neg r25
  298:main.c        **** 
- 1113               		.loc 1 298 19 view .LVU294
- 1114 0462 8983      		std Y+1,r24
- 1115 0464 9A83      		std Y+2,r25
+ 1094               		.loc 1 298 19 view .LVU300
+ 1095 042a 8983      		std Y+1,r24
+ 1096 042c 9A83      		std Y+2,r25
  301:main.c        **** 
- 1116               		.loc 1 301 9 is_stmt 1 view .LVU295
+ 1097               		.loc 1 301 9 is_stmt 1 view .LVU301
  301:main.c        **** 
- 1117               		.loc 1 301 28 is_stmt 0 view .LVU296
- 1118 0466 6981      		ldd r22,Y+1
- 1119 0468 7A81      		ldd r23,Y+2
+ 1098               		.loc 1 301 28 is_stmt 0 view .LVU302
+ 1099 042e 8981      		ldd r24,Y+1
+ 1100 0430 9A81      		ldd r25,Y+2
  301:main.c        **** 
- 1120               		.loc 1 301 14 view .LVU297
- 1121 046a 862F      		mov r24,r22
- 1122 046c 8170      		andi r24,lo8(1)
- 1123 046e 382E      		mov r3,r24
- 1124               	.LVL88:
+ 1101               		.loc 1 301 14 view .LVU303
+ 1102 0432 282F      		mov r18,r24
+ 1103 0434 2170      		andi r18,lo8(1)
+ 1104 0436 D22E      		mov r13,r18
+ 1105               	.LVL85:
  303:main.c        ****         for (int i = 0; i < 7; i++)
- 1125               		.loc 1 303 9 is_stmt 1 view .LVU298
+ 1106               		.loc 1 303 9 is_stmt 1 view .LVU304
  304:main.c        ****         {
- 1126               		.loc 1 304 9 view .LVU299
- 1127               	.LBB24:
+ 1107               		.loc 1 304 9 view .LVU305
+ 1108               	.LBB25:
  304:main.c        ****         {
- 1128               		.loc 1 304 14 view .LVU300
+ 1109               		.loc 1 304 14 view .LVU306
  304:main.c        ****         {
- 1129               		.loc 1 304 18 is_stmt 0 view .LVU301
- 1130 0470 20E0      		ldi r18,0
- 1131 0472 30E0      		ldi r19,0
- 1132               	.LBE24:
+ 1110               		.loc 1 304 18 is_stmt 0 view .LVU307
+ 1111 0438 40E0      		ldi r20,0
+ 1112 043a 50E0      		ldi r21,0
+ 1113               	.LBE25:
  303:main.c        ****         for (int i = 0; i < 7; i++)
- 1133               		.loc 1 303 17 view .LVU302
- 1134 0474 61E0      		ldi r22,lo8(1)
+ 1114               		.loc 1 303 17 view .LVU308
+ 1115 043c 61E0      		ldi r22,lo8(1)
  292:main.c        ****         // the address for the LM75
- 1135               		.loc 1 292 16 view .LVU303
- 1136 0476 70E0      		ldi r23,0
- 1137               	.LBB25:
+ 1116               		.loc 1 292 16 view .LVU309
+ 1117 043e 70E0      		ldi r23,0
+ 1118               	.LBB26:
  304:main.c        ****         {
- 1138               		.loc 1 304 9 view .LVU304
- 1139 0478 00C0      		rjmp .L36
- 1140               	.LBE25:
- 1141               	.LBE26:
- 1142               		.cfi_endproc
- 1143               	.LFE14:
- 1145               	.global	temp_reg_low
- 1146               		.section .bss
- 1149               	temp_reg_low:
- 1150 0000 00        		.zero	1
- 1151               	.global	temp_reg_high
- 1154               	temp_reg_high:
- 1155 0001 00        		.zero	1
- 1156               	.global	dsp_buff4
- 1159               	dsp_buff4:
- 1160 0002 0000 0000 		.zero	21
- 1160      0000 0000 
- 1160      0000 0000 
- 1160      0000 0000 
- 1160      0000 0000 
- 1161               	.global	dsp_buff3
- 1164               	dsp_buff3:
- 1165 0017 0000 0000 		.zero	21
- 1165      0000 0000 
- 1165      0000 0000 
- 1165      0000 0000 
- 1165      0000 0000 
- 1166               	.global	dsp_buff2
- 1169               	dsp_buff2:
- 1170 002c 0000 0000 		.zero	21
- 1170      0000 0000 
- 1170      0000 0000 
- 1170      0000 0000 
- 1170      0000 0000 
- 1171               	.global	dsp_buff1
- 1174               	dsp_buff1:
- 1175 0041 0000 0000 		.zero	21
- 1175      0000 0000 
- 1175      0000 0000 
- 1175      0000 0000 
- 1175      0000 0000 
- 1176               		.text
- 1177               	.Letext0:
- 1178               		.file 3 "/usr/avr/include/stdint.h"
- 1179               		.file 4 "/usr/avr/include/avr/ioavr128db48.h"
- 1180               		.file 5 "/usr/avr/include/stdio.h"
+ 1119               		.loc 1 304 9 view .LVU310
+ 1120 0440 00C0      		rjmp .L36
+ 1121               	.LVL86:
+ 1122               	.L38:
+ 304:main.c        ****         {
+ 1123               		.loc 1 304 9 view .LVU311
+ 1124               	.LBE26:
+ 1125               	.LBB27:
+ 330:main.c        ****             sprintf(dsp_buff3, "%d.%d F", (c2 - c3) / 100, c2 / 10);
+ 1126               		.loc 1 330 13 is_stmt 1 view .LVU312
+ 330:main.c        ****             sprintf(dsp_buff3, "%d.%d F", (c2 - c3) / 100, c2 / 10);
+ 1127               		.loc 1 330 21 is_stmt 0 view .LVU313
+ 1128 0442 E4E6      		ldi r30,lo8(100)
+ 1129 0444 F0E0      		ldi r31,0
+ 1130 0446 C901      		movw r24,r18
+ 1131 0448 BF01      		movw r22,r30
+ 1132 044a 0E94 0000 		call __divmodhi4
+ 1133               	.LVL87:
+ 331:main.c        ****         }
+ 1134               		.loc 1 331 13 is_stmt 1 view .LVU314
+ 331:main.c        ****         }
+ 1135               		.loc 1 331 47 is_stmt 0 view .LVU315
+ 1136 044e AC01      		movw r20,r24
+ 1137 0450 421B      		sub r20,r18
+ 1138 0452 530B      		sbc r21,r19
+ 1139 0454 9A01      		movw r18,r20
+ 1140               	.LVL88:
+ 331:main.c        ****         }
+ 1141               		.loc 1 331 13 view .LVU316
+ 1142 0456 6AE0      		ldi r22,lo8(10)
+ 1143 0458 70E0      		ldi r23,0
+ 1144 045a 0E94 0000 		call __divmodhi4
+ 1145               	.LVL89:
+ 331:main.c        ****         }
+ 1146               		.loc 1 331 13 view .LVU317
+ 1147 045e 7F93      		push r23
+ 1148 0460 6F93      		push r22
+ 1149 0462 C901      		movw r24,r18
+ 1150 0464 BF01      		movw r22,r30
+ 1151 0466 0E94 0000 		call __divmodhi4
+ 1152 046a 7F93      		push r23
+ 1153 046c 6F93      		push r22
+ 1154 046e 80E0      		ldi r24,lo8(.LC3)
+ 1155 0470 90E0      		ldi r25,hi8(.LC3)
+ 1156 0472 9F93      		push r25
+ 1157 0474 8F93      		push r24
+ 1158 0476 80E0      		ldi r24,lo8(dsp_buff3)
+ 1159 0478 90E0      		ldi r25,hi8(dsp_buff3)
+ 1160 047a 9F93      		push r25
+ 1161 047c 8F93      		push r24
+ 1162 047e 0E94 0000 		call sprintf
+ 1163               	.LVL90:
+ 331:main.c        ****         }
+ 1164               		.loc 1 331 13 view .LVU318
+ 1165 0482 CDBF      		out __SP_L__,r28
+ 1166 0484 DEBF      		out __SP_H__,r29
+ 1167 0486 00C0      		rjmp .L39
+ 1168               	.LBE27:
+ 1169               	.LBE28:
+ 1170               		.cfi_endproc
+ 1171               	.LFE14:
+ 1173               	.global	temp_reg_low
+ 1174               		.section .bss
+ 1177               	temp_reg_low:
+ 1178 0000 00        		.zero	1
+ 1179               	.global	temp_reg_high
+ 1182               	temp_reg_high:
+ 1183 0001 00        		.zero	1
+ 1184               	.global	dsp_buff4
+ 1187               	dsp_buff4:
+ 1188 0002 0000 0000 		.zero	21
+ 1188      0000 0000 
+ 1188      0000 0000 
+ 1188      0000 0000 
+ 1188      0000 0000 
+ 1189               	.global	dsp_buff3
+ 1192               	dsp_buff3:
+ 1193 0017 0000 0000 		.zero	21
+ 1193      0000 0000 
+ 1193      0000 0000 
+ 1193      0000 0000 
+ 1193      0000 0000 
+ 1194               	.global	dsp_buff2
+ 1197               	dsp_buff2:
+ 1198 002c 0000 0000 		.zero	21
+ 1198      0000 0000 
+ 1198      0000 0000 
+ 1198      0000 0000 
+ 1198      0000 0000 
+ 1199               	.global	dsp_buff1
+ 1202               	dsp_buff1:
+ 1203 0041 0000 0000 		.zero	21
+ 1203      0000 0000 
+ 1203      0000 0000 
+ 1203      0000 0000 
+ 1203      0000 0000 
+ 1204               		.text
+ 1205               	.Letext0:
+ 1206               		.file 3 "/usr/avr/include/stdint.h"
+ 1207               		.file 4 "/usr/avr/include/avr/ioavr128db48.h"
+ 1208               		.file 5 "/usr/avr/include/stdio.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 main.c
    output.elf-main.s:2      *ABS*:0000003e __SP_H__
@@ -1892,7 +1940,7 @@ DEFINED SYMBOLS
    output.elf-main.s:218    .text:00000090 .Loc.69
    output.elf-main.s:219    .text:00000090 .Loc.70
    output.elf-main.s:223    .text:00000096 .Loc.71
-   output.elf-main.s:1154   .bss:00000001 temp_reg_high
+   output.elf-main.s:1182   .bss:00000001 temp_reg_high
    output.elf-main.s:225    .text:0000009a .Loc.72
    output.elf-main.s:226    .text:0000009a .Loc.73
    output.elf-main.s:229    .text:0000009e .Loc.74
@@ -1902,7 +1950,7 @@ DEFINED SYMBOLS
    output.elf-main.s:237    .text:000000a6 .Loc.78
    output.elf-main.s:238    .text:000000a6 .Loc.79
    output.elf-main.s:242    .text:000000ac .Loc.80
-   output.elf-main.s:1149   .bss:00000000 temp_reg_low
+   output.elf-main.s:1177   .bss:00000000 temp_reg_low
    output.elf-main.s:244    .text:000000b0 .Loc.81
    output.elf-main.s:245    .text:000000b0 .Loc.82
    output.elf-main.s:248    .text:000000b4 .Loc.83
@@ -1974,7 +2022,7 @@ DEFINED SYMBOLS
    output.elf-main.s:429    .text:0000014e .Loc.140
    output.elf-main.s:434    .text:00000154 .Loc.141
    output.elf-main.s:435    .text:00000154 .Loc.142
-   output.elf-main.s:1174   .bss:00000041 dsp_buff1
+   output.elf-main.s:1202   .bss:00000041 dsp_buff1
    output.elf-main.s:441    .text:0000015e .Loc.143
    output.elf-main.s:445    .text:00000162 .Loc.144
    output.elf-main.s:450    .text:0000016a .Loc.145
@@ -1987,7 +2035,7 @@ DEFINED SYMBOLS
    output.elf-main.s:469    .text:00000178 .Loc.152
    output.elf-main.s:474    .text:0000017e .Loc.153
    output.elf-main.s:475    .text:0000017e .Loc.154
-   output.elf-main.s:1169   .bss:0000002c dsp_buff2
+   output.elf-main.s:1197   .bss:0000002c dsp_buff2
    output.elf-main.s:481    .text:00000188 .Loc.155
    output.elf-main.s:485    .text:0000018c .Loc.156
    output.elf-main.s:490    .text:00000194 .Loc.157
@@ -2000,7 +2048,7 @@ DEFINED SYMBOLS
    output.elf-main.s:509    .text:000001a2 .Loc.164
    output.elf-main.s:514    .text:000001a8 .Loc.165
    output.elf-main.s:515    .text:000001a8 .Loc.166
-   output.elf-main.s:1164   .bss:00000017 dsp_buff3
+   output.elf-main.s:1192   .bss:00000017 dsp_buff3
    output.elf-main.s:521    .text:000001b2 .Loc.167
    output.elf-main.s:525    .text:000001b6 .Loc.168
    output.elf-main.s:530    .text:000001be .Loc.169
@@ -2013,7 +2061,7 @@ DEFINED SYMBOLS
    output.elf-main.s:549    .text:000001cc .Loc.176
    output.elf-main.s:554    .text:000001d2 .Loc.177
    output.elf-main.s:555    .text:000001d2 .Loc.178
-   output.elf-main.s:1159   .bss:00000002 dsp_buff4
+   output.elf-main.s:1187   .bss:00000002 dsp_buff4
    output.elf-main.s:561    .text:000001dc .Loc.179
    output.elf-main.s:565    .text:000001e0 .Loc.180
    output.elf-main.s:569    .text:000001e0 .Loc.181
@@ -2096,62 +2144,77 @@ DEFINED SYMBOLS
    output.elf-main.s:847    .text:000002dc main
    output.elf-main.s:849    .text:000002dc .Loc.250
    output.elf-main.s:850    .text:000002dc L0
-   output.elf-main.s:862    .text:000002e6 .Loc.251
-   output.elf-main.s:865    .text:000002ea .Loc.252
-   output.elf-main.s:868    .text:000002ee .Loc.253
-   output.elf-main.s:871    .text:000002f2 .Loc.254
-   output.elf-main.s:876    .text:000002fa .Loc.255
-   output.elf-main.s:881    .text:00000302 .Loc.256
-   output.elf-main.s:889    .text:00000308 .Loc.257
-   output.elf-main.s:890    .text:00000308 .Loc.258
-   output.elf-main.s:895    .text:00000310 .Loc.259
-   output.elf-main.s:898    .text:00000314 .Loc.260
-   output.elf-main.s:899    .text:00000314 .Loc.261
-   output.elf-main.s:904    .text:0000031c .Loc.262
-   output.elf-main.s:909    .text:00000324 .Loc.263
-   output.elf-main.s:912    .text:00000326 .Loc.264
-   output.elf-main.s:913    .text:00000326 .Loc.265
-   output.elf-main.s:916    .text:00000328 .Loc.266
-   output.elf-main.s:921    .text:0000032c .Loc.267
-   output.elf-main.s:926    .text:00000332 .Loc.268
-   output.elf-main.s:927    .text:00000332 .Loc.269
-   output.elf-main.s:932    .text:0000033a .Loc.270
-   output.elf-main.s:935    .text:0000033e .Loc.271
-   output.elf-main.s:936    .text:0000033e .Loc.272
-   output.elf-main.s:939    .text:00000342 .Loc.273
-   output.elf-main.s:946    .text:0000034c .Loc.274
-   output.elf-main.s:957    .text:0000035e .Loc.275
-   output.elf-main.s:960    .text:00000360 .Loc.276
-   output.elf-main.s:987    .text:00000394 .Loc.277
-   output.elf-main.s:988    .text:00000394 .Loc.278
-   output.elf-main.s:1013   .text:000003c2 .Loc.279
-   output.elf-main.s:1015   .text:000003c4 .Loc.280
-   output.elf-main.s:1037   .text:000003ee .Loc.281
-   output.elf-main.s:1050   .text:00000406 .Loc.282
-   output.elf-main.s:1079   .text:0000043e .Loc.283
-   output.elf-main.s:1083   .text:00000442 .Loc.284
-   output.elf-main.s:1084   .text:00000442 .Loc.285
-   output.elf-main.s:1089   .text:00000446 .Loc.286
-   output.elf-main.s:1091   .text:00000446 .Loc.287
-   output.elf-main.s:1092   .text:00000446 .Loc.288
-   output.elf-main.s:1093   .text:00000446 .Loc.289
-   output.elf-main.s:1099   .text:00000450 .Loc.290
-   output.elf-main.s:1102   .text:00000454 .Loc.291
-   output.elf-main.s:1104   .text:00000454 .Loc.292
-   output.elf-main.s:1105   .text:00000454 .Loc.293
-   output.elf-main.s:1113   .text:00000462 .Loc.294
-   output.elf-main.s:1116   .text:00000466 .Loc.295
-   output.elf-main.s:1117   .text:00000466 .Loc.296
-   output.elf-main.s:1120   .text:0000046a .Loc.297
-   output.elf-main.s:1125   .text:00000470 .Loc.298
-   output.elf-main.s:1126   .text:00000470 .Loc.299
-   output.elf-main.s:1128   .text:00000470 .Loc.300
-   output.elf-main.s:1129   .text:00000470 .Loc.301
-   output.elf-main.s:1133   .text:00000474 .Loc.302
-   output.elf-main.s:1135   .text:00000476 .Loc.303
-   output.elf-main.s:1138   .text:00000478 .Loc.304
-   output.elf-main.s:1142   .text:0000047a L0
-   output.elf-main.s:1181   .text:0000047a L0
+   output.elf-main.s:851    .text:000002de L0
+   output.elf-main.s:860    .text:000002e2 .Loc.251
+   output.elf-main.s:863    .text:000002e6 .Loc.252
+   output.elf-main.s:866    .text:000002ea .Loc.253
+   output.elf-main.s:869    .text:000002ee .Loc.254
+   output.elf-main.s:874    .text:000002f6 .Loc.255
+   output.elf-main.s:879    .text:000002fe .Loc.256
+   output.elf-main.s:887    .text:00000304 .Loc.257
+   output.elf-main.s:888    .text:00000304 .Loc.258
+   output.elf-main.s:893    .text:0000030c .Loc.259
+   output.elf-main.s:896    .text:00000310 .Loc.260
+   output.elf-main.s:897    .text:00000310 .Loc.261
+   output.elf-main.s:902    .text:00000318 .Loc.262
+   output.elf-main.s:907    .text:00000320 .Loc.263
+   output.elf-main.s:910    .text:00000322 .Loc.264
+   output.elf-main.s:911    .text:00000322 .Loc.265
+   output.elf-main.s:914    .text:00000324 .Loc.266
+   output.elf-main.s:919    .text:00000328 .Loc.267
+   output.elf-main.s:924    .text:0000032e .Loc.268
+   output.elf-main.s:925    .text:0000032e .Loc.269
+   output.elf-main.s:930    .text:00000336 .Loc.270
+   output.elf-main.s:933    .text:0000033a .Loc.271
+   output.elf-main.s:934    .text:0000033a .Loc.272
+   output.elf-main.s:937    .text:0000033e .Loc.273
+   output.elf-main.s:944    .text:00000348 .Loc.274
+   output.elf-main.s:955    .text:0000035a .Loc.275
+   output.elf-main.s:983    .text:00000390 .Loc.276
+   output.elf-main.s:984    .text:00000390 .Loc.277
+   output.elf-main.s:994    .text:000003a2 .Loc.278
+   output.elf-main.s:997    .text:000003a6 .Loc.279
+   output.elf-main.s:1012   .text:000003c0 .Loc.280
+   output.elf-main.s:1013   .text:000003c0 .Loc.281
+   output.elf-main.s:1017   .text:000003c4 .Loc.282
+   output.elf-main.s:1018   .text:000003c4 .Loc.283
+   output.elf-main.s:1024   .text:000003cc .Loc.284
+   output.elf-main.s:1025   .text:000003cc .Loc.285
+   output.elf-main.s:1031   .text:000003d6 .Loc.286
+   output.elf-main.s:1032   .text:000003d6 .Loc.287
+   output.elf-main.s:1036   .text:000003da .Loc.288
+   output.elf-main.s:1041   .text:000003e2 .Loc.289
+   output.elf-main.s:1064   .text:0000040a .Loc.290
+   output.elf-main.s:1068   .text:0000040e .Loc.291
+   output.elf-main.s:1070   .text:0000040e .Loc.292
+   output.elf-main.s:1072   .text:0000040e .Loc.293
+   output.elf-main.s:1073   .text:0000040e .Loc.294
+   output.elf-main.s:1074   .text:0000040e .Loc.295
+   output.elf-main.s:1080   .text:00000418 .Loc.296
+   output.elf-main.s:1083   .text:0000041c .Loc.297
+   output.elf-main.s:1085   .text:0000041c .Loc.298
+   output.elf-main.s:1086   .text:0000041c .Loc.299
+   output.elf-main.s:1094   .text:0000042a .Loc.300
+   output.elf-main.s:1097   .text:0000042e .Loc.301
+   output.elf-main.s:1098   .text:0000042e .Loc.302
+   output.elf-main.s:1101   .text:00000432 .Loc.303
+   output.elf-main.s:1106   .text:00000438 .Loc.304
+   output.elf-main.s:1107   .text:00000438 .Loc.305
+   output.elf-main.s:1109   .text:00000438 .Loc.306
+   output.elf-main.s:1110   .text:00000438 .Loc.307
+   output.elf-main.s:1114   .text:0000043c .Loc.308
+   output.elf-main.s:1116   .text:0000043e .Loc.309
+   output.elf-main.s:1119   .text:00000440 .Loc.310
+   output.elf-main.s:1123   .text:00000442 .Loc.311
+   output.elf-main.s:1126   .text:00000442 .Loc.312
+   output.elf-main.s:1127   .text:00000442 .Loc.313
+   output.elf-main.s:1134   .text:0000044e .Loc.314
+   output.elf-main.s:1135   .text:0000044e .Loc.315
+   output.elf-main.s:1141   .text:00000456 .Loc.316
+   output.elf-main.s:1146   .text:0000045e .Loc.317
+   output.elf-main.s:1164   .text:00000482 .Loc.318
+   output.elf-main.s:1170   .text:00000488 L0
+   output.elf-main.s:1209   .text:00000488 L0
                      .debug_frame:00000000 L0
    output.elf-main.s:64     .text:00000018 .L3
    output.elf-main.s:132    .text:00000058 .L6
@@ -2183,65 +2246,74 @@ DEFINED SYMBOLS
    output.elf-main.s:804    .text:000002ae .L02
    output.elf-main.s:815    .text:000002c0 .L03
    output.elf-main.s:826    .text:000002d2 .L04
-   output.elf-main.s:1088   .text:00000446 .L38
-   output.elf-main.s:886    .text:00000308 .L37
-   output.elf-main.s:952    .text:00000356 .L05
-   output.elf-main.s:920    .text:0000032c .L36
-   output.elf-main.s:2549   .debug_abbrev:00000000 .Ldebug_abbrev0
+   output.elf-main.s:1069   .text:0000040e .L40
+   output.elf-main.s:884    .text:00000304 .L37
+   output.elf-main.s:950    .text:00000352 .L05
+   output.elf-main.s:1122   .text:00000442 .L38
+   output.elf-main.s:918    .text:00000328 .L36
+   output.elf-main.s:1063   .text:0000040a .L39
+   output.elf-main.s:2593   .debug_abbrev:00000000 .Ldebug_abbrev0
    output.elf-main.s:10     .text:00000000 .Ltext0
-   output.elf-main.s:1177   .text:0000047a .Letext0
-   output.elf-main.s:3783   .debug_line:00000000 .Ldebug_line0
+   output.elf-main.s:1205   .text:00000488 .Letext0
+   output.elf-main.s:4045   .debug_line:00000000 .Ldebug_line0
    output.elf-main.s:848    .text:000002dc .LFB14
-   output.elf-main.s:1143   .text:0000047a .LFE14
-   output.elf-main.s:3762   .debug_rnglists:0000000c .LLRL17
-   output.elf-main.s:3331   .debug_loclists:00000012 .LLST18
-   output.elf-main.s:3324   .debug_loclists:0000000c .LVUS18
-   output.elf-main.s:3356   .debug_loclists:0000002f .LLST19
-   output.elf-main.s:3349   .debug_loclists:00000029 .LVUS19
-   output.elf-main.s:3379   .debug_loclists:0000004a .LLST20
-   output.elf-main.s:3374   .debug_loclists:00000046 .LVUS20
-   output.elf-main.s:3770   .debug_rnglists:00000017 .LLRL21
-   output.elf-main.s:3397   .debug_loclists:0000005e .LLST22
-   output.elf-main.s:3392   .debug_loclists:0000005a .LVUS22
-   output.elf-main.s:986    .text:00000394 .LVL75
-   output.elf-main.s:994    .text:000003a0 .LVL76
-   output.elf-main.s:1008   .text:000003bc .LVL77
-   output.elf-main.s:1022   .text:000003d2 .LVL79
-   output.elf-main.s:1036   .text:000003ee .LVL80
-   output.elf-main.s:1049   .text:00000406 .LVL81
-   output.elf-main.s:1064   .text:00000422 .LVL82
-   output.elf-main.s:1078   .text:0000043e .LVL83
-   output.elf-main.s:1081   .text:00000442 .LVL84
-   output.elf-main.s:1096   .text:0000044c .LVL86
-   output.elf-main.s:864    .text:000002ea .LVL63
-   output.elf-main.s:867    .text:000002ee .LVL64
-   output.elf-main.s:870    .text:000002f2 .LVL65
-   output.elf-main.s:875    .text:000002fa .LVL66
-   output.elf-main.s:880    .text:00000302 .LVL67
-   output.elf-main.s:883    .text:00000306 .LVL68
+   output.elf-main.s:1171   .text:00000488 .LFE14
+   output.elf-main.s:4024   .debug_rnglists:0000000c .LLRL17
+   output.elf-main.s:3380   .debug_loclists:00000014 .LLST18
+   output.elf-main.s:3371   .debug_loclists:0000000c .LVUS18
+   output.elf-main.s:3410   .debug_loclists:00000038 .LLST19
+   output.elf-main.s:3403   .debug_loclists:00000032 .LVUS19
+   output.elf-main.s:3433   .debug_loclists:00000053 .LLST20
+   output.elf-main.s:3428   .debug_loclists:0000004f .LVUS20
+   output.elf-main.s:3457   .debug_loclists:0000006d .LLST21
+   output.elf-main.s:3446   .debug_loclists:00000063 .LVUS21
+   output.elf-main.s:3520   .debug_loclists:000000b6 .LLST22
+   output.elf-main.s:3511   .debug_loclists:000000ae .LVUS22
+   output.elf-main.s:4032   .debug_rnglists:00000017 .LLRL23
+   output.elf-main.s:3579   .debug_loclists:000000f9 .LLST24
+   output.elf-main.s:3574   .debug_loclists:000000f5 .LVUS24
+   output.elf-main.s:1023   .text:000003cc .LBB24
+   output.elf-main.s:1059   .text:00000406 .LBE24
+   output.elf-main.s:3600   .debug_loclists:00000110 .LLST25
+   output.elf-main.s:3597   .debug_loclists:0000010e .LVUS25
+   output.elf-main.s:1058   .text:00000406 .LVL80
+   output.elf-main.s:1125   .text:00000442 .LBB27
+   output.elf-main.s:1168   .text:00000488 .LBE27
+   output.elf-main.s:3619   .debug_loclists:00000123 .LLST26
+   output.elf-main.s:3612   .debug_loclists:0000011d .LVUS26
+   output.elf-main.s:1163   .text:00000482 .LVL90
+   output.elf-main.s:982    .text:00000390 .LVL74
+   output.elf-main.s:1066   .text:0000040e .LVL82
+   output.elf-main.s:1077   .text:00000414 .LVL83
+   output.elf-main.s:862    .text:000002e6 .LVL63
+   output.elf-main.s:865    .text:000002ea .LVL64
+   output.elf-main.s:868    .text:000002ee .LVL65
+   output.elf-main.s:873    .text:000002f6 .LVL66
+   output.elf-main.s:878    .text:000002fe .LVL67
+   output.elf-main.s:881    .text:00000302 .LVL68
    output.elf-main.s:780    .text:00000292 .LFB13
    output.elf-main.s:835    .text:000002dc .LFE13
    output.elf-main.s:599    .text:000001f0 .LFB12
    output.elf-main.s:771    .text:00000292 .LFE12
    output.elf-main.s:626    .text:0000020a .LBB18
    output.elf-main.s:652    .text:00000222 .LBE18
-   output.elf-main.s:3420   .debug_loclists:00000077 .LLST13
-   output.elf-main.s:3415   .debug_loclists:00000073 .LVUS13
+   output.elf-main.s:3682   .debug_loclists:00000168 .LLST13
+   output.elf-main.s:3677   .debug_loclists:00000164 .LVUS13
    output.elf-main.s:640    .text:00000214 .LVL43
    output.elf-main.s:662    .text:0000022e .LBB19
    output.elf-main.s:689    .text:00000246 .LBE19
-   output.elf-main.s:3438   .debug_loclists:0000008b .LLST14
-   output.elf-main.s:3433   .debug_loclists:00000087 .LVUS14
+   output.elf-main.s:3700   .debug_loclists:0000017c .LLST14
+   output.elf-main.s:3695   .debug_loclists:00000178 .LVUS14
    output.elf-main.s:677    .text:00000238 .LVL49
    output.elf-main.s:699    .text:00000252 .LBB20
    output.elf-main.s:726    .text:0000026a .LBE20
-   output.elf-main.s:3456   .debug_loclists:0000009f .LLST15
-   output.elf-main.s:3451   .debug_loclists:0000009b .LVUS15
+   output.elf-main.s:3718   .debug_loclists:00000190 .LLST15
+   output.elf-main.s:3713   .debug_loclists:0000018c .LVUS15
    output.elf-main.s:714    .text:0000025c .LVL55
    output.elf-main.s:736    .text:00000276 .LBB21
    output.elf-main.s:764    .text:0000028e .LBE21
-   output.elf-main.s:3476   .debug_loclists:000000b5 .LLST16
-   output.elf-main.s:3469   .debug_loclists:000000af .LVUS16
+   output.elf-main.s:3738   .debug_loclists:000001a6 .LLST16
+   output.elf-main.s:3731   .debug_loclists:000001a0 .LVUS16
    output.elf-main.s:751    .text:00000280 .LVL61
    output.elf-main.s:612    .text:000001f8 .LVL37
    output.elf-main.s:616    .text:000001fe .LVL38
@@ -2257,33 +2329,33 @@ DEFINED SYMBOLS
    output.elf-main.s:594    .text:000001f0 .LFE11
    output.elf-main.s:417    .text:00000148 .LBB12
    output.elf-main.s:444    .text:00000162 .LBE12
-   output.elf-main.s:3504   .debug_loclists:000000d8 .LLST6
-   output.elf-main.s:3499   .debug_loclists:000000d4 .LVUS6
+   output.elf-main.s:3766   .debug_loclists:000001c9 .LLST6
+   output.elf-main.s:3761   .debug_loclists:000001c5 .LVUS6
    output.elf-main.s:432    .text:00000154 .LVL15
    output.elf-main.s:456    .text:00000172 .LBB13
    output.elf-main.s:484    .text:0000018c .LBE13
-   output.elf-main.s:3522   .debug_loclists:000000ec .LLST7
-   output.elf-main.s:3517   .debug_loclists:000000e8 .LVUS7
+   output.elf-main.s:3784   .debug_loclists:000001dd .LLST7
+   output.elf-main.s:3779   .debug_loclists:000001d9 .LVUS7
    output.elf-main.s:472    .text:0000017e .LVL21
    output.elf-main.s:496    .text:0000019c .LBB14
    output.elf-main.s:524    .text:000001b6 .LBE14
-   output.elf-main.s:3540   .debug_loclists:00000100 .LLST8
-   output.elf-main.s:3535   .debug_loclists:000000fc .LVUS8
+   output.elf-main.s:3802   .debug_loclists:000001f1 .LLST8
+   output.elf-main.s:3797   .debug_loclists:000001ed .LVUS8
    output.elf-main.s:512    .text:000001a8 .LVL27
    output.elf-main.s:536    .text:000001c6 .LBB15
    output.elf-main.s:564    .text:000001e0 .LBE15
-   output.elf-main.s:3560   .debug_loclists:00000116 .LLST9
-   output.elf-main.s:3553   .debug_loclists:00000110 .LVUS9
+   output.elf-main.s:3822   .debug_loclists:00000207 .LLST9
+   output.elf-main.s:3815   .debug_loclists:00000201 .LVUS9
    output.elf-main.s:552    .text:000001d2 .LVL33
    output.elf-main.s:568    .text:000001e0 .LBI16
    output.elf-main.s:567    .text:000001e0 .LBB16
    output.elf-main.s:587    .text:000001ec .LBE16
-   output.elf-main.s:3586   .debug_loclists:00000137 .LLST10
-   output.elf-main.s:3583   .debug_loclists:00000135 .LVUS10
-   output.elf-main.s:3598   .debug_loclists:00000146 .LLST11
-   output.elf-main.s:3595   .debug_loclists:00000144 .LVUS11
-   output.elf-main.s:3610   .debug_loclists:00000155 .LLST12
-   output.elf-main.s:3607   .debug_loclists:00000153 .LVUS12
+   output.elf-main.s:3848   .debug_loclists:00000228 .LLST10
+   output.elf-main.s:3845   .debug_loclists:00000226 .LVUS10
+   output.elf-main.s:3860   .debug_loclists:00000237 .LLST11
+   output.elf-main.s:3857   .debug_loclists:00000235 .LVUS11
+   output.elf-main.s:3872   .debug_loclists:00000246 .LLST12
+   output.elf-main.s:3869   .debug_loclists:00000244 .LVUS12
    output.elf-main.s:400    .text:00000130 .LVL9
    output.elf-main.s:405    .text:00000138 .LVL10
    output.elf-main.s:410    .text:00000140 .LVL11
@@ -2296,36 +2368,34 @@ DEFINED SYMBOLS
    output.elf-main.s:534    .text:000001c6 .LVL29
    output.elf-main.s:341    .text:00000104 .LFB10
    output.elf-main.s:381    .text:00000126 .LFE10
-   output.elf-main.s:3626   .debug_loclists:00000166 .LLST5
-   output.elf-main.s:3619   .debug_loclists:00000160 .LVUS5
+   output.elf-main.s:3888   .debug_loclists:00000257 .LLST5
+   output.elf-main.s:3881   .debug_loclists:00000251 .LVUS5
    output.elf-main.s:282    .text:000000d4 .LFB9
    output.elf-main.s:335    .text:00000104 .LFE9
    output.elf-main.s:183    .text:00000076 .LFB8
    output.elf-main.s:277    .text:000000d4 .LFE8
-   output.elf-main.s:3658   .debug_loclists:0000018b .LLST4
-   output.elf-main.s:3653   .debug_loclists:00000187 .LVUS4
+   output.elf-main.s:3920   .debug_loclists:0000027c .LLST4
+   output.elf-main.s:3915   .debug_loclists:00000278 .LVUS4
    output.elf-main.s:150    .text:00000064 .LFB7
    output.elf-main.s:177    .text:00000076 .LFE7
    output.elf-main.s:50     .text:00000012 .LFB6
    output.elf-main.s:145    .text:00000064 .LFE6
-   output.elf-main.s:3684   .debug_loclists:000001a6 .LLST0
-   output.elf-main.s:3679   .debug_loclists:000001a2 .LVUS0
+   output.elf-main.s:3946   .debug_loclists:00000297 .LLST0
+   output.elf-main.s:3941   .debug_loclists:00000293 .LVUS0
    output.elf-main.s:107    .text:00000046 .LBI10
    output.elf-main.s:106    .text:00000046 .LBB10
    output.elf-main.s:126    .text:00000052 .LBE10
-   output.elf-main.s:3708   .debug_loclists:000001bc .LLST1
-   output.elf-main.s:3705   .debug_loclists:000001ba .LVUS1
-   output.elf-main.s:3720   .debug_loclists:000001c9 .LLST2
-   output.elf-main.s:3717   .debug_loclists:000001c7 .LVUS2
-   output.elf-main.s:3732   .debug_loclists:000001d6 .LLST3
-   output.elf-main.s:3729   .debug_loclists:000001d4 .LVUS3
+   output.elf-main.s:3970   .debug_loclists:000002ad .LLST1
+   output.elf-main.s:3967   .debug_loclists:000002ab .LVUS1
+   output.elf-main.s:3982   .debug_loclists:000002ba .LLST2
+   output.elf-main.s:3979   .debug_loclists:000002b8 .LVUS2
+   output.elf-main.s:3994   .debug_loclists:000002c7 .LLST3
+   output.elf-main.s:3991   .debug_loclists:000002c5 .LVUS3
    output.elf-main.s:16     .text:00000000 .LFB5
    output.elf-main.s:44     .text:00000012 .LFE5
-   output.elf-main.s:1182   .debug_info:00000000 .Ldebug_info0
+   output.elf-main.s:1210   .debug_info:00000000 .Ldebug_info0
 
 UNDEFINED SYMBOLS
 sprintf
-__floatsisf
-__mulsf3
-__addsf3
+__divmodhi4
 __do_clear_bss

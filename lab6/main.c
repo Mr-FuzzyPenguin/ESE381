@@ -64,7 +64,7 @@ int write_twi0_SerLCD(uint8_t saddr, uint8_t data)
     // Transmit data packets to the slave
 
     // the default address is 0x72
-	// bitshift to the right and then bit mask for the write
+    // bitshift to the right and then bit mask for the write
     TWI0.MADDR =  saddr << 1 | 0x0;
 
     // check to see if the write interrupt flag is ready
@@ -101,9 +101,9 @@ int write_twi0_SerLCD(uint8_t saddr, uint8_t data)
     // we can send another piece of data, or... we can write in
     TWI0.MCTRLB |= TWI_MCMD_STOP_gc;
     // to terminate the communication
-	
-	_delay_ms(1);
-	return 0;
+
+    _delay_ms(1);
+    return 0;
 }
 
 void init_twi0_LM75 (void)
@@ -161,8 +161,8 @@ uint16_t TWI0_LM75_read(uint8_t saddr)
 
     // actually returns it
     volatile uint16_t result = (uint16_t)((temp_reg_high << 8) | (temp_reg_low & 0x80));
-	
-	return result;
+
+    return result;
 }
 
 // this initializes the SerLCD
@@ -225,36 +225,36 @@ void update_twi0_SerLCD(void){
 
 // all this does is take the dsp_buff* and write it directly into SPI0.DATA
 void update_SerLCD(void){
-	// clear and write
-	write_spi0_SerLCD('|');
-	write_spi0_SerLCD('-');
+    // clear and write
+    write_spi0_SerLCD('|');
+    write_spi0_SerLCD('-');
 
-	// start at the first line
-	write_spi0_SerLCD(254);
-	write_spi0_SerLCD(128+0);
-	for (uint8_t i = 0; dsp_buff1[i];){
-		write_spi0_SerLCD(dsp_buff1[i++]);
-	}
-	// move to second line
-	write_spi0_SerLCD(254);
-	write_spi0_SerLCD(128+64);
-	for (uint8_t i = 0; dsp_buff2[i];){
-		write_spi0_SerLCD(dsp_buff2[i++]);
-	}
-	// move to third line
-	write_spi0_SerLCD(254);
-	write_spi0_SerLCD(128+20);
-	for (uint8_t i = 0; dsp_buff3[i];){
-		write_spi0_SerLCD(dsp_buff3[i++]);
-	}
-	// move to fourth line
-	write_spi0_SerLCD(254);
-	write_spi0_SerLCD(128+84);
-	for (uint8_t i = 0; dsp_buff4[i];){
-		write_spi0_SerLCD(dsp_buff4[i++]);
-	}
+    // start at the first line
+    write_spi0_SerLCD(254);
+    write_spi0_SerLCD(128+0);
+    for (uint8_t i = 0; dsp_buff1[i];){
+        write_spi0_SerLCD(dsp_buff1[i++]);
+    }
+    // move to second line
+    write_spi0_SerLCD(254);
+    write_spi0_SerLCD(128+64);
+    for (uint8_t i = 0; dsp_buff2[i];){
+        write_spi0_SerLCD(dsp_buff2[i++]);
+    }
+    // move to third line
+    write_spi0_SerLCD(254);
+    write_spi0_SerLCD(128+20);
+    for (uint8_t i = 0; dsp_buff3[i];){
+        write_spi0_SerLCD(dsp_buff3[i++]);
+    }
+    // move to fourth line
+    write_spi0_SerLCD(254);
+    write_spi0_SerLCD(128+84);
+    for (uint8_t i = 0; dsp_buff4[i];){
+        write_spi0_SerLCD(dsp_buff4[i++]);
+    }
 
-	// wait so that it doesn't write too frequently
+    // wait so that it doesn't write too frequently
 }
 
 // this clears the display buffers
@@ -272,8 +272,8 @@ int main(void)
     // initialize the LCD
     init_twi0_SerLCD();
 
-	// init LM75
-	init_twi0_LM75();
+    // init LM75
+    init_twi0_LM75();
 
     // display clear
     clear_display_buffs();
@@ -288,7 +288,7 @@ int main(void)
     while(1)
     {
 
-		// start with a celcius_accumulator
+        // start with a celcius_accumulator
         int8_t celcius_accumulator = 0;
         // the address for the LM75
         volatile uint16_t totalread = TWI0_LM75_read(0b1001000);
@@ -303,21 +303,34 @@ int main(void)
         uint8_t scale = 1;
         for (int i = 0; i < 7; i++)
         {
-			// shift out once more
-			totalread = totalread >> 1;
+            // shift out once more
+            totalread = totalread >> 1;
             celcius_accumulator += scale*(totalread % 2);
-			scale *= 2;
+            scale *= 2;
         }
-		
-		// shift out once more
-		totalread = totalread >> 1;
+
+        // shift out once more
+        totalread = totalread >> 1;
         celcius_accumulator -= 128*(totalread %2) ;
 
         sprintf(dsp_buff1, "Human Readable LM75");
         sprintf(dsp_buff2, "%d.%d C",celcius_accumulator, 5*half);
-        sprintf(dsp_buff3, "%f F",32+((9.0/5.0)*(celcius_accumulator + (0.5 * half))));
 
-		update_twi0_SerLCD();
+        // for Fahrenheit some interesting shenanigans must be done.
+        // absolute value:
+        int16_t c1 = 18 * (10 * celcius_accumulator + 5 * half);
+        int16_t c3 = 3200 + c1;
+        if (celcius_accumulator >= 0)
+        {
+            int16_t c2 = c1 % 100;
+            sprintf(dsp_buff3, "%d.%d F",(c3 - c2) / 100, c2 / 10);
+        }
+        else
+        {
+            int16_t c2 = c3 % 100;
+            sprintf(dsp_buff3, "%d.%d F", (c2 - c3) / 100, c2 / 10);
+        }
+        update_twi0_SerLCD();
     }
     return 0;
 }

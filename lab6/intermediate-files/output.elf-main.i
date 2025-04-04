@@ -3663,8 +3663,8 @@ int write_twi0_SerLCD(uint8_t saddr, uint8_t data)
        .MCTRLB |= TWI_MCMD_STOP_gc;
 
 
- _delay_ms(1);
- return 0;
+    _delay_ms(1);
+    return 0;
 }
 
 void init_twi0_LM75 (void)
@@ -3775,7 +3775,7 @@ uint16_t TWI0_LM75_read(uint8_t saddr)
 
     volatile uint16_t result = (uint16_t)((temp_reg_high << 8) | (temp_reg_low & 0x80));
 
- return result;
+    return result;
 }
 
 
@@ -3927,33 +3927,33 @@ void update_twi0_SerLCD(void){
 
 void update_SerLCD(void){
 
- write_spi0_SerLCD('|');
- write_spi0_SerLCD('-');
+    write_spi0_SerLCD('|');
+    write_spi0_SerLCD('-');
 
 
- write_spi0_SerLCD(254);
- write_spi0_SerLCD(128+0);
- for (uint8_t i = 0; dsp_buff1[i];){
-  write_spi0_SerLCD(dsp_buff1[i++]);
- }
+    write_spi0_SerLCD(254);
+    write_spi0_SerLCD(128+0);
+    for (uint8_t i = 0; dsp_buff1[i];){
+        write_spi0_SerLCD(dsp_buff1[i++]);
+    }
 
- write_spi0_SerLCD(254);
- write_spi0_SerLCD(128+64);
- for (uint8_t i = 0; dsp_buff2[i];){
-  write_spi0_SerLCD(dsp_buff2[i++]);
- }
+    write_spi0_SerLCD(254);
+    write_spi0_SerLCD(128+64);
+    for (uint8_t i = 0; dsp_buff2[i];){
+        write_spi0_SerLCD(dsp_buff2[i++]);
+    }
 
- write_spi0_SerLCD(254);
- write_spi0_SerLCD(128+20);
- for (uint8_t i = 0; dsp_buff3[i];){
-  write_spi0_SerLCD(dsp_buff3[i++]);
- }
+    write_spi0_SerLCD(254);
+    write_spi0_SerLCD(128+20);
+    for (uint8_t i = 0; dsp_buff3[i];){
+        write_spi0_SerLCD(dsp_buff3[i++]);
+    }
 
- write_spi0_SerLCD(254);
- write_spi0_SerLCD(128+84);
- for (uint8_t i = 0; dsp_buff4[i];){
-  write_spi0_SerLCD(dsp_buff4[i++]);
- }
+    write_spi0_SerLCD(254);
+    write_spi0_SerLCD(128+84);
+    for (uint8_t i = 0; dsp_buff4[i];){
+        write_spi0_SerLCD(dsp_buff4[i++]);
+    }
 
 
 }
@@ -3974,7 +3974,7 @@ int main(void)
     init_twi0_SerLCD();
 
 
- init_twi0_LM75();
+    init_twi0_LM75();
 
 
     clear_display_buffs();
@@ -4005,20 +4005,33 @@ int main(void)
         for (int i = 0; i < 7; i++)
         {
 
-   totalread = totalread >> 1;
+            totalread = totalread >> 1;
             celcius_accumulator += scale*(totalread % 2);
-   scale *= 2;
+            scale *= 2;
         }
 
 
-  totalread = totalread >> 1;
+        totalread = totalread >> 1;
         celcius_accumulator -= 128*(totalread %2) ;
 
         sprintf(dsp_buff1, "Human Readable LM75");
         sprintf(dsp_buff2, "%d.%d C",celcius_accumulator, 5*half);
-        sprintf(dsp_buff3, "%f F",32+((9.0/5.0)*(celcius_accumulator + (0.5 * half))));
 
-  update_twi0_SerLCD();
+
+
+        int16_t c1 = 18 * (10 * celcius_accumulator + 5 * half);
+        int16_t c3 = 3200 + c1;
+        if (celcius_accumulator >= 0)
+        {
+            int16_t c2 = c1 % 100;
+            sprintf(dsp_buff3, "%d.%d F",(c3 - c2) / 100, c2 / 10);
+        }
+        else
+        {
+            int16_t c2 = c3 % 100;
+            sprintf(dsp_buff3, "%d.%d F", (c2 - c3) / 100, c2 / 10);
+        }
+        update_twi0_SerLCD();
     }
     return 0;
 }
