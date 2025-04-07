@@ -25,7 +25,7 @@ void USART3_init(void) {
     VPORTB.DIR |= PIN0_bm;
 }
 
-void USART3_sendChar(char c) {
+void USART3_sendChar(uint8_t c) {
     // Wait until the transmit buffer is empty (USART_DREIF)
     while (!(USART3.STATUS & USART_DREIF_bm)) {}
     USART3.TXDATAL = c;
@@ -43,8 +43,8 @@ int main(void) {
         i++; // Move to the next character
     }
     // some code to move the cursor into the new row
-    USART3_sendChar(254);
-    USART3_sendChar(128+64);
+    USART3_sendChar((uint8_t) (254));
+    USART3_sendChar((uint8_t) (128+64));
     uint8_t message2[] = "What happens now\0";
     i = 0;
     while (message2[i] != '\0') {
