@@ -1,5 +1,5 @@
 # ESE 381 Code
-The following is a GitHub repository where in ESE 381 we wrote a comprehensive code that (ideally) covers everything. Typically, this is the last task code, where the last task requires us to have all the preceding tasks functioning in order to get the last task working.
+The following is a GitHub repository where we wrote some code for labs that (ideally) covers everything. Historically, this contained only the last task code, where the last task requires us to have all the preceding tasks functioning in order to get the last task working. It was originally used to review for a midterm; this is no longer the case. This repository is mow used for code organization. It was originally privated, but now publicized.
 
 # Assumptions
 As with all code that is written, a few assumptions must be made:
