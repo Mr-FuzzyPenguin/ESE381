@@ -7,7 +7,7 @@ As with all code that is written, a few assumptions must be made:
 2. The hardware does not contain any issues or bad wiring, so it will function correctly.
 
 # Wiring Guidelines
-The PDFs of all the schematics are made with KiCAD. These will be added soon. In real life, the wiring should have as minimal crossings as possible:
+The PDFs of all the schematics are made with KiCAD. In real life, the wiring should have as minimal crossings as possible:
 ![Wiring Guidelines:](./wiring-guideline-style.jpg)
 ## The guidelines I strictly follow:
 - The wiring may have crossings, but at the highest level, it should only have one-crossing. 
