@@ -121,7 +121,7 @@
 #include <avr/interrupt.h>
 #include <stdint.h>
 #define F_CPU 4000000	// CPU clock in Hz
-#define USART3_BAUD_RATE(BAUD_RATE) ((float)(4000000 * 64 / (16 * (float)BAUD_RATE)) + 0.5)
+#define USART1_BAUD_RATE(BAUD_RATE) ((float)(4000000 * 64 / (16 * (float)BAUD_RATE)) + 0.5)
 
 /* UART Buffer Defines */
 #define USART_RX_BUFFER_SIZE 16     /* 2,4,8,16,32,64,128 or 256 bytes */
@@ -140,28 +140,28 @@ static uint8_t USART_TxTail;  //orig. declared volatile - kls
 //uint8_t counter = 0;
 
 /* Function Prototypes */
-void USART3_Init(uint32_t baud, uint8_t data_bits, unsigned char parity);
-uint8_t USART3_Receive( void );
-void USART3_Transmit( uint8_t data );
+void USART1_Init(uint32_t baud, uint8_t data_bits, unsigned char parity);
+uint8_t USART1_Receive( void );
+void USART1_Transmit( uint8_t data );
 uint8_t DataInReceiveBuffer(void);
 
 
 /* Main - a simple test program*/
 int main( void )
 {
-    USART3_Init(115200, 8, 'd');   // Initialize USART3
+    USART1_Init(115200, 8, 'd');   // Initialize USART1
     sei();           // Enable global interrupts => enable USART interrupts
     for( ; ; )        // Forever
     {
         // Uncomment next statement to have operation independent of SW0
-        USART3_Transmit( USART3_Receive() );
+        USART1_Transmit( USART1_Receive() );
     }
     return 0;
 }
 
 
-// Function to initialize USART3
-void USART3_Init(uint32_t baud, uint8_t data_bits, unsigned char parity)
+// Function to initialize USART1
+void USART1_Init(uint32_t baud, uint8_t data_bits, unsigned char parity)
 {
     //Set PB0 as an output (Tx), initially 1, and PB1 as an input (Rx)
     PORTB.DIR &= ~PIN1_bm;	// RXD pin input
@@ -169,11 +169,11 @@ void USART3_Init(uint32_t baud, uint8_t data_bits, unsigned char parity)
     PORTB.OUT |= PIN0_bm;	// TXD output value = 1
 
     //Set the baud rate
-    USART3.BAUD = USART3_BAUD_RATE(baud);	// Load BAUD register
+    USART1.BAUD = USART1_BAUD_RATE(baud);	// Load BAUD register
 
     //Enable Tx and Rx for operation and Tx and Rx interrupts
-    USART3.CTRLB |= (USART_TXEN_bm | USART_RXEN_bm);
-    USART3.CTRLA |= (USART_RXCIE_bm); //Enable RXCIE
+    USART1.CTRLB |= (USART_TXEN_bm | USART_RXEN_bm);
+    USART1.CTRLA |= (USART_RXCIE_bm); //Enable RXCIE
 
     uint8_t p;
     switch (parity)
@@ -212,23 +212,23 @@ void USART3_Init(uint32_t baud, uint8_t data_bits, unsigned char parity)
             return;
     }
 
-    USART3.CTRLC = USART_CMODE_ASYNCHRONOUS_gc | p | USART_SBMODE_1BIT_gc | d;
+    USART1.CTRLC = USART_CMODE_ASYNCHRONOUS_gc | p | USART_SBMODE_1BIT_gc | d;
 }
 
 
 /* Interrupt handlers */
 
 //Receive complete interrupt
-ISR (USART3_RXC_vect)
+ISR (USART1_RXC_vect)
 {
     uint8_t data;
     cli();		// Clear global interrupt flag
-    data = USART3.RXDATAL;
+    data = USART1.RXDATAL;
     sei();		// re enable global interrupts
 }
 
 
-ISR (USART3_DRE_vect)
+ISR (USART1_DRE_vect)
 {
     uint8_t tmptail;
     cli();		// Clear global interrupts
@@ -240,18 +240,18 @@ ISR (USART3_DRE_vect)
         tmptail = ( USART_TxTail + 1 ) & USART_TX_BUFFER_MASK;
         USART_TxTail = tmptail;      // Store new index
 
-        USART3.TXDATAL = USART_TxBuf[tmptail];  // Start transmission
+        USART1.TXDATAL = USART_TxBuf[tmptail];  // Start transmission
     }
     else
     {
-        USART3.CTRLA &= ~(USART_DREIE_bm);     // Disable UDRE interrupt
+        USART1.CTRLA &= ~(USART_DREIE_bm);     // Disable UDRE interrupt
     }
     sei();
 }
 
 
 /* Read function */
-unsigned char USART3_Receive( void )
+unsigned char USART1_Receive( void )
 {
     uint8_t tmptail;
 
@@ -262,7 +262,7 @@ unsigned char USART3_Receive( void )
 }
 
 /* Write function */
-void USART3_Transmit( uint8_t data )
+void USART1_Transmit( uint8_t data )
 {
     uint8_t tmphead;
     /* Calculate buffer index */
@@ -271,7 +271,7 @@ void USART3_Transmit( uint8_t data )
     USART_TxBuf[tmphead] = data;           /* Store data in buffer */
     USART_TxHead = tmphead;                /* Store new index */
 
-    USART3.CTRLA |= USART_DREIE_bm;                    /* Enable UDRE interrupt */
+    USART1.CTRLA |= USART_DREIE_bm;                    /* Enable UDRE interrupt */
 }
 
 uint8_t DataInReceiveBuffer( void )
