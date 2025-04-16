@@ -1,0 +1,20 @@
+environments:
+  default:
+    shutdown_post_debug_session: true
+
+    tool:
+      name: "curiosity_nano"
+
+    target:
+      name: "avr128db48"
+      physical_interface: "updi"
+      hardware_breakpoints: true
+
+    server:
+      name: "avr_gdb_rsp"
+      ip_address: "127.0.0.1"
+      port: 6969 # haha funny number (set it to whatever you want)
+      range_stepping: true
+
+insight:
+  activate_on_startup: false
