@@ -1,113 +1,3 @@
-// /*
-//  * usart3_avr128_cir_buff.c
-//  *
-//  * Created: 3/1/2024 6:26:29 PM
-//  * Modified: 4/8/2025 7:49:24 PM
-//  * Authors : Originally by Professor Short, Modified by Katherine Trusinski and Stanley Cokro
-//  * Description: Modified code from circular_buffer_avr128_usart3 by replacing USART1_Init() function with
-//  * void USART1_Init(uint15_t baud, uint8_t data_bits, unsigned char parity). Program also receives characters via USART1
-//  * and places them in a circular receive buffer. The main loop transfers the characters from the receive butter to the
-//  * transmit buffer and enables the transmit data buffer interrupt so that the transmit ISR writes data in the transmit
-//  * buffer to the USART for transmission.
-//  */
-//
-// #include <avr/io.h>
-// #include <avr/interrupt.h>
-// #include <stdint.h>
-// #define F_CPU 4000000	// CPU clock in Hz
-// #define USART1_BAUD_RATE(BAUD_RATE) ((float)(4000000 * 64 / (16 * (float)BAUD_RATE)) + 0.5)
-// #define MAX_RCV_BUFF_SIZE 80
-//
-// /* Function Prototypes */
-// // DONE
-// void USART1_Init(uint32_t baud, uint8_t data_bits, unsigned char parity);
-// // NOT DONE
-// uint8_t USART1_Receive( void );
-// void USART1_Transmit( uint8_t data );
-//
-// /* Global variable definitions */
-// uint8_t rcv_buffer[MAX_RCV_BUFF_SIZE] = {0};
-//
-// // /* Static Variables */
-// uint8_t i = 0;
-//
-// // Function to initialize USART1
-// void USART1_Init(uint32_t baud, uint8_t data_bits, unsigned char parity)
-// {
-//     // Validate data_bits parameter (must be 5 through 8)
-//     if (data_bits < 5 || data_bits > 8)
-//     {
-//         // Invalid data_bits, set to 8 bits
-//         data_bits = 8;
-//     }
-//
-//     // Configure PB0 as output (Tx) and PB1 as input (Rx)
-//     PORTB.DIR &= ~PIN1_bm;   // [B1] RXD pin input
-//     PORTB.DIR |= PIN0_bm;    // [B0] TXD pin output
-//     PORTB.OUT |= PIN0_bm;    // [B0] TXD output value = 1
-//
-//     // Set the baud rate
-//     USART1.BAUD = (uint16_t)USART1_BAUD_RATE(baud);
-//
-//     // Configure data bits
-//     USART1.CTRLC = (data_bits - 5) << USART_CHSIZE_gp;
-//
-//     // Configure parity
-//     if (parity == 'E')
-//     {
-//         USART1.CTRLC |= USART_PMODE_EVEN_gc;
-//     }
-//     else if (parity == 'O')
-//     {
-//         USART1.CTRLC |= USART_PMODE_ODD_gc;
-//     }
-//     else
-//     {
-//         USART1.CTRLC &= ~USART_PMODE_gm; // No parity
-//     }
-//
-//     // Set 1 stop bit (default in many configurations)
-//     USART1.CTRLC &= ~USART_SBMODE_bm; // Ensure stop bit mode is 1
-//
-//     // Enable Tx and Rx for operation
-//     USART1.CTRLB |= (USART_TXEN_bm | USART_RXEN_bm);
-//
-//     // Enable receive complete interrupt
-//     USART1.CTRLA |= USART_RXCIE_bm; // Enable RXCIE
-// }
-//
-//
-// ISR (USART1_RXC_vect)		//Receive complete interrupt
-// {
-//     uint8_t data;
-//
-//     cli();
-//     data = USART1.RXDATAL;
-//     i++;
-//
-//     // reset the cursor because we had reached the end
-//     if (data == '\n')
-//     {
-//         i = 0;
-//     }
-//
-//     sei();
-// }
-//
-// int main( void )
-// {
-//     // Initialize USART1
-//     USART1_Init(115200, 8, 'N');
-//     // Turn on interrupts
-//     sei();
-//
-//     while(1)        // Forever (do nothing)
-//     {
-//         // do nothing
-//     }
-//     return 0;
-// }
-
 /*
  *
  * circular_buffer_avr128_usart3.c
@@ -129,13 +19,22 @@
 #define USART_RX_BUFFER_MASK ( USART_RX_BUFFER_SIZE - 1 )
 #define USART_TX_BUFFER_MASK ( USART_TX_BUFFER_SIZE - 1 )
 
+#if ( USART_RX_BUFFER_SIZE & USART_RX_BUFFER_MASK )
+#error RX buffer size is not a power of 2
+#endif
+#if ( USART_TX_BUFFER_SIZE & USART_TX_BUFFER_MASK )
+#error TX buffer size is not a power of 2
+#endif
+
+//#define RX_BUFFER_MARGIN ((uint8_t)(0.1 * USART_RX_BUFFER_SIZE + 0.5))
+
 /* Static Variables */
 static unsigned char USART_RxBuf[USART_RX_BUFFER_SIZE];
-static uint8_t USART_RxHead;  //orig. declared volatile - kls
-static uint8_t USART_RxTail;  //orig. declared volatile - kls
+static  uint8_t USART_RxHead;  //orig. declared volatile - kls
+static  uint8_t USART_RxTail;  //orig. declared volatile - kls
 static unsigned char USART_TxBuf[USART_TX_BUFFER_SIZE];
-static uint8_t USART_TxHead;  //orig. declared volatile - kls
-static uint8_t USART_TxTail;  //orig. declared volatile - kls
+static  uint8_t USART_TxHead;  //orig. declared volatile - kls
+static  uint8_t USART_TxTail;  //orig. declared volatile - kls
 
 //uint8_t counter = 0;
 
@@ -149,12 +48,21 @@ uint8_t DataInReceiveBuffer(void);
 /* Main - a simple test program*/
 int main( void )
 {
+    USART_RxTail = 0x00;	//clear buffer indexes, not really necessary
+    USART_RxHead = 0x00;	//because they are automatically cleared since
+    USART_TxTail = 0x00;	//declared as global uninitialized variables
+    USART_TxHead = 0x00;
+
+    // SW0 pin an input, must be pressed to transfer data from Rx to Tx buffer
     USART1_Init(115200, 8, 'd');   // Initialize USART1
     sei();           // Enable global interrupts => enable USART interrupts
     for( ; ; )        // Forever
     {
-        // Uncomment next statement to have operation independent of SW0
+        //Uncomment next statement to have operation independent of SW0
         USART1_Transmit( USART1_Receive() );
+
+        //Uncomment next statement have operation dependent on SW0
+        // if (!(VPORTB_IN & PIN2_bm)) USART1_Transmit( USART1_Receive() );
     }
     return 0;
 }
@@ -164,9 +72,9 @@ int main( void )
 void USART1_Init(uint32_t baud, uint8_t data_bits, unsigned char parity)
 {
     //Set PB0 as an output (Tx), initially 1, and PB1 as an input (Rx)
-    PORTB.DIR &= ~PIN1_bm;	// RXD pin input
-    PORTB.DIR |= PIN0_bm;	// TXD pin output
-    PORTB.OUT |= PIN0_bm;	// TXD output value = 1
+    PORTC.DIR &= ~PIN1_bm;	// RXD pin input
+    PORTC.DIR |= PIN0_bm;	// TXD pin output
+    PORTC.OUT |= PIN0_bm;	// TXD output value = 1
 
     //Set the baud rate
     USART1.BAUD = USART1_BAUD_RATE(baud);	// Load BAUD register
@@ -218,12 +126,32 @@ void USART1_Init(uint32_t baud, uint8_t data_bits, unsigned char parity)
 
 /* Interrupt handlers */
 
-//Receive complete interrupt
-ISR (USART1_RXC_vect)
+ISR (USART1_RXC_vect)		//Receive complete interrupt
 {
     uint8_t data;
+
+    //The following variable is not necessary if you are not going to take any action
+    //for an overflow that requires keeping the old index. Instead just use
+    //USART_RxHead instead of tmphead.
+    uint8_t tmphead;
+
     cli();		// Clear global interrupt flag
+
+    /* Read the received data */
     data = USART1.RXDATAL;
+
+    /* Calculate buffer index, increment and possibly roll over index */
+    tmphead = ( USART_RxHead + 1 ) & USART_RX_BUFFER_MASK;
+
+
+    if ( tmphead == USART_RxTail )
+    {
+        // ERROR! Receive buffer overflow
+    }
+
+    USART_RxBuf[tmphead] = data; // Store received data in buffer
+    //Alternate position B for USART_RxHead = tmphead;
+    USART_RxHead = tmphead;      // Store new index (was prev. in position A)
     sei();		// re enable global interrupts
 }
 
