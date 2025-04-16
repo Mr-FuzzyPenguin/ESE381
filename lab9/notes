@@ -1,0 +1,18 @@
+Task 1: No code.
+Task 2: Simple parsing
+Task 3: Absolute pain
+
+
+Notes for safely-conducting-shenanigans:
+
+TO PREVENT SHORTING THE AVR128DB48:
+
+Turning on:
+Power the Arduino first, wait until it finishes blinking, and turns on the LED on Pin 13 constantly (to indicate stability).
+Then, power the AVR128DB48
+Then, add the wire from TX to C1
+
+Turning off:
+Remove the TX to C1 wire
+Turn off the AVR128DB48
+Turn off the Arduino
