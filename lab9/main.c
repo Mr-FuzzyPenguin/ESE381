@@ -44,6 +44,10 @@ uint8_t USART1_Receive( void );
 void USART1_Transmit( uint8_t data );
 uint8_t DataInReceiveBuffer(void);
 
+/* Converting to buffer off circular */
+#define MAX_BUFF_SIZE 80
+uint8_t rx_buff[MAX_BUFF_SIZE] = {0};
+uint8_t rx_idx = 0;
 
 /* Main - a simple test program*/
 int main( void )
@@ -130,9 +134,6 @@ ISR (USART1_RXC_vect)		//Receive complete interrupt
 {
     uint8_t data;
 
-    //The following variable is not necessary if you are not going to take any action
-    //for an overflow that requires keeping the old index. Instead just use
-    //USART_RxHead instead of tmphead.
     uint8_t tmphead;
 
     cli();		// Clear global interrupt flag
@@ -140,18 +141,12 @@ ISR (USART1_RXC_vect)		//Receive complete interrupt
     /* Read the received data */
     data = USART1.RXDATAL;
 
-    /* Calculate buffer index, increment and possibly roll over index */
-    tmphead = ( USART_RxHead + 1 ) & USART_RX_BUFFER_MASK;
-
-
-    if ( tmphead == USART_RxTail )
+    rx_buff[rx_idx] = data;
+    if (data == '\n')
     {
-        // ERROR! Receive buffer overflow
+        rx_idx = 0;
     }
 
-    USART_RxBuf[tmphead] = data; // Store received data in buffer
-    //Alternate position B for USART_RxHead = tmphead;
-    USART_RxHead = tmphead;      // Store new index (was prev. in position A)
     sei();		// re enable global interrupts
 }
 
