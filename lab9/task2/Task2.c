@@ -20,17 +20,17 @@
 
 // Buffers and control variables
 char received_message[RECEIVED_BUFFER_SIZE] = {0}; // Buffer for complete message
-volatile uint8_t received_index = 0;              // Index for received message
-volatile uint8_t message_complete = 0;            // Flag for message completion
+static volatile uint8_t received_index = 0;              // Index for received message
+static volatile uint8_t message_complete = 0;            // Flag for message completion
 
 char payload[PAYLOAD_BUFFER_SIZE] = {0};          // Buffer for extracted payload
 
 // Additional fields for parsing
-char RCV_preamble[10] = {0};
-volatile uint16_t txmtr_address = 0;
-volatile uint16_t rcv_data_len = 0;
-volatile int16_t RSSI = 0;
-volatile int16_t SNR = 0;
+static char RCV_preamble[10] = {0};
+static volatile unsigned int txmtr_address = 0;
+static volatile unsigned int rcv_data_len = 0;
+static volatile int RSSI = 0;
+static volatile int SNR = 0;
 
 // Function prototypes
 void USART1_Init(uint32_t baud, uint8_t data_bits, unsigned char parity);
