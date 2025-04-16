@@ -10,8 +10,12 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdint.h>
+#include <stdio.h>
 #define F_CPU 4000000	// CPU clock in Hz
 #define USART1_BAUD_RATE(BAUD_RATE) ((float)(4000000 * 64 / (16 * (float)BAUD_RATE)) + 0.5)
+
+/* Static Variables */
+// NOTE TO BE REMOVED
 
 /* UART Buffer Defines */
 #define USART_RX_BUFFER_SIZE 16     /* 2,4,8,16,32,64,128 or 256 bytes */
@@ -25,29 +29,42 @@
 #if ( USART_TX_BUFFER_SIZE & USART_TX_BUFFER_MASK )
 #error TX buffer size is not a power of 2
 #endif
-
-//#define RX_BUFFER_MARGIN ((uint8_t)(0.1 * USART_RX_BUFFER_SIZE + 0.5))
-
-/* Static Variables */
 static unsigned char USART_RxBuf[USART_RX_BUFFER_SIZE];
-static  uint8_t USART_RxHead;  //orig. declared volatile - kls
-static  uint8_t USART_RxTail;  //orig. declared volatile - kls
+static uint8_t USART_RxHead;  //orig. declared volatile - kls
+static uint8_t USART_RxTail;  //orig. declared volatile - kls
 static unsigned char USART_TxBuf[USART_TX_BUFFER_SIZE];
-static  uint8_t USART_TxHead;  //orig. declared volatile - kls
-static  uint8_t USART_TxTail;  //orig. declared volatile - kls
+static uint8_t USART_TxHead;  //orig. declared volatile - kls
+static uint8_t USART_TxTail;  //orig. declared volatile - kls
 
-//uint8_t counter = 0;
 
 /* Function Prototypes */
+// done:
 void USART1_Init(uint32_t baud, uint8_t data_bits, unsigned char parity);
-uint8_t USART1_Receive( void );
+void USART1_Receive( void );
+
+// working on it:
 void USART1_Transmit( uint8_t data );
-uint8_t DataInReceiveBuffer(void);
+
+// stuck:
+// removed
+//uint8_t DataInReceiveBuffer(void);
 
 /* Converting to buffer off circular */
-#define MAX_BUFF_SIZE 80
-uint8_t rx_buff[MAX_BUFF_SIZE] = {0};
-uint8_t rx_idx = 0;
+#define MAX_PAYLOAD_SIZE 80
+#define MAX_BUFF_SIZE MAX_PAYLOAD_SIZE*2
+#define RCV_PREAMBLE_SIZE 5
+
+// receive utilities:
+static char received_message[MAX_BUFF_SIZE] = {0};
+static uint8_t rx_idx = 0;
+static uint8_t RCV_preamble[RCV_PREAMBLE_SIZE];
+static unsigned int txmtr_address;
+static unsigned int rcv_data_len;
+static char payload[MAX_PAYLOAD_SIZE];
+static int RSSI;
+static int SNR;
+
+
 
 /* Main - a simple test program*/
 int main( void )
@@ -62,11 +79,10 @@ int main( void )
     sei();           // Enable global interrupts => enable USART interrupts
     for( ; ; )        // Forever
     {
+        USART1_Receive();
         //Uncomment next statement to have operation independent of SW0
-        USART1_Transmit( USART1_Receive() );
+        // USART1_Transmit( USART1_Receive() );
 
-        //Uncomment next statement have operation dependent on SW0
-        // if (!(VPORTB_IN & PIN2_bm)) USART1_Transmit( USART1_Receive() );
     }
     return 0;
 }
@@ -141,10 +157,11 @@ ISR (USART1_RXC_vect)		//Receive complete interrupt
     /* Read the received data */
     data = USART1.RXDATAL;
 
-    rx_buff[rx_idx] = data;
+    received_message[rx_idx++] = data;
     if (data == '\n')
     {
-        rx_idx = 0;
+        // place a 0 at the end
+        received_message[rx_idx] = 0;
     }
 
     sei();		// re enable global interrupts
@@ -174,30 +191,36 @@ ISR (USART1_DRE_vect)
 
 
 /* Read function */
-unsigned char USART1_Receive( void )
+void USART1_Receive( void )
 {
-    uint8_t tmptail;
+    // (transmission not ended)
+    while (received_message[rx_idx] != '\n' ) {}
 
-    while ( USART_RxHead == USART_RxTail );  /* Wait for incomming data */
-        tmptail = ( USART_RxTail + 1 ) & USART_RX_BUFFER_MASK;/* Calculate buffer index */
-        USART_RxTail = tmptail;                /* Store new index */
-        return USART_RxBuf[tmptail];           /* Return data */
+    // ah we have received something!
+    sscanf(received_message, "%[^=]=%u,%u,%[^,],%d,%d,'\r','\n",RCV_preamble, &txmtr_address, &rcv_data_len, payload, &RSSI, &SNR);
+
+    received_message[0] = 0;
+    rx_idx = 0;
 }
 
-/* Write function */
+// Working on it:
+/* Write function * /
 void USART1_Transmit( uint8_t data )
 {
     uint8_t tmphead;
-    /* Calculate buffer index */
-    tmphead = ( USART_TxHead + 1 ) & USART_TX_BUFFER_MASK; /* Wait for free space in buffer */
+    /* Calculate buffer index * /
+    /* Wait for free space in buffer * /
+    tmphead = ( USART_TxHead + 1 ) & USART_TX_BUFFER_MASK;
     while ( tmphead == USART_TxTail );
-    USART_TxBuf[tmphead] = data;           /* Store data in buffer */
-    USART_TxHead = tmphead;                /* Store new index */
+    USART_TxBuf[tmphead] = data;           /* Store data in buffer * /
+    USART_TxHead = tmphead;                /* Store new index * /
 
-    USART1.CTRLA |= USART_DREIE_bm;                    /* Enable UDRE interrupt */
+    USART1.CTRLA |= USART_DREIE_bm;                    /* Enable UDRE interrupt * /
 }
+*/
 
-uint8_t DataInReceiveBuffer( void )
-{
-    return ( USART_RxHead != USART_RxTail ); /* Return 0 (FALSE) if the receive buffer is empty */
-}
+// NOTE TO BE REMOVED
+// uint8_t DataInReceiveBuffer( void )
+// {
+//     return ( USART_RxHead != USART_RxTail ); /* Return 0 (FALSE) if the receive buffer is empty */
+// }
