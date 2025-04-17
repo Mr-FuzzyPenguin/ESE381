@@ -134,7 +134,6 @@ ISR(USART1_RXC_vect)
     cli();
 
     char received_char = USART1.RXDATAL; // Read received character
-    // make sure it is not '\0' because that's just bad data.
     received_message[received_index] = received_char; // Store character in buffer
 
     if (received_char == '\n') // End of message
