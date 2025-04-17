@@ -56,13 +56,13 @@ int main(void)
         // Check if a message is received
         if (message_complete)
         {
-            message_complete = 0; // Reset the flag
             parse_received_message(); // Parse the message
 
             // Verify if the message is from PC (bench + 30)
             if (txmtr_address == (LW1_ADDRESS + 30))
             {
                 send_reply_message(); // Prepare reply message and start transmission
+				message_complete = 0; // Reset the flag
             }
         }
     }
@@ -176,9 +176,9 @@ void parse_received_message(void)
 void send_reply_message(void)
 {
     // check if the received message is NOT +OK (AKA, actual data)
-    if (strcmp("+OK\r\n", received_message))
+    if (strcmp("+OK\r\n", received_message)!= 0)
     {
-        snprintf(reply_message, REPLY_BUFFER_SIZE, "+SEND=%u,%u,%s\r\n", LW1_ADDRESS + 30, (unsigned int) strlen(payload), payload);
+        snprintf(reply_message, REPLY_BUFFER_SIZE, "AT+SEND=%u,%u,%s\r\n", LW1_ADDRESS + 30, (unsigned int) strlen(payload), payload);
         reply_index = 0;
         reply_length = strlen(reply_message);
 
