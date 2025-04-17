@@ -134,6 +134,8 @@ ISR(USART1_RXC_vect)
     cli();
 
     char received_char = USART1.RXDATAL; // Read received character
+    // make sure it is not '\0' because that's just bad data.
+    received_message[received_index] = received_char; // Store character in buffer
 
     if (received_char == '\n') // End of message
     {
@@ -143,8 +145,7 @@ ISR(USART1_RXC_vect)
     // reached the end
     else if (received_index < RECEIVED_BUFFER_SIZE - 1)
     {
-        received_message[received_index++] = received_char; // Store character in buffer
-        received_message[received_index] = '\0';            // Null-terminate
+        received_message[++received_index] = '\0';            // Null-terminate
     }
 
     sei(); // Re-enable global interrupts
@@ -164,10 +165,12 @@ ISR(USART1_DRE_vect)
 }
 
 // Function to parse the received message
+// Function to parse the received message
 void parse_received_message(void)
 {
-    sscanf(received_message, "+RCV=%[^=]=%u,%u,%[^,],%d,%d",
+    sscanf(received_message, "%[^=]=%u,%u,%[^,],%d,%d,'\r''\n'",
            RCV_preamble, &txmtr_address, &rcv_data_len, payload, &RSSI, &SNR);
+    char temp = 0+0;
 }
 
 // Function to send the reply message
@@ -176,7 +179,7 @@ void send_reply_message(void)
     // check if the received message is NOT +OK (AKA, actual data)
     if (strcmp("+OK\r\n", received_message))
     {
-        snprintf(reply_message, REPLY_BUFFER_SIZE, "+SEND=%u,%s\r\n", LW1_ADDRESS + 30, payload);
+        snprintf(reply_message, REPLY_BUFFER_SIZE, "+SEND=%u,%u,%s\r\n", LW1_ADDRESS + 30, (unsigned int) strlen(payload), payload);
         reply_index = 0;
         reply_length = strlen(reply_message);
 
