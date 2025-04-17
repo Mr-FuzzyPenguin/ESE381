@@ -10,6 +10,7 @@
 #include <avr/interrupt.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 #define USART1_BAUD_RATE(BAUD_RATE) ((float)(4000000 * 64 / (16 * (float)BAUD_RATE)) + 0.5)
 #define F_CPU 4000000 // CPU clock in Hz
@@ -31,14 +32,14 @@ volatile uint8_t reply_index = 0;                 // Index for reply transmissio
 volatile uint8_t reply_length = 0;                // Length of reply message
 
 // Additional fields for parsing
-char RCV_preamble[10] = {0};
-volatile uint16_t txmtr_address = 0;   // Transmitter address
-volatile uint16_t rcv_data_len = 0;   // Received data length
-volatile int16_t RSSI = 0;            // RSSI value
-volatile int16_t SNR = 0;             // SNR value
+static char RCV_preamble[10] = {0};
+static volatile unsigned int txmtr_address = 0;
+static volatile unsigned int rcv_data_len = 0;
+static volatile int RSSI = 0;
+static volatile int SNR = 0;
 
 // Device address for LW1
-#define LW1_ADDRESS 1 // Change this to match your bench number
+#define LW1_ADDRESS 2 // Change this to match your bench number
 
 // Function prototypes
 void USART1_Init(uint32_t baud, uint8_t data_bits, unsigned char parity);
@@ -125,9 +126,13 @@ void USART1_Init(uint32_t baud, uint8_t data_bits, unsigned char parity)
     USART1.CTRLC = USART_CMODE_ASYNCHRONOUS_gc | p | USART_SBMODE_1BIT_gc | d;
 }
 
-// RX Complete interrupt service routine
+
+// USART RX Complete interrupt service routine
 ISR(USART1_RXC_vect)
 {
+    // Clear global interrupts
+    cli();
+
     char received_char = USART1.RXDATAL; // Read received character
 
     if (received_char == '\n') // End of message
@@ -135,11 +140,14 @@ ISR(USART1_RXC_vect)
         message_complete = 1; // Mark message as complete
         received_index = 0;   // Reset index for the next message
     }
+    // reached the end
     else if (received_index < RECEIVED_BUFFER_SIZE - 1)
     {
         received_message[received_index++] = received_char; // Store character in buffer
         received_message[received_index] = '\0';            // Null-terminate
     }
+
+    sei(); // Re-enable global interrupts
 }
 
 // Data Register Empty interrupt service routine
@@ -165,9 +173,13 @@ void parse_received_message(void)
 // Function to send the reply message
 void send_reply_message(void)
 {
-    snprintf(reply_message, REPLY_BUFFER_SIZE, "+SEND=%u,%s\r\n", LW1_ADDRESS + 30, payload);
-    reply_index = 0;
-    reply_length = strlen(reply_message);
+    // check if the received message is NOT +OK (AKA, actual data)
+    if (strcmp("+OK\r\n", received_message))
+    {
+        snprintf(reply_message, REPLY_BUFFER_SIZE, "+SEND=%u,%s\r\n", LW1_ADDRESS + 30, payload);
+        reply_index = 0;
+        reply_length = strlen(reply_message);
 
-    USART1.CTRLA |= USART_DREIE_bm; // Enable DRE interrupt to start transmission
+        USART1.CTRLA |= USART_DREIE_bm; // Enable DRE interrupt to start transmission
+    }
 }
