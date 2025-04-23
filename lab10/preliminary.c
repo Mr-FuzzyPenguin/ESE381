@@ -18,8 +18,6 @@ char dsp_buff2[21];
 char dsp_buff3[21];
 char dsp_buff4[21];
 
-// for scd41
-uint8_t checksum;
 /*
 // for interrupts (why am I doing this)
 // this is literally optional
@@ -103,10 +101,14 @@ ISR(TWI0_TWIM_vect)
 // Sends the start condition and repeated start by sending the address and write
 int start_communication_twi0_serLCD(uint8_t saddr)
 {
+	// Wait until the bus state is idle before writing
+	while ((TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_IDLE_gc) {}
+	
 	// the default address is 0x72
 	// bitshift to the right and then bit mask for the write
 	TWI0.MADDR =  saddr << 1 | 0x0;
 	
+	// wait until I can write again
 	while (!(TWI0.MSTATUS & TWI_WIF_bm)){}
 	return 0;
 }
@@ -177,10 +179,14 @@ int write_twi0_SerLCD(uint8_t saddr, uint8_t data)
 #define READ  1
 #define WRITE 0
 int start_communication_twi0_scd41(uint8_t saddr, uint8_t rw){
+	// Wait until the bus state is idle before writing
+	while ((TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_IDLE_gc) {}
+	
 	// the default address is 0x62
 	// bitshift to the right and then bit mask for the write
 	TWI0.MADDR =  saddr << 1 | rw;
 		
+	// wait until I can write again
 	while (!(TWI0.MSTATUS & TWI_WIF_bm)){}
 	return 0;
 }
@@ -191,7 +197,7 @@ int end_communication_twi0_scd41()
 	return 0;
 }
 
-int write_twi0_scd41(uint8_t saddr, uint8_t data)
+int write_twi0_scd41(uint8_t saddr, uint16_t data)
 {
 	// start by sending address and write
 	start_communication_twi0_scd41(saddr, WRITE);
@@ -204,27 +210,59 @@ int write_twi0_scd41(uint8_t saddr, uint8_t data)
     }
 
     // "transmitting data by writing to the Master Data (TWI0.MDATA) register, which will also clear the Write Interrupt Flat (WIF)"
-    TWI0.MDATA = data;
+    TWI0.MDATA = (uint8_t)((data & 0xff00) >> 8);
 
     // again, wait until we can write again.
     while (!(TWI0.MSTATUS & TWI_WIF_bm)){}
 
     // Check to see if you have received an acknowledgement bit...
     if (TWI0.MSTATUS & TWI_RXACK_bm) {
-        // return a non-zero value for an error
+		end_communication_twi0_scd41();
         return 1;
     }
+	
+	// "transmitting data by writing to the Master Data (TWI0.MDATA) register, which will also clear the Write Interrupt Flat (WIF)"
+	TWI0.MDATA = (uint8_t)(data & 0xff);
+
+	// again, wait until we can write again.
+	while (!(TWI0.MSTATUS & TWI_WIF_bm)){}
+	
+	end_communication_twi0_scd41();
 
 	// to not write as quickly
     _delay_ms(5);
     return 0;
 }
 
+uint8_t read_data_ready_scd41(uint8_t saddr)
+{
+	uint8_t byte1, byte2, byte3;
+	start_communication_twi0_scd41(0x72, WRITE);
+	byte1 = read_data_ready_scd41(0x72,1);
+	byte2 = read_data_ready_scd41(0x72,1);
+	byte3 = read_data_ready_scd41(0x72,1);
+	
+	// if all 0, return 1 else return 0
+	return (!((uint16_t)(((byte2 & 0x03) << 8) | byte3 )))
+}
+
+uint8_t read_twi0_scd41(uint8_t saddr, uint8_t continuing)
+{
+	// wait until I can read
+	while (!(TWI0.MSTATUS & TWI_RIF_bm)){}
+		
+	uint8_t result = TWI0.MDATA;
+	if (continuing)
+		TWI0.MCTRLB = 0x02;
+	else
+		end_communication_twi0_scd41();
+	return result
+}
+
+/*
 uint16_t read_twi0_scd41(uint8_t saddr, uint8_t* c)
 {
 	uint8_t high_byte, low_byte;
-	
-	start_communication_twi0_scd41(saddr, READ);
 	
 	while (!(TWI0.MSTATUS & TWI_RIF_bm)){}
 	high_byte = TWI0.MDATA;
@@ -236,16 +274,11 @@ uint16_t read_twi0_scd41(uint8_t saddr, uint8_t* c)
 	
 	while (!(TWI0.MSTATUS & TWI_RIF_bm)){}
 	*c = TWI0.MDATA;
-	
-	// done communication with SCD41
-	TWI0.MCTRLB = TWI_MCMD_STOP_gc;
-	
-	// wait until BUS is idle
-	while ((TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_IDLE_gc) {}
 		
 	volatile uint16_t result = (uint16_t)((high_byte << 8) | low_byte );
 	return result;
 }
+*/
 
 void update_twi0_SerLCD(void){
     // clear and write
@@ -296,6 +329,8 @@ void clear_display_buffs(void){
 
 int main(void)
 {
+	uint8_t checksum;
+	
     init_twi0_SerLCD();
 	init_twi0_scd41();
 	
@@ -307,32 +342,32 @@ int main(void)
 		float temperature;
 		float rh;
 
-		write_twi0_scd41(0x72,0xe4);
-		write_twi0_scd41(0x72,0xb8);
+		// get data ready status
+		write_twi0_scd41(0x72,0xe4b8);
+		
 		// wait until the sensor has valid data
-		while (!((read_twi0_scd41(0x72, &checksum) & 0x03) && checksum)) {}
+		while (!read_data_ready_scd41(0x72)) {
+			_delay_ms(5);
+		}
 		end_communication_twi0_scd41();
 
 		// from here on forth, the sensor is ready.
-		write_twi0_scd41(0x72, 0xec);
-		write_twi0_scd41(0x72, 0x05);
-		raw = read_twi0_scd41(0x72, &checksum);
-
+		write_twi0_scd41(0x72, 0xec05);
+		
+		raw = ((uint16_t)(read_twi0_scd41(0x72,1) << 8) | (uint16_t)(read_twi0_scd41(0x72,1)));
+		checksum = read_twi0_scd41(0x72,1); // continuously read
 		co_ppm = raw;
 		
-		
-		write_twi0_scd41(0x72, 0xec);
-		write_twi0_scd41(0x72, 0x05);
-		raw = read_twi0_scd41(0x72, &checksum);
-		
+		raw = ((uint16_t)(read_twi0_scd41(0x72,1) << 8) | (uint16_t)(read_twi0_scd41(0x72,1)));
+		checksum = read_twi0_scd41(0x72,1); // continuously read
 		temperature = -45 + 175 * (raw / 65536);
 		
-		write_twi0_scd41(0x72, 0xec);
-		write_twi0_scd41(0x72, 0x05);
-		raw = read_twi0_scd41(0x72, &checksum);
-		
+		raw = ((uint16_t)(read_twi0_scd41(0x72,1) << 8) | (uint16_t)(read_twi0_scd41(0x72,1)));
+		checksum = read_twi0_scd41(0x72,0); // terminate read
 		rh = 100 * (raw / 65536);
 		
+		_delay_ms(500);
 	}
     return 0;
 }
+
