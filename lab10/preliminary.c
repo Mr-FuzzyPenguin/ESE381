@@ -12,11 +12,14 @@
 #define F_CPU 4000000UL
 #include <util/delay.h>
 
+// for display
 char dsp_buff1[21];
 char dsp_buff2[21];
 char dsp_buff3[21];
 char dsp_buff4[21];
 
+// for scd41
+uint8_t checksum;
 /*
 // for interrupts (why am I doing this)
 // this is literally optional
@@ -217,23 +220,27 @@ int write_twi0_scd41(uint8_t saddr, uint8_t data)
     return 0;
 }
 
-uint16_t read_twi0_scd41(uint8_t saddr)
+uint16_t read_twi0_scd41(uint8_t saddr, uint8_t* c)
 {
 	uint8_t high_byte, low_byte;
 	
 	start_communication_twi0_scd41(saddr, READ);
 	
 	while (!(TWI0.MSTATUS & TWI_RIF_bm)){}
-	
 	high_byte = TWI0.MDATA;
-	
 	TWI0.MCTRLB = 0x02;
 	
 	while (!(TWI0.MSTATUS & TWI_RIF_bm)){}
 	low_byte = TWI0.MDATA;
+	TWI0.MCTRLB = 0x02;
 	
+	while (!(TWI0.MSTATUS & TWI_RIF_bm)){}
+	*c = TWI0.MDATA;
+	
+	// done communication with SCD41
 	TWI0.MCTRLB = TWI_MCMD_STOP_gc;
 	
+	// wait until BUS is idle
 	while ((TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_IDLE_gc) {}
 		
 	volatile uint16_t result = (uint16_t)((high_byte << 8) | low_byte );
@@ -290,12 +297,42 @@ void clear_display_buffs(void){
 int main(void)
 {
     init_twi0_SerLCD();
-    init_twi0_scd41();
-    	
-    while(1)
-    {
-	// please put something here		
-    }
+	init_twi0_scd41();
+	
+	while(1)
+	{
+		uint16_t raw;
+		
+		uint16_t co_ppm;
+		float temperature;
+		float rh;
+
+		write_twi0_scd41(0x72,0xe4);
+		write_twi0_scd41(0x72,0xb8);
+		// wait until the sensor has valid data
+		while (!((read_twi0_scd41(0x72, &checksum) & 0x03) && checksum)) {}
+		end_communication_twi0_scd41();
+
+		// from here on forth, the sensor is ready.
+		write_twi0_scd41(0x72, 0xec);
+		write_twi0_scd41(0x72, 0x05);
+		raw = read_twi0_scd41(0x72, &checksum);
+
+		co_ppm = raw;
+		
+		
+		write_twi0_scd41(0x72, 0xec);
+		write_twi0_scd41(0x72, 0x05);
+		raw = read_twi0_scd41(0x72, &checksum);
+		
+		temperature = -45 + 175 * (raw / 65536);
+		
+		write_twi0_scd41(0x72, 0xec);
+		write_twi0_scd41(0x72, 0x05);
+		raw = read_twi0_scd41(0x72, &checksum);
+		
+		rh = 100 * (raw / 65536);
+		
+	}
     return 0;
 }
-
