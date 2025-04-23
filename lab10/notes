@@ -1,1 +1,17 @@
+//Main function provided by Professor Short via lecture slides.
+
+int main(void)
+{
+	I2C0_SCD41_init();	// Initialize I2C0 to talk to SCD41 slave.
+	_delay_ms(2000);	// Wait 1 second for SCD41 to power up
+	
+	SCD41_send_cmd(SCD41_ADDR, START_PERIODIC_MEASUREMENT);
+	_delay_ms(1);		// Wait 1 ms for command execution
+	
+    while (1) 
+    {
+		while (!(SCD41_read_data_ready(SCD41_ADDR)));
+		SCD41_read_meas(SCD41_ADDR);
+    }
+}
 
