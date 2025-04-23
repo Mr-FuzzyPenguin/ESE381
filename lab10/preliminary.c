@@ -290,14 +290,12 @@ void clear_display_buffs(void){
 int main(void)
 {
     init_twi0_SerLCD();
-	init_twi0_scd41();
-	
-	while(1)
-	{
-		// please put something here
-		
-	}
+    init_twi0_scd41();
+    	
+    while(1)
+    {
+	// please put something here		
+    }
     return 0;
 }
-
 
