@@ -18,6 +18,9 @@ char dsp_buff2[21];
 char dsp_buff3[21];
 char dsp_buff4[21];
 
+#define SCD41_ADDR 0x62
+#define SERLCD_ADDR 0x72
+
 /*
 // for interrupts (why am I doing this)
 // this is literally optional
@@ -237,10 +240,10 @@ int write_twi0_scd41(uint8_t saddr, uint16_t data)
 uint8_t read_data_ready_scd41(uint8_t saddr)
 {
 	uint8_t byte1, byte2, byte3;
-	start_communication_twi0_scd41(0x62, WRITE);
-	byte1 = read_data_ready_scd41(0x62,1);
-	byte2 = read_data_ready_scd41(0x62,1);
-	byte3 = read_data_ready_scd41(0x62,1);
+	start_communication_twi0_scd41(SCD41_ADDR, WRITE);
+	byte1 = read_data_ready_scd41(SCD41_ADDR,1);
+	byte2 = read_data_ready_scd41(SCD41_ADDR,1);
+	byte3 = read_data_ready_scd41(SCD41_ADDR,0);
 	
 	// if all 0, return 1 else return 0
 	return (!((uint16_t)(((byte2 & 0x03) << 8) | byte3 )))
@@ -343,31 +346,29 @@ int main(void)
 		float rh;
 
 		// get data ready status
-		write_twi0_scd41(0x62,0xe4b8);
+		write_twi0_scd41(SCD41_ADDR,0xe4b8);
 		
 		// wait until the sensor has valid data
-		while (!read_data_ready_scd41(0x62)) {
+		while (!read_data_ready_scd41(SCD41_ADDR)) {
 			_delay_ms(5);
 		}
-		end_communication_twi0_scd41();
 
 		// from here on forth, the sensor is ready.
-		write_twi0_scd41(0x62, 0xec05);
+		write_twi0_scd41(SCD41_ADDR, 0xec05);
 		
-		raw = ((uint16_t)(read_twi0_scd41(0x62,1) << 8) | (uint16_t)(read_twi0_scd41(0x62,1)));
-		checksum = read_twi0_scd41(0x62,1); // continuously read
+		raw = ((uint16_t)(read_twi0_scd41(SCD41_ADDR,1) << 8) | (uint16_t)(read_twi0_scd41(SCD41_ADDR,1)));
+		checksum = read_twi0_scd41(SCD41_ADDR,1); // continuously read
 		co_ppm = raw;
 		
-		raw = ((uint16_t)(read_twi0_scd41(0x62,1) << 8) | (uint16_t)(read_twi0_scd41(0x62,1)));
-		checksum = read_twi0_scd41(0x62,1); // continuously read
+		raw = ((uint16_t)(read_twi0_scd41(SCD41_ADDR,1) << 8) | (uint16_t)(read_twi0_scd41(SCD41_ADDR,1)));
+		checksum = read_twi0_scd41(SCD41_ADDR,1); // continuously read
 		temperature = -45 + 175 * (raw / 65536);
 		
-		raw = ((uint16_t)(read_twi0_scd41(0x62,1) << 8) | (uint16_t)(read_twi0_scd41(0x62,1)));
-		checksum = read_twi0_scd41(0x62,0); // terminate read
+		raw = ((uint16_t)(read_twi0_scd41(SCD41_ADDR,1) << 8) | (uint16_t)(read_twi0_scd41(SCD41_ADDR,1)));
+		checksum = read_twi0_scd41(SCD41_ADDR,0); // terminate reading
 		rh = 100 * (raw / 65536);
 		
 		_delay_ms(500);
 	}
     return 0;
 }
-
