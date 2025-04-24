@@ -237,51 +237,30 @@ int write_twi0_scd41(uint8_t saddr, uint16_t data)
     return 0;
 }
 
-uint8_t read_data_ready_scd41(uint8_t saddr)
-{
-	uint8_t byte1, byte2, byte3;
-	start_communication_twi0_scd41(SCD41_ADDR, WRITE);
-	byte1 = read_data_ready_scd41(SCD41_ADDR,1);
-	byte2 = read_data_ready_scd41(SCD41_ADDR,1);
-	byte3 = read_data_ready_scd41(SCD41_ADDR,0);
-	
-	// if all 0, return 1 else return 0
-	return (!((uint16_t)(((byte2 & 0x03) << 8) | byte3 )))
-}
-
 uint8_t read_twi0_scd41(uint8_t saddr, uint8_t continuing)
 {
 	// wait until I can read
 	while (!(TWI0.MSTATUS & TWI_RIF_bm)){}
-		
+	
 	uint8_t result = TWI0.MDATA;
 	if (continuing)
-		TWI0.MCTRLB = 0x02;
+	TWI0.MCTRLB = 0x02;
 	else
-		end_communication_twi0_scd41();
-	return result
-}
-
-/*
-uint16_t read_twi0_scd41(uint8_t saddr, uint8_t* c)
-{
-	uint8_t high_byte, low_byte;
-	
-	while (!(TWI0.MSTATUS & TWI_RIF_bm)){}
-	high_byte = TWI0.MDATA;
-	TWI0.MCTRLB = 0x02;
-	
-	while (!(TWI0.MSTATUS & TWI_RIF_bm)){}
-	low_byte = TWI0.MDATA;
-	TWI0.MCTRLB = 0x02;
-	
-	while (!(TWI0.MSTATUS & TWI_RIF_bm)){}
-	*c = TWI0.MDATA;
-		
-	volatile uint16_t result = (uint16_t)((high_byte << 8) | low_byte );
+	end_communication_twi0_scd41();
 	return result;
 }
-*/
+
+uint8_t read_data_ready_scd41(uint8_t saddr)
+{
+	start_communication_twi0_scd41(SCD41_ADDR, WRITE);
+	uint8_t msbyte = read_twi0_scd41(SCD41_ADDR, 1);
+	uint8_t lsbyte = read_twi0_scd41(SCD41_ADDR, 1);
+	// flush and stop communication
+	read_twi0_scd41(SCD41_ADDR,0);
+	
+	// if all 0, return 1 else return 0
+	return (!((uint16_t)(((msbyte & 0x03) << 8) | lsbyte )));
+}
 
 void update_twi0_SerLCD(void){
     // clear and write
@@ -372,3 +351,4 @@ int main(void)
 	}
     return 0;
 }
+
