@@ -190,8 +190,15 @@ int start_communication_twi0_scd41(uint8_t saddr, uint8_t rw){
 	// bitshift to the right and then bit mask for the write
 	TWI0.MADDR =  saddr << 1 | rw;
 		
-	// wait until I can write again
-	while (!(TWI0.MSTATUS & TWI_WIF_bm)){}
+	if (rw == WRITE)
+	{
+		// wait until I can write again
+		while (!(TWI0.MSTATUS & TWI_WIF_bm)){}
+	}
+	else
+	{
+		while (!(TWI0.MSTATUS & TWI_RIF_bm)){}
+	}
 	return 0;
 }
 
@@ -204,7 +211,7 @@ int end_communication_twi0_scd41()
 int write_twi0_scd41(uint8_t saddr, uint16_t data)
 {
 	// start by sending address and write
-	start_communication_twi0_scd41(saddr, WRITE);
+	// start_communication_twi0_scd41(saddr, WRITE);
 
     // check NACK or ACK
     if (TWI0.MSTATUS & TWI_RXACK_bm)
@@ -230,11 +237,9 @@ int write_twi0_scd41(uint8_t saddr, uint16_t data)
 
 	// again, wait until we can write again.
 	while (!(TWI0.MSTATUS & TWI_WIF_bm)){}
-	
-	end_communication_twi0_scd41();
 
 	// to not write as quickly
-    _delay_ms(5);
+    //_delay_ms(5);
     return 0;
 }
 
@@ -245,19 +250,17 @@ uint8_t read_twi0_scd41(uint8_t saddr, uint8_t continuing)
 	
 	uint8_t result = TWI0.MDATA;
 	if (continuing)
-	TWI0.MCTRLB = 0x02;
+		TWI0.MCTRLB = 0x02;
 	else
-	end_communication_twi0_scd41();
+		TWI0.MCTRLB = 0x07;
 	return result;
 }
 
 uint8_t read_data_ready_scd41(uint8_t saddr)
 {
-	start_communication_twi0_scd41(SCD41_ADDR, WRITE);
+	// start_communication_twi0_scd41(SCD41_ADDR, READ);
 	uint8_t msbyte = read_twi0_scd41(SCD41_ADDR, 1);
 	uint8_t lsbyte = read_twi0_scd41(SCD41_ADDR, 1);
-	// flush and stop communication
-	read_twi0_scd41(SCD41_ADDR,0);
 	
 	// if all 0, return 1 else return 0
 	return (!((uint16_t)(((msbyte & 0x03) << 8) | lsbyte )));
@@ -316,45 +319,68 @@ int main(void)
 	
     init_twi0_SerLCD();
 	init_twi0_scd41();
+
+	start_communication_twi0_scd41(SCD41_ADDR, WRITE);
+	write_twi0_scd41(SCD41_ADDR, 0x21b1);
+	end_communication_twi0_scd41();
 	
 	while(1)
-	{
+	{	
 		uint16_t raw;
 		
 		uint16_t co_ppm;
 		float temperature;
 		float rh;
-
-		// get data ready status
-		write_twi0_scd41(SCD41_ADDR,0xe4b8);
 		
-		// wait until the sensor has valid data
-		while (!read_data_ready_scd41(SCD41_ADDR)) {
-			_delay_ms(5);
-		}
+		volatile uint8_t msbyte, lsbyte;
+		
+		do {
+			// get data ready status
+			start_communication_twi0_scd41(SCD41_ADDR,WRITE);
+			write_twi0_scd41(SCD41_ADDR,0xe4b8);
+			_delay_ms(1);
+			start_communication_twi0_scd41(SCD41_ADDR, READ);
+			msbyte = read_twi0_scd41(SCD41_ADDR, 1);
+			lsbyte = read_twi0_scd41(SCD41_ADDR, 0);	
+		// if all 0, then it is ready
+		} while (!((uint16_t)(((msbyte & 0x03) << 8) | lsbyte )));
+		
+		
+		
 
+		start_communication_twi0_scd41(SCD41_ADDR, WRITE);
 		// from here on forth, the sensor is ready.
 		write_twi0_scd41(SCD41_ADDR, 0xec05);
 		
-		raw = ((uint16_t)(read_twi0_scd41(SCD41_ADDR,1) << 8) | (uint16_t)(read_twi0_scd41(SCD41_ADDR,1)));
+		start_communication_twi0_scd41(SCD41_ADDR, READ);
+		
+		msbyte = read_twi0_scd41(SCD41_ADDR,1);
+		lsbyte = read_twi0_scd41(SCD41_ADDR,1);
+		
+		raw = (uint16_t) msbyte << 8 | lsbyte;
 		checksum = read_twi0_scd41(SCD41_ADDR,1); // continuously read
 		co_ppm = raw;
 		
-		raw = ((uint16_t)(read_twi0_scd41(SCD41_ADDR,1) << 8) | (uint16_t)(read_twi0_scd41(SCD41_ADDR,1)));
-		checksum = read_twi0_scd41(SCD41_ADDR,1); // continuously read
-		temperature = -45 + 175 * (raw / 65536);
+		msbyte = read_twi0_scd41(SCD41_ADDR,1);
+		lsbyte = read_twi0_scd41(SCD41_ADDR,1);
 		
-		raw = ((uint16_t)(read_twi0_scd41(SCD41_ADDR,1) << 8) | (uint16_t)(read_twi0_scd41(SCD41_ADDR,1)));
+		raw = (uint16_t) msbyte << 8 | lsbyte;
+		checksum = read_twi0_scd41(SCD41_ADDR,1); // continuously read
+		temperature = (float)(-45.0 + (175.0 * ((float)raw / 65536.0)));
+		
+		msbyte = read_twi0_scd41(SCD41_ADDR,1);
+		lsbyte = read_twi0_scd41(SCD41_ADDR,1);
+		
+		raw = (uint16_t) msbyte << 8 | lsbyte;
 		checksum = read_twi0_scd41(SCD41_ADDR,0); // terminate reading
-		rh = 100 * (raw / 65536);
+		rh = (float)(100.0 * ((float) raw / 65536.0));
 		
 		_delay_ms(500);
 
 		sprintf(dsp_buff1,"%u PPM CO", co_ppm);
 		sprintf(dsp_buff2,"%f C", temperature);
-		sprintf(dsp_buff3, "%f \%", rh);
+		sprintf(dsp_buff3,"%f %%", rh);
 		update_twi0_SerLCD();
 	}
     return 0;
 }
-
