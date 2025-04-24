@@ -105,7 +105,7 @@ ISR(TWI0_TWIM_vect)
 int start_communication_twi0_serLCD(uint8_t saddr)
 {
 	// Wait until the bus state is idle before writing
-	while ((TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_IDLE_gc) {}
+	while ((TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_IDLE_gc && (TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_OWNER_gc) {}
 	
 	// the default address is 0x72
 	// bitshift to the right and then bit mask for the write
@@ -183,7 +183,8 @@ int write_twi0_SerLCD(uint8_t saddr, uint8_t data)
 #define WRITE 0
 int start_communication_twi0_scd41(uint8_t saddr, uint8_t rw){
 	// Wait until the bus state is idle before writing
-	while ((TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_IDLE_gc) {}
+	while ((TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_IDLE_gc && (TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_OWNER_gc) {}
+
 	
 	// the default address is 0x62
 	// bitshift to the right and then bit mask for the write
@@ -348,6 +349,11 @@ int main(void)
 		rh = 100 * (raw / 65536);
 		
 		_delay_ms(500);
+
+		sprintf(dsp_buff1,"%u PPM CO", co_ppm);
+		sprintf(dsp_buff2,"%f C", temperature);
+		sprintf(dsp_buff3, "%f \%", rh);
+		update_twi0_SerLCD();
 	}
     return 0;
 }
