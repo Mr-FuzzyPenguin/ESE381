@@ -29,10 +29,31 @@ char dsp_buff4[21];
 
 int main(void)
 {
+	// flash the light to signal the AVR128DB48 starting up.
+	PORTB.DIR |= PIN3_bm;
+	_delay_ms(500);
+	PORTB.OUT |= PIN3_bm;
+	_delay_ms(100);
+	PORTB.OUT &= ~PIN3_bm;
+	_delay_ms(100);
+	PORTB.OUT |= PIN3_bm;
+	_delay_ms(100);
+	PORTB.OUT &= ~PIN3_bm;
+	_delay_ms(100);
+	PORTB.DIR &= ~PIN3_bm;
+	_delay_ms(250);
 	
-	uint8_t checksum;
-	
+	// Display booting up message because
+	// I don't like sitting and worrying
+	// in silence. At least now I can sit
+	// and worry with a booting up message
+	// crossing my fingers that the SCD41
+	// actually connects to the AVR128DB48
     init_twi0_serlcd();
+	sprintf(dsp_buff1, "Booting up...");
+	sprintf(dsp_buff2, "Please wait.");
+	update_twi0_serlcd(SERLCD_ADDR);
+	
 	init_twi0_scd41();
 
 	write_twi0_scd41(SCD41_ADDR, 0x21b1);
@@ -57,6 +78,7 @@ int main(void)
 	
 	while(1)
 	{	
+		uint8_t checksum;
 		uint16_t raw;
 		
 		int co_ppm;
@@ -92,8 +114,6 @@ int main(void)
 		checksum = read_twi0_scd41(SCD41_ADDR,0); // terminate reading
 		rh = (float)(100.0 * ((float) raw / 65536.0));
 		
-		_delay_ms(500);
-
 		// |# is subscript 2
 		sprintf(dsp_buff1,"%d PPM CO|#", co_ppm);
 		// 0xdf is degree symbol
