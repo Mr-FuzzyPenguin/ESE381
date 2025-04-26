@@ -3,7 +3,7 @@
  *
  * Created: 4/1/2025 4:53:32 PM
  * Authors : Katherine Trusinski and Stanley Cokro
- * Description: This program file contains implementations of functions to interface with the SerLCD display module over the I2C protocol. 
+ * Description: This program file contains implementations of functions to interface with the serlcd display module over the I2C protocol. 
  * It includes initialization of the TWI (I2C) interface and functions for updating the LCD display with formatted data from buffers. 
  *
  */
@@ -11,27 +11,27 @@
 #include "serlcd_i2c.h"
 #include "serlcd_utils.h"
 
-// required for a delay every time you call the update_twi0_SerLCD
+// required for a delay every time you call the update_twi0_serlcd
 #define F_CPU 4000000UL
 #include <util/delay.h>
 
 #include <avr/io.h>
 #include <stdint.h>
 
-void init_twi0_SerLCD (void)
+void init_twi0_serlcd (void)
 {
     // 29.3.2.1 Initialization
     // 29.5.1   Control Register A
     // This configuration gives us
     // I2C, SDASETUP for 8 clock cycles, SDAHOLD is 50 nano seconds (for some time) and disable fast mode
-    TWI0.CTRLA = TWI_SDASETUP_8CYC_gc | TWI_SDAHOLD_50NS_gc;
+    TWI0.CTRLA = TWI_INPUTLVL_I2C_gc | TWI_SDASETUP_8CYC_gc | TWI_SDAHOLD_50NS_gc;
 
     // 29.3.2.1.1 Master Initialization
     // The Master Baud Rate
     // because we set the mbaud (master baud) rate to 1,
     // the F_{SCL} = around 304 KHz
     // this is "as fast" as possible that we can get it running with a 4 MHz clock.
-    TWI0.MBAUD = 0;
+    TWI0.MBAUD = 1;
 
     // Must write a '1' to the enable twi master
     // "Writing a '1' to the Enable TWI Master (ENABLE) bit in the Master Control A (TWIn.MCTRLA) register will enable the TWI master"
@@ -39,56 +39,39 @@ void init_twi0_SerLCD (void)
 
     // "The Bus State (BUSSTATE) bit field from the Master Status (TWIn.MSTATUS) register must be set to 0x1, to force the bus state to Idle."
     TWI0.MSTATUS = TWI_BUSSTATE_IDLE_gc;
+
+	// Set enable interrupt
+	/*
+	sei();
+	TWI0.CTRLA = TWI_RIEN_bm | TWI_WIEN_bm;
+	*/
+	return;
 }
 
-void update_twi0_SerLCD(void)
+// Sends the start condition and repeated start by sending the address and write
+void start_communication_twi0_serlcd(uint8_t saddr)
 {
-    // search elsewhere, the dsp_buff*
-    // variables are in a different file!
-    // it should still be found in the block
-    // scope though.
-    extern char dsp_buff1[];	// Declaration f, s, e
-    extern char dsp_buff2[];	// Declaration f, s, e
-    extern char dsp_buff3[];	// Declaration f, s, e
-    extern char dsp_buff4[];	// Declaration f, s, e
-
-    // clear and write
-    write_twi0_SerLCD(0x72, '|');
-    write_twi0_SerLCD(0x72, '-');
-
-    // start at the first line
-    write_twi0_SerLCD(0x72, 254);
-    write_twi0_SerLCD(0x72, 128+0);
-    for (uint8_t i = 0; dsp_buff1[i];){	// Definition (i) b, a, n
-        write_twi0_SerLCD(0x72, dsp_buff1[i++]);
-    }
-    // move to second line
-    write_twi0_SerLCD(0x72, 254);
-    write_twi0_SerLCD(0x72, 128+64);
-    for (uint8_t i = 0; dsp_buff2[i];){	// Definition (i) b, a, n
-        write_twi0_SerLCD(0x72, dsp_buff2[i++]);
-    }
-    // move to third line
-    write_twi0_SerLCD(0x72, 254);
-    write_twi0_SerLCD(0x72, 128+20);
-    for (uint8_t i = 0; dsp_buff3[i];){	// Definition (i) b, a, n
-        write_twi0_SerLCD(0x72, dsp_buff3[i++]);
-    }
-    // move to fourth line
-    write_twi0_SerLCD(0x72, 254);
-    write_twi0_SerLCD(0x72, 128+84);
-    for (uint8_t i = 0; dsp_buff4[i];){	// Definition (i) b, a, n
-        write_twi0_SerLCD(0x72, dsp_buff4[i++]);
-    }
-
-    // wait so that it doesn't write too frequently
-    _delay_us(500);
+	// Wait until the bus state is idle before writing
+	while ((TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_IDLE_gc && (TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_OWNER_gc) {}
+	
+	// the default address is 0x72
+	// bitshift to the right and then bit mask for the write
+	TWI0.MADDR =  saddr << 1 | 0x0;
+	
+	// wait until I can write again
+	while (!(TWI0.MSTATUS & TWI_WIF_bm)){}
 }
 
-int write_twi0_SerLCD(uint8_t saddr, uint8_t data)	// Function definition, definitions (saddr, data) b, a, n
+void end_communication_twi0_serlcd()
+{
+    // we can send another piece of data, or... 
+	// we can write in TWI0.MCTRLB to terminate the communication
+    TWI0.MCTRLB |= TWI_MCMD_STOP_gc;
+}
+
+void write_twi0_serlcd(uint8_t saddr, uint8_t data)
 {
     // 29.3.2.2.4 Transmitting Data Packets
-
 
     // 29.5.8 Master Address
     // this is to setup the M1 case where you must transmit the address packet first.
@@ -100,29 +83,25 @@ int write_twi0_SerLCD(uint8_t saddr, uint8_t data)	// Function definition, defin
     // The clock hold is active at this point, forcing the SCL low. This will stretch the low period of the clock to slow down the
     // overall clock frequency, forcing delays required to process the data and preventing further activity on the bus.
     // The software can prepare to:
-    //     Transmit data packets to the slave
-
-    // the default address is 0x72
-    // bitshift to the right and then bit mask for the write
-    TWI0.MADDR =  saddr << 1 | 0x0;
-
-    // check to see if the write interrupt flag is ready
-    // otherwise, wait.
-    while (!(TWI0.MSTATUS & TWI_WIF_bm)){}
+    // Transmit data packets to the slave
 
     // check to see if the rxack bit is 1. If it is a 1
     // then that means that it is not ready
     /*"
-     *   When this flag is read as '0', it indicates that the most recent Acknowledge bit from the slave was ACK and the slave
-     *   is ready for more data.
-     *   When this flag is read as '1', it indicates that the most recent Acknowledge bit from the slave was NACK and the
-     *   slave is not able to or does not need to receive more data.
-     *   ""*/
+    When this flag is read as '0', it indicates that the most recent Acknowledge bit from the slave was ACK and the slave
+    is ready for more data.
+    When this flag is read as '1', it indicates that the most recent Acknowledge bit from the slave was NACK and the
+    slave is not able to or does not need to receive more data.
+    ""*/
+
+	// start by sending address and write
+	start_communication_twi0_serlcd(saddr);
 
     // check NACK or ACK
     if (TWI0.MSTATUS & TWI_RXACK_bm)
     {
-        return 1;
+		end_communication_twi0_serlcd();
+		return;
     }
 
     // "transmitting data by writing to the Master Data (TWI0.MDATA) register, which will also clear the Write Interrupt Flat (WIF)"
@@ -131,16 +110,51 @@ int write_twi0_SerLCD(uint8_t saddr, uint8_t data)	// Function definition, defin
     // again, wait until we can write again.
     while (!(TWI0.MSTATUS & TWI_WIF_bm)){}
 
-    // Check to see if you have received an acknolwedgement bit...
+    // Check to see if you have received an acknowledgement bit...
     if (TWI0.MSTATUS & TWI_RXACK_bm) {
         // return a non-zero value for an error
-        return 1;
+        return;
     }
 
-    // we can send another piece of data, or... we can write in
-    TWI0.MCTRLB |= TWI_MCMD_STOP_gc;
-    // to terminate the communication
+	// to not write as quickly
+    return;
+}
 
-    _delay_ms(1);
-    return 0;
+void update_twi0_serlcd(uint8_t addr){
+	// clear and write
+	write_twi0_serlcd(addr, '|');
+	write_twi0_serlcd(addr, '-');
+
+	// start at the first line
+	write_twi0_serlcd(addr, 254);
+	write_twi0_serlcd(addr, 128+0);
+	for (uint8_t i = 0; dsp_buff1[i];){
+		write_twi0_serlcd(addr, dsp_buff1[i++]);
+	}
+	
+	// move to second line
+	write_twi0_serlcd(addr, 254);
+	write_twi0_serlcd(addr, 128+64);
+	for (uint8_t i = 0; dsp_buff2[i];){
+		write_twi0_serlcd(addr, dsp_buff2[i++]);
+	}
+	
+	// move to third line
+	write_twi0_serlcd(addr, 254);
+	write_twi0_serlcd(addr, 128+20);
+	for (uint8_t i = 0; dsp_buff3[i];){
+		write_twi0_serlcd(addr, dsp_buff3[i++]);
+	}
+	
+	// move to fourth line
+	write_twi0_serlcd(addr, 254);
+	write_twi0_serlcd(addr, 128+84);
+	for (uint8_t i = 0; dsp_buff4[i];){
+		write_twi0_serlcd(addr, dsp_buff4[i++]);
+	}
+
+	end_communication_twi0_serlcd();
+
+	// wait so that it doesn't write too frequently
+	_delay_us(500);
 }

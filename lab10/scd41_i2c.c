@@ -17,7 +17,7 @@ void init_twi0_scd41(void)
 	return;
 }
 
-int start_communication_twi0_scd41(uint8_t saddr, uint8_t rw){
+void start_communication_twi0_scd41(uint8_t saddr, uint8_t rw){
 	// Wait until the bus state is idle before writing
 	while ((TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_IDLE_gc && (TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_OWNER_gc) {}
 
@@ -35,13 +35,11 @@ int start_communication_twi0_scd41(uint8_t saddr, uint8_t rw){
 	{
 		while (!(TWI0.MSTATUS & TWI_RIF_bm)){}
 	}
-	return 0;
 }
 
-int end_communication_twi0_scd41()
+void end_communication_twi0_scd41()
 {
 	TWI0.MCTRLB |= TWI_MCMD_STOP_gc;
-	return 0;
 }
 
 int write_twi0_scd41(uint8_t saddr, uint16_t data)

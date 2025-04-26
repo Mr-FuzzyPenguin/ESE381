@@ -16,19 +16,18 @@
 #define READ 1           // Read mode for I2C communication
 #define WRITE 0          // Write mode for I2C communication
 
-// Function declarations
+// Function declarations for init, start, end
 void init_twi0_scd41(void); // Initializes the TWI/I2C interface for the SCD41
-
-int start_communication_twi0_scd41(uint8_t saddr, uint8_t rw); // Starts I2C communication with the sensor
-int end_communication_twi0_scd41(void);                       // Ends I2C communication with the sensor
+void start_communication_twi0_scd41(uint8_t saddr, uint8_t rw); // Starts I2C communication with the sensor
+void end_communication_twi0_scd41(void);                       // Ends I2C communication with the sensor
 
 // Sends data to the SCD41 sensor
 int write_twi0_scd41(uint8_t saddr, uint16_t data); 
 
-// ensures the scd41 is ready after the function call 
-void ensure_ready_scd41(uint8_t saddr); 
-
 // Reads data from the SCD41 sensor
 uint8_t read_twi0_scd41(uint8_t saddr, uint8_t continuing);
+
+// ensures the scd41 is ready after the function call 
+void ensure_ready_scd41(uint8_t saddr); 
 
 #endif /* SCD41_I2C_H */
