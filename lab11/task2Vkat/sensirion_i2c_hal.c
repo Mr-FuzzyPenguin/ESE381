@@ -29,6 +29,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+ * sensirion_i2c_hal.c
+ *
+ * Created: 4/30/2025 5:14:00 PM
+ * Author : Katherine Trusinski and Stanley Cokro
+ * Description: Program includes the modified logic of the associated header file which implements the ISR (interrupt driven).
+ */ 
+
 #include "sensirion_i2c_hal.h"
 #include "sensirion_common.h"
 #include "sensirion_config.h"
@@ -43,6 +51,8 @@ volatile enum OperationMode operation_mode;
 int write_complete_flag = 0;
 int read_complete_flag = 0;
 char data_buffer[80] = {0};
+	
+int buffer_index = 0, count = 0;
 /*
  * INSTRUCTIONS
  * ============
@@ -97,6 +107,7 @@ void sensirion_i2c_hal_free(void) {
  * @returns 0 on success, error code otherwise
  */
 int8_t sensirion_i2c_hal_read(uint8_t address, uint8_t* data, uint8_t count) {
+	operation_mode = READ;
     // wait until bus is idle or we own the bus
     while ((TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_IDLE_gc && (TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_OWNER_gc) {}
 
@@ -104,7 +115,7 @@ int8_t sensirion_i2c_hal_read(uint8_t address, uint8_t* data, uint8_t count) {
     TWI0.MADDR = address << 1 | 0x01;
 
     // wait until the address is done shifted out
-    while (!(TWI0.MSTATUS & TWI_RIF_bm)){}
+    //while (!(TWI0.MSTATUS & TWI_RIF_bm)){}
 
     // check if nack or ack
     // if 1 == NACK
@@ -124,7 +135,7 @@ int8_t sensirion_i2c_hal_read(uint8_t address, uint8_t* data, uint8_t count) {
         data[i] = TWI0.MDATA;
 
         // Receiver always sends acknowledge
-        TWI0.MCTRLB = TWI_MCMD_RECVTRANS_gc;
+        //TWI0.MCTRLB = TWI_MCMD_RECVTRANS_gc;
 
     }
 
@@ -132,10 +143,10 @@ int8_t sensirion_i2c_hal_read(uint8_t address, uint8_t* data, uint8_t count) {
     while (!(TWI0.MSTATUS & TWI_RIF_bm)){}
 
     // place it in the final index
-    data[count - 1] = TWI0.MDATA;
+    //data[count - 1] = TWI0.MDATA;
 
     // terminate by sending NACK and stop condition
-    TWI0.MCTRLB = TWI_ACKACT_NACK_gc | TWI_MCMD_STOP_gc;
+    // TWI0.MCTRLB = TWI_ACKACT_NACK_gc | TWI_MCMD_STOP_gc;
     return NO_ERROR;
 }
 
@@ -152,7 +163,7 @@ int8_t sensirion_i2c_hal_read(uint8_t address, uint8_t* data, uint8_t count) {
  */
 int8_t sensirion_i2c_hal_write(uint8_t address, const uint8_t* data,
                                uint8_t count) {
-
+	 operation_mode = WRITE;
      // Wait until the bus state is idle before writing
      while ((TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_IDLE_gc && (TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_OWNER_gc) {}
 
@@ -166,27 +177,27 @@ int8_t sensirion_i2c_hal_write(uint8_t address, const uint8_t* data,
      // check if nack or ack
      // if 1 == NACK
      // if 0 == ACK
-     if (TWI0.MSTATUS & TWI_RXACK_bm)
-     {
-         TWI0.MCTRLB = TWI_MCMD_STOP_gc;
-         return 1;
-     }
+     //if (TWI0.MSTATUS & TWI_RXACK_bm)
+     //{
+       //  TWI0.MCTRLB = TWI_MCMD_STOP_gc;
+         //return 1;
+     //}
 
      // otherwise, from here on forth, writing is possible.
-     for (int i = 0; i < count-1; i++)
-     {
-         TWI0.MDATA = data[i];
+     //for (int i = 0; i < count-1; i++)
+     //{
+       //  TWI0.MDATA = data[i];
 
          // Wait until you can write more data
-         while (!(TWI0.MSTATUS & TWI_WIF_bm)){}
+         //while (!(TWI0.MSTATUS & TWI_WIF_bm)){}
 
          // verify constant ACKS
-         if (TWI0.MSTATUS & TWI_RXACK_bm)
-         {
-             TWI0.MCTRLB = TWI_MCMD_STOP_gc;
-             return 1;
-         }
-     }
+         //if (TWI0.MSTATUS & TWI_RXACK_bm)
+         //{
+           //  TWI0.MCTRLB = TWI_MCMD_STOP_gc;
+             //return 1;
+         //}
+     //}
 
      // last chunk of data to be sent
      TWI0.MDATA = data[count-1];
@@ -202,9 +213,6 @@ int8_t sensirion_i2c_hal_write(uint8_t address, const uint8_t* data,
 ISR(TWI0_TWIM_vect) {
 	// Clear global interrupts
 	cli();
-	
-	//check first if idle mode
-	int buffer_index = 0, count = 0;
 	
 	// Check the current operation mode
 	if (operation_mode == WRITE) {
@@ -291,4 +299,3 @@ void sensirion_i2c_hal_sleep_usec(uint32_t useconds) {
             break;
     }
 }
-
