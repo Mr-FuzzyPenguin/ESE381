@@ -43,6 +43,12 @@
 extern "C" {
 #endif /* __cplusplus */
 
+// Enum for operation modes
+enum OperationMode { READ, WRITE };
+
+// Volatile variable declaration
+extern volatile enum OperationMode operation_mode;
+
 /**
  * Select the current i2c bus by index.
  * All following i2c operations will be directed at that bus.
