@@ -54,8 +54,8 @@
 #define INTENT_READ  1
 
 uint8_t intent;
-uint8_t write_complete_flag = 0;
-uint8_t read_complete_flag = 0;
+volatile uint8_t write_complete_flag = 0;
+volatile uint8_t read_complete_flag = 0;
 
 // receive index
 uint8_t data_buffer[80] = {0};
@@ -181,12 +181,7 @@ int8_t sensirion_i2c_hal_write(uint8_t address, const uint8_t* data,
     tx_idx = 0;
 
     // assume write is not complete until "magically" completed for you (via interrupts)
-    extern uint8_t write_complete_flag;
     write_complete_flag = 0;
-
-    // set my intent so that when then the ISR calls in, it knows our intent
-    intent = INTENT_WRITE;
-    TWI0.MCTRLA |= TWI_WIEN_bm;
 
     // tell the read interrupt how many bits you should expect
     // and if you don't get that amount of bits, then you sent the interrupt_error
@@ -203,6 +198,10 @@ int8_t sensirion_i2c_hal_write(uint8_t address, const uint8_t* data,
 
     // bitshift to the right and then bit mask for the write
     TWI0.MADDR = address << 1;
+
+    // set my intent so that when then the ISR calls in, it knows our intent
+    intent = INTENT_WRITE;
+    TWI0.MCTRLA |= TWI_WIEN_bm;
 
     // if you are reading this:
     // the interrupt should teleport me away a couple of times...
