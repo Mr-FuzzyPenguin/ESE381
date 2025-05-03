@@ -11,8 +11,6 @@
 #include <stdio.h>
 
 // required for a delay every time you call the update_twi0_SerLCD
-#define F_CPU 4000000UL
-#include <util/delay.h>
 
 // this clears the display buffers
 void clear_display_buffs(void){	// Function definition

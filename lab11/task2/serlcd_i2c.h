@@ -8,18 +8,18 @@
  */
 
 #include "serlcd_utils.h"
-
-// required for a delay every time you call the update_twi0_serlcd
-#define F_CPU 4000000UL
-#include <util/delay.h>
+#include "i2c_interrupt_handler.h"
 
 #include <avr/io.h>
 #include <stdint.h>
 
+extern char dsp_buff1[21];
+extern char dsp_buff2[21];
+extern char dsp_buff3[21];
+extern char dsp_buff4[21];
+
 // function declarations for init, start, end
 void init_twi0_serlcd (void);	 // Initializes the TWI/I2C interface for the serlcd
-void start_communication_twi0_serlcd(uint8_t saddr); // Starts I2C communication with the lcd
-void end_communication_twi0_serlcd(); // Ends I2C communication with the lcd
 
 // Sends data to the serlcd
 void write_twi0_serlcd(uint8_t saddr, uint8_t data);	// Function definition, definitions (saddr, data) b, a, n

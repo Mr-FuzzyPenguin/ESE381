@@ -39,34 +39,15 @@
 
 #include "sensirion_i2c_hal.h"
 #include "sensirion_common.h"
-#include "sensirion_config.h"
 
 #include <avr/io.h>
-#include <avr/interrupt.h>
 #include <stdint.h>
 
 #define F_CPU 4000000UL
 #include <util/delay.h>
 
-// volatile enum OperationMode operation_mode;
+#include "i2c_interrupt_handler.h"
 
-#define INTENT_WRITE 0
-#define INTENT_READ  1
-
-uint8_t intent;
-volatile uint8_t write_complete_flag = 0;
-volatile uint8_t read_complete_flag = 0;
-
-// receive index
-uint8_t data_buffer[80] = {0};
-uint8_t rx_idx = 0;
-uint8_t rx_expected;
-
-// transmit index
-uint8_t tx_idx = 0;
-uint8_t tx_expected;
-
-uint8_t interrupt_error = NO_ERROR;
 /*
  * INSTRUCTIONS
  * ============
@@ -122,43 +103,7 @@ void sensirion_i2c_hal_free(void) {
  * @returns 0 on success, error code otherwise
  */
 int8_t sensirion_i2c_hal_read(uint8_t address, uint8_t* data, uint8_t count) {
-    // assume no errors until proven wrong
-    interrupt_error = NO_ERROR;
-
-    // set the receive index to 0
-    rx_idx = 0;
-
-    // assume write is not complete until "magically" completed for you (via interrupts)
-    read_complete_flag = 0;
-
-    // set my intent so that when then the ISR calls in, it knows our intent
-    intent = INTENT_READ;
-    TWI0.MCTRLA |= TWI_RIEN_bm;
-
-    // tell the read interrupt how many bits you should expect
-    // and if you don't get that amount of bits, then you sent the interrupt_error
-    rx_expected = count;
-
-    // wait until bus is idle or we own the bus
-    while ((TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_IDLE_gc && (TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_OWNER_gc) {}
-
-    // bitshift to the right and then bit mask for the write
-    TWI0.MADDR = address << 1 | 0x01;
-
-    // if you are reading this:
-    // the interrupt should teleport me away a couple of times...
-    // and it should read things one by one while I'm waiting...
-    while (!read_complete_flag && !interrupt_error) {
-        // I will be waiting until I am done reading
-        // or if an error ocurred I will stop.
-    }
-
-    // by now the data_buffer is populated.
-    for (uint8_t i = 0; i<count; i++)
-    {
-        data[i] = data_buffer[i];
-    }
-    return interrupt_error;
+    return i2c_read(address, data, count);
 }
 
 /**
@@ -174,153 +119,7 @@ int8_t sensirion_i2c_hal_read(uint8_t address, uint8_t* data, uint8_t count) {
  */
 int8_t sensirion_i2c_hal_write(uint8_t address, const uint8_t* data,
                                uint8_t count) {
-    // assume no errors until proven wrong
-    interrupt_error = NO_ERROR;
-
-    // set the write index to 0
-    tx_idx = 0;
-
-    // assume write is not complete until "magically" completed for you (via interrupts)
-    write_complete_flag = 0;
-
-    // tell the read interrupt how many bits you should expect
-    // and if you don't get that amount of bits, then you sent the interrupt_error
-    tx_expected = count;
-
-    // put our data into the data_buffer which the interrupt can touch
-    for (uint8_t i = 0; i < count; i++)
-    {
-        data_buffer[i] = data[i];
-    }
-
-    // wait until bus is idle or we own the bus
-    while ((TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_IDLE_gc && (TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_OWNER_gc) {}
-
-    // bitshift to the right and then bit mask for the write
-    TWI0.MADDR = address << 1;
-
-    // set my intent so that when then the ISR calls in, it knows our intent
-    intent = INTENT_WRITE;
-    TWI0.MCTRLA |= TWI_WIEN_bm;
-
-    // if you are reading this:
-    // the interrupt should teleport me away a couple of times...
-    // and it should write things one by one while I'm waiting...
-    while (!write_complete_flag && !interrupt_error) {
-        // I will be waiting until I am done reading
-        // or if an error ocurred I will stop.
-    }
-
-    return interrupt_error;
-
-    // while ((TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_IDLE_gc && (TWI0.MSTATUS & 0x03) != TWI_BUSSTATE_OWNER_gc) {}
-    //
-    // // the default address is 0x62
-    // // bitshift to the right and then bit mask for the write
-    // TWI0.MADDR =  address << 1;
-    //
-    // // wait until the address is done shifted out
-    // while (!(TWI0.MSTATUS & TWI_WIF_bm)){}
-    //
-    // // check if nack or ack
-    // // if 1 == NACK
-    // // if 0 == ACK
-    // if (TWI0.MSTATUS & TWI_RXACK_bm)
-    // {
-    //     TWI0.MCTRLB = TWI_MCMD_STOP_gc;
-    //     return 1;
-    // }
-    //
-    // // otherwise, from here on forth, writing is possible.
-    // for (int i = 0; i < count-1; i++)
-    // {
-    //     TWI0.MDATA = data[i];
-    //
-    //     // Wait until you can write more data
-    //     while (!(TWI0.MSTATUS & TWI_WIF_bm)){}
-    //
-    //     // verify constant ACKS
-    //     if (TWI0.MSTATUS & TWI_RXACK_bm)
-    //     {
-    //         TWI0.MCTRLB = TWI_MCMD_STOP_gc;
-    //         return 1;
-    //     }
-    // }
-    //
-    // // last chunk of data to be sent
-    // TWI0.MDATA = data[count-1];
-    //
-    // // Verified that there is no more data to be shifted out
-    // while (!(TWI0.MSTATUS & TWI_WIF_bm)){}
-    //
-    // // finally, send the stop condition
-    // TWI0.MCTRLB = TWI_MCMD_STOP_gc;
-    // return NO_ERROR;
-}
-
-ISR(TWI0_TWIM_vect) {
-	// Clear global interrupts
-	cli();
-
-    switch (intent) {
-        case INTENT_READ:
-            data_buffer[rx_idx] = TWI0.MDATA;
-            // check if I got a nack and I am ended
-            // AND that my receive index is as expected
-            if (TWI0.MSTATUS & TWI_RXACK_bm && rx_idx != rx_expected-1)
-            {
-                interrupt_error = 1;
-            }
-            // in other words, if I got a NACK and I'm not done, error!
-
-            // reached the end
-            else if(rx_idx == rx_expected - 1)
-            {
-                TWI0.MCTRLA &= ~TWI_RIEN_bm;
-                read_complete_flag = 1;
-                TWI0.MCTRLB = TWI_ACKACT_NACK_gc | TWI_MCMD_STOP_gc;
-                break;
-            }
-
-            // alrght now that I am done reading that one byte
-            // I should probably tell them I got their message
-            // here's an ACK
-            TWI0.MCTRLB = TWI_MCMD_RECVTRANS_gc;
-
-            // and increment the rx_idx
-            rx_idx++;
-            break;
-
-
-        case INTENT_WRITE:
-
-            TWI0.MDATA = data_buffer[tx_idx];
-
-            // check if I got a nack and I am ended
-            // AND that my receive index is as expected
-            if (TWI0.MSTATUS & TWI_RXACK_bm && tx_idx != tx_expected-1)
-            {
-                interrupt_error = 1;
-            }
-            // in other words, if I got a NACK and I'm not done, error!
-
-            // reached the end
-            else if(tx_idx == tx_expected - 1)
-            {
-                TWI0.MCTRLA &= ~TWI_WIEN_bm;
-                write_complete_flag = 1;
-                TWI0.MCTRLB = TWI_MCMD_STOP_gc;
-                break;
-            }
-
-            tx_idx++;
-            break;
-        default:
-            break;
-
-        }
-
-	sei();
+    return i2c_write(address, data, count);
 }
 
 /**

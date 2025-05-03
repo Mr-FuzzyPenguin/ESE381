@@ -6,16 +6,15 @@
  *stats All using I2C/TWI interface on AVR128DB48
  */
 
-#include "sensirion_i2c.h"
 #include <avr/io.h>
 #include <stdint.h>
 #include <stdio.h>
 
 // for display
-char dsp_buff1[21];
-char dsp_buff2[21];
-char dsp_buff3[21];
-char dsp_buff4[21];
+char dsp_buff1[21] = {0};
+char dsp_buff2[21] = {0};
+char dsp_buff3[21] = {0};
+char dsp_buff4[21] = {0};
 
 #define SCD41_ADDR 0x62
 #define SERLCD_ADDR 0x72
@@ -90,12 +89,12 @@ int main(void) {
     uint16_t co2_concentration = 0;
     int32_t temperature = 0;
     int32_t relative_humidity = 0;
-    uint16_t repetition = 0;
-    for (repetition = 0; repetition < 50; repetition++) {
+    while (1) {
         //
         // Slow down the sampling to 0.2Hz.
         //
         sensirion_hal_sleep_us(5000000);
+        update_twi0_serlcd(SERLCD_ADDR);
         //
         // If ambient pressure compensation during measurement
         // is required, you should call the respective functions here.
@@ -119,6 +118,13 @@ int main(void) {
             // printf("error executing read_measurement(): %i\n", error);
             continue;
         }
+
+        clear_display_buffs();
+        sprintf(dsp_buff1,"%d PPM CO|#", co2_concentration);
+        // 0xdf is degree symbol
+        sprintf(dsp_buff2,"%f %cC", (float) temperature, (char)0xdf);
+        sprintf(dsp_buff3,"%f%% RH", (float) relative_humidity);
+
         //
         // Print results in physical units.
         // printf("CO2 concentration [ppm]: %u\n", co2_concentration);
